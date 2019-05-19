@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>/Users/qqbai/Documents/Gridea/output</id>
+    <id>https://windrunner0707.github.io</id>
     <title>还施水阁--Windrunner0707&apos;s Blog</title>
-    <updated>2019-05-19T14:23:47.937Z</updated>
+    <updated>2019-05-19T14:45:58.951Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="/Users/qqbai/Documents/Gridea/output"/>
-    <link rel="self" href="/Users/qqbai/Documents/Gridea/output/atom.xml"/>
+    <link rel="alternate" href="https://windrunner0707.github.io"/>
+    <link rel="self" href="https://windrunner0707.github.io/atom.xml"/>
     <subtitle>浮生长恨欢娱少，肯爱千金轻一笑</subtitle>
-    <logo>/Users/qqbai/Documents/Gridea/output/images/avatar.png</logo>
-    <icon>/Users/qqbai/Documents/Gridea/output/favicon.ico</icon>
+    <logo>https://windrunner0707.github.io/images/avatar.png</logo>
+    <icon>https://windrunner0707.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 还施水阁--Windrunner0707&apos;s Blog</rights>
     <entry>
         <title type="html"><![CDATA[解决无法访问部署在Linux上的Tomcat问题]]></title>
-        <id>/Users/qqbai/Documents/Gridea/output/post/jie-jue-wu-fa-fang-wen-bu-shu-zai-linux-shang-de-tomcat-wen-ti/index.html</id>
-        <link href="/Users/qqbai/Documents/Gridea/output/post/jie-jue-wu-fa-fang-wen-bu-shu-zai-linux-shang-de-tomcat-wen-ti/index.html">
+        <id>https://windrunner0707.github.io/post/jie-jue-wu-fa-fang-wen-bu-shu-zai-linux-shang-de-tomcat-wen-ti</id>
+        <link href="https://windrunner0707.github.io/post/jie-jue-wu-fa-fang-wen-bu-shu-zai-linux-shang-de-tomcat-wen-ti">
         </link>
         <updated>2017-12-20T14:15:15.000Z</updated>
         <content type="html"><![CDATA[<p>服务器环境：CentOS Tomcat8</p>
@@ -46,8 +46,8 @@ num target prot opt source destination
     </entry>
     <entry>
         <title type="html"><![CDATA[使用Ubuntu安装IntelliJ IDEA并创建桌面图标]]></title>
-        <id>/Users/qqbai/Documents/Gridea/output/post/shi-yong-ubuntu-an-zhuang-intellij-idea-bing-chuang-jian-zhuo-mian-tu-biao/index.html</id>
-        <link href="/Users/qqbai/Documents/Gridea/output/post/shi-yong-ubuntu-an-zhuang-intellij-idea-bing-chuang-jian-zhuo-mian-tu-biao/index.html">
+        <id>https://windrunner0707.github.io/post/shi-yong-ubuntu-an-zhuang-intellij-idea-bing-chuang-jian-zhuo-mian-tu-biao</id>
+        <link href="https://windrunner0707.github.io/post/shi-yong-ubuntu-an-zhuang-intellij-idea-bing-chuang-jian-zhuo-mian-tu-biao">
         </link>
         <updated>2017-11-15T14:10:40.000Z</updated>
         <content type="html"><![CDATA[<p>本文主要记录我在Ubuntu操作系统下安装必要的开发软件IntelliJ IDEA以及Postman，并创建桌面图标的过程。</p>
@@ -75,8 +75,8 @@ Encoding=UTF-8
     </entry>
     <entry>
         <title type="html"><![CDATA[（转）JavaEE中各类对象的总结]]></title>
-        <id>/Users/qqbai/Documents/Gridea/output/post/zhuan-javaee-zhong-ge-lei-dui-xiang-de-zong-jie/index.html</id>
-        <link href="/Users/qqbai/Documents/Gridea/output/post/zhuan-javaee-zhong-ge-lei-dui-xiang-de-zong-jie/index.html">
+        <id>https://windrunner0707.github.io/post/zhuan-javaee-zhong-ge-lei-dui-xiang-de-zong-jie</id>
+        <link href="https://windrunner0707.github.io/post/zhuan-javaee-zhong-ge-lei-dui-xiang-de-zong-jie">
         </link>
         <updated>2017-05-19T13:59:21.000Z</updated>
         <content type="html"><![CDATA[<h3 id="daodata-access-object数据访问对象-dao层对开发人员黑盒由架构师设计封装">DAO[data access object]数据访问对象 DAO层对开发人员黑盒，由架构师设计封装。</h3>
@@ -107,8 +107,8 @@ Encoding=UTF-8
     </entry>
     <entry>
         <title type="html"><![CDATA[（转）CSDN-骆昊《Java就业指导》]]></title>
-        <id>/Users/qqbai/Documents/Gridea/output/post/zhuan-csdn-luo-hao-lesslessjava-jiu-ye-zhi-dao-greatergreater/index.html</id>
-        <link href="/Users/qqbai/Documents/Gridea/output/post/zhuan-csdn-luo-hao-lesslessjava-jiu-ye-zhi-dao-greatergreater/index.html">
+        <id>https://windrunner0707.github.io/post/zhuan-csdn-luo-hao-lesslessjava-jiu-ye-zhi-dao-greatergreater</id>
+        <link href="https://windrunner0707.github.io/post/zhuan-csdn-luo-hao-lesslessjava-jiu-ye-zhi-dao-greatergreater">
         </link>
         <updated>2016-05-19T14:18:20.000Z</updated>
         <content type="html"><![CDATA[<p>想要成为合格的Java程序员或工程师到底需要具备哪些专业技能，面试者在面试之前到底需要准备哪些东西呢？本文陈列的这些内容既可以作为个人简历中的内容，也可以作为面试的时候跟面试官聊的东西，你可以把这些内容写到你的简历中，当然更需要的是你在面试的时候向面试官展示这些专业技能。相信此文对正在寻觅Java程序员（Java工程师）职位的freshman以及希望成为中高级Java开发者的junior都会有所帮助。</p>
