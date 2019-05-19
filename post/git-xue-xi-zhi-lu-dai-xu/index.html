@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>关于 | 还施水阁</title>
+<title>Git学习之路 | 还施水阁</title>
 <link rel="shortcut icon" href="https://windrunner0707.github.io/favicon.ico?v=1558280623100">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
@@ -79,24 +79,59 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              关于
+              Git学习之路
             </h2>
             <div class="post-info">
               <time class="post-time">
                 · 2019-05-19 ·
               </time>
               
+                <a href="https://windrunner0707.github.io/tag/J0oEbkeTu" class="post-tag">
+                  # Git
+                </a>
+              
             </div>
             
             <div class="post-content">
-              <p>白琦琦<br>
-Backend Developer<br>
-业余爱好为金庸武侠 ，游戏</p>
+              <p>Github上的git学习动画：
+https://learngitbranching.js.org/?demo</p>
+<h2 id="日常工作中的一些操作">日常工作中的一些操作：</h2>
+<p>git commit --amend   可以对上一次的提交做修改</p>
+<h3 id="git合并多次提交">git合并多次提交：</h3>
+<p>1.git log 查看提交历史；
+2.git rebase -i HEAD~3  选取最近的几次提交，-i 指从最新提交开始计数；
+3.在vi编辑模式中把需要合并提交的 pick 改为 squash，指合并到上次提交，保存；
+4.进入commit merge界面，编辑合并提交信息，保存；
+5.git log发现多次提交已合并；
+git pull --rebase 保证提交为直线，避免merge</p>
+<h3 id="回退上一个提交">回退上一个提交</h3>
+<p>commit回退：git reset --hard HEAD^      git reset –hard <commit id>
+修改远程： git push origin master -f
+//查看仓库所使用的连接形式
+git remote -v
+//修改仓库的连接方式为ssh
+git remote set-url origin git开头的仓库地址</p>
+<h3 id="git给提交加tag并提交到远程仓库">Git给提交加tag并提交到远程仓库</h3>
+<p>git tag —list
+git ls-remote —tags
+git tag v1.0.0 -m ‘123’ id
+git push tags</p>
+<h3 id="手动修改gitconfig文件的内容">手动修改gitconfig文件的内容</h3>
+<p>vi .git/config</p>
 
             </div>
           </article>
         </div>
 
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.github.io/post/jie-jue-wu-fa-fang-wen-bu-shu-zai-linux-shang-de-tomcat-wen-ti">
+              <h3 class="post-title">
+                解决无法访问部署在Linux上的Tomcat问题
+              </h3>
+            </a>
+          </div>
         
 
         
