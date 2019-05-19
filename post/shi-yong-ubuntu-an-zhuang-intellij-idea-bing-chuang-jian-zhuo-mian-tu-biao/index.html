@@ -1,0 +1,149 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>使用Ubuntu安装IntelliJ IDEA并创建桌面图标 | 还施水阁--Windrunner0707&#39;s Blog</title>
+<link rel="shortcut icon" href="/Users/qqbai/Documents/Gridea/output/favicon.ico?v=1558275825790">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="/Users/qqbai/Documents/Gridea/output/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="/Users/qqbai/Documents/Gridea/output">
+  <img class="avatar" src="/Users/qqbai/Documents/Gridea/output/images/avatar.png?v=1558275825790" alt="">
+  </a>
+  <h1 class="site-title">
+    还施水阁--Windrunner0707&#39;s Blog
+  </h1>
+  <p class="site-description">
+    浮生长恨欢娱少，肯爱千金轻一笑
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/Users/qqbai/Documents/Gridea/output//index.html" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/Users/qqbai/Documents/Gridea/output/archives/index.html" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/Users/qqbai/Documents/Gridea/output/tags/index.html" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/Users/qqbai/Documents/Gridea/output/post/about/index.html" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/windrunner0707" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              使用Ubuntu安装IntelliJ IDEA并创建桌面图标
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2017-11-15 ·
+              </time>
+              
+                <a href="/Users/qqbai/Documents/Gridea/output/tag/SwmgpzagZ/index.html" class="post-tag">
+                  # Linux
+                </a>
+              
+            </div>
+            
+              <div class="post-feature-image" style="background-image: url('https://source.unsplash.com/collection/190727')">
+              </div>
+            
+            <div class="post-content">
+              <p>本文主要记录我在Ubuntu操作系统下安装必要的开发软件IntelliJ IDEA以及Postman，并创建桌面图标的过程。</p>
+<p>1.官网下载IDEA为tar.gz压缩包，IDEA解压后需要运行bin目录下的idea.sh脚本启动安装程序，并且以后运行时也需在终端启动，非常麻烦。但是可以选择创建桌面图标。</p>
+<p>2.创建桌面图标。Ubuntu的软件快捷方式均在usr/share/applications目录下，以idea为例，在该目录下运行vim</p>
+<pre><code>sudo vim /usr/share/applications/intellij-idea.desktop
+</code></pre>
+<p>创建新的文件并在文件中复制以下内容：</p>
+<pre><code>[Desktop Entry]
+Name=IntelliJ IDEA
+Exec=/你的目录/idea-IU-141.1532.4/bin/idea.sh
+Comment=IntelliJ IDEA
+Icon=/你的目录/idea-IU-141.1532.4/bin/idea.png
+Type=Application
+Terminal=false
+Encoding=UTF-8
+</code></pre>
+<p>其中Exec=为使用终端打开idea的方式，icon是图标所在目录。</p>
+<p>并给该文件赋予权限:</p>
+<pre><code>sudo chmod +x /usr/share/applications/intellij-idea.desktop
+</code></pre>
+<p>即可得到idea的快捷方式。</p>
+<p>将快捷方式图标拖入左侧快捷栏或者桌面即可。</p>
+
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="/Users/qqbai/Documents/Gridea/output/post/zhuan-javaee-zhong-ge-lei-dui-xiang-de-zong-jie/index.html">
+              <h3 class="post-title">
+                （转）JavaEE中各类对象的总结
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="/Users/qqbai/Documents/Gridea/output/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

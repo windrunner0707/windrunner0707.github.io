@@ -1,0 +1,154 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>解决无法访问部署在Linux上的Tomcat问题 | 还施水阁--Windrunner0707&#39;s Blog</title>
+<link rel="shortcut icon" href="/Users/qqbai/Documents/Gridea/output/favicon.ico?v=1558275825790">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="/Users/qqbai/Documents/Gridea/output/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="/Users/qqbai/Documents/Gridea/output">
+  <img class="avatar" src="/Users/qqbai/Documents/Gridea/output/images/avatar.png?v=1558275825790" alt="">
+  </a>
+  <h1 class="site-title">
+    还施水阁--Windrunner0707&#39;s Blog
+  </h1>
+  <p class="site-description">
+    浮生长恨欢娱少，肯爱千金轻一笑
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/Users/qqbai/Documents/Gridea/output//index.html" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/Users/qqbai/Documents/Gridea/output/archives/index.html" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/Users/qqbai/Documents/Gridea/output/tags/index.html" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/Users/qqbai/Documents/Gridea/output/post/about/index.html" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/windrunner0707" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              解决无法访问部署在Linux上的Tomcat问题
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2017-12-20 ·
+              </time>
+              
+                <a href="/Users/qqbai/Documents/Gridea/output/tag/SwmgpzagZ/index.html" class="post-tag">
+                  # Linux
+                </a>
+              
+            </div>
+            
+              <div class="post-feature-image" style="background-image: url('https://source.unsplash.com/collection/190727')">
+              </div>
+            
+            <div class="post-content">
+              <p>服务器环境：CentOS Tomcat8</p>
+<p>Tomcat安装运行后，访问提示无法连接至服务器。</p>
+<p>主要原因是linux开启了防火墙，有两种解决方案，一种是关闭防火墙，另外一种是开放所要访问的端口。</p>
+<p>1、关闭防火墙(非常不建议)</p>
+<pre><code>service iptables stop –停止    
+service iptables start –启动    
+</code></pre>
+<p>2、使用命令开放端口</p>
+<p>首先查看一下本机防火墙现有的规则列表：</p>
+<p>使用命令：</p>
+<pre><code>iptables -L --line-number 
+</code></pre>
+<p>以下显示的是INPUT链的规则</p>
+<pre><code>Chain INPUT (policy ACCEPT)    
+num target prot opt source destination
+1 ACCEPT all – 0.0.0.0/0 0.0.0.0/0 state RELATED,ESTABLISHED
+2 ACCEPT icmp – 0.0.0.0/0 0.0.0.0/0
+3 ACCEPT all – 0.0.0.0/0 0.0.0.0/0
+4 ACCEPT tcp – 0.0.0.0/0 0.0.0.0/0 state NEW tcp dpt:22
+5 REJECT all – 0.0.0.0/0 0.0.0.0/0 reject-with icmp-host-prohibited   
+</code></pre>
+<p>由表格可以看出，linux只开放了端口22，因此我们需要把tomcat的端口(我这里是8080)加入进去，在这里需要注意规则的最后一条，也就是第5条，对于规则来讲是链式的，最后一条意思是拒绝所有，那么对于所有在第5条之后追加的规则都是无效的，因此我们需要把规则插入到第5条之前，而不能在最后一条追加，具体插入命令如下：</p>
+<pre><code>iptables -I INPUT 5 -m  state  --state  NEW  -m  tcp  -p  tcp  --dport  8080  -j  ACCEPT    
+</code></pre>
+<p>8080为tomcat服务器端口，可根据需要修改自己的端口。</p>
+<p>这条命令执行完成之后，主机就可以访问tomcat了。</p>
+
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="/Users/qqbai/Documents/Gridea/output/post/shi-yong-ubuntu-an-zhuang-intellij-idea-bing-chuang-jian-zhuo-mian-tu-biao/index.html">
+              <h3 class="post-title">
+                使用Ubuntu安装IntelliJ IDEA并创建桌面图标
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="/Users/qqbai/Documents/Gridea/output/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

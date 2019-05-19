@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>/Users/qqbai/Documents/Gridea/output</id>
+    <title>还施水阁--Windrunner0707&apos;s Blog</title>
+    <updated>2019-05-19T14:23:47.937Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="/Users/qqbai/Documents/Gridea/output"/>
+    <link rel="self" href="/Users/qqbai/Documents/Gridea/output/atom.xml"/>
+    <subtitle>浮生长恨欢娱少，肯爱千金轻一笑</subtitle>
+    <logo>/Users/qqbai/Documents/Gridea/output/images/avatar.png</logo>
+    <icon>/Users/qqbai/Documents/Gridea/output/favicon.ico</icon>
+    <rights>All rights reserved 2019, 还施水阁--Windrunner0707&apos;s Blog</rights>
+    <entry>
+        <title type="html"><![CDATA[解决无法访问部署在Linux上的Tomcat问题]]></title>
+        <id>/Users/qqbai/Documents/Gridea/output/post/jie-jue-wu-fa-fang-wen-bu-shu-zai-linux-shang-de-tomcat-wen-ti/index.html</id>
+        <link href="/Users/qqbai/Documents/Gridea/output/post/jie-jue-wu-fa-fang-wen-bu-shu-zai-linux-shang-de-tomcat-wen-ti/index.html">
+        </link>
+        <updated>2017-12-20T14:15:15.000Z</updated>
+        <content type="html"><![CDATA[<p>服务器环境：CentOS Tomcat8</p>
+<p>Tomcat安装运行后，访问提示无法连接至服务器。</p>
+<p>主要原因是linux开启了防火墙，有两种解决方案，一种是关闭防火墙，另外一种是开放所要访问的端口。</p>
+<p>1、关闭防火墙(非常不建议)</p>
+<pre><code>service iptables stop –停止    
+service iptables start –启动    
+</code></pre>
+<p>2、使用命令开放端口</p>
+<p>首先查看一下本机防火墙现有的规则列表：</p>
+<p>使用命令：</p>
+<pre><code>iptables -L --line-number 
+</code></pre>
+<p>以下显示的是INPUT链的规则</p>
+<pre><code>Chain INPUT (policy ACCEPT)    
+num target prot opt source destination
+1 ACCEPT all – 0.0.0.0/0 0.0.0.0/0 state RELATED,ESTABLISHED
+2 ACCEPT icmp – 0.0.0.0/0 0.0.0.0/0
+3 ACCEPT all – 0.0.0.0/0 0.0.0.0/0
+4 ACCEPT tcp – 0.0.0.0/0 0.0.0.0/0 state NEW tcp dpt:22
+5 REJECT all – 0.0.0.0/0 0.0.0.0/0 reject-with icmp-host-prohibited   
+</code></pre>
+<p>由表格可以看出，linux只开放了端口22，因此我们需要把tomcat的端口(我这里是8080)加入进去，在这里需要注意规则的最后一条，也就是第5条，对于规则来讲是链式的，最后一条意思是拒绝所有，那么对于所有在第5条之后追加的规则都是无效的，因此我们需要把规则插入到第5条之前，而不能在最后一条追加，具体插入命令如下：</p>
+<pre><code>iptables -I INPUT 5 -m  state  --state  NEW  -m  tcp  -p  tcp  --dport  8080  -j  ACCEPT    
+</code></pre>
+<p>8080为tomcat服务器端口，可根据需要修改自己的端口。</p>
+<p>这条命令执行完成之后，主机就可以访问tomcat了。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[使用Ubuntu安装IntelliJ IDEA并创建桌面图标]]></title>
+        <id>/Users/qqbai/Documents/Gridea/output/post/shi-yong-ubuntu-an-zhuang-intellij-idea-bing-chuang-jian-zhuo-mian-tu-biao/index.html</id>
+        <link href="/Users/qqbai/Documents/Gridea/output/post/shi-yong-ubuntu-an-zhuang-intellij-idea-bing-chuang-jian-zhuo-mian-tu-biao/index.html">
+        </link>
+        <updated>2017-11-15T14:10:40.000Z</updated>
+        <content type="html"><![CDATA[<p>本文主要记录我在Ubuntu操作系统下安装必要的开发软件IntelliJ IDEA以及Postman，并创建桌面图标的过程。</p>
+<p>1.官网下载IDEA为tar.gz压缩包，IDEA解压后需要运行bin目录下的idea.sh脚本启动安装程序，并且以后运行时也需在终端启动，非常麻烦。但是可以选择创建桌面图标。</p>
+<p>2.创建桌面图标。Ubuntu的软件快捷方式均在usr/share/applications目录下，以idea为例，在该目录下运行vim</p>
+<pre><code>sudo vim /usr/share/applications/intellij-idea.desktop
+</code></pre>
+<p>创建新的文件并在文件中复制以下内容：</p>
+<pre><code>[Desktop Entry]
+Name=IntelliJ IDEA
+Exec=/你的目录/idea-IU-141.1532.4/bin/idea.sh
+Comment=IntelliJ IDEA
+Icon=/你的目录/idea-IU-141.1532.4/bin/idea.png
+Type=Application
+Terminal=false
+Encoding=UTF-8
+</code></pre>
+<p>其中Exec=为使用终端打开idea的方式，icon是图标所在目录。</p>
+<p>并给该文件赋予权限:</p>
+<pre><code>sudo chmod +x /usr/share/applications/intellij-idea.desktop
+</code></pre>
+<p>即可得到idea的快捷方式。</p>
+<p>将快捷方式图标拖入左侧快捷栏或者桌面即可。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[（转）JavaEE中各类对象的总结]]></title>
+        <id>/Users/qqbai/Documents/Gridea/output/post/zhuan-javaee-zhong-ge-lei-dui-xiang-de-zong-jie/index.html</id>
+        <link href="/Users/qqbai/Documents/Gridea/output/post/zhuan-javaee-zhong-ge-lei-dui-xiang-de-zong-jie/index.html">
+        </link>
+        <updated>2017-05-19T13:59:21.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="daodata-access-object数据访问对象-dao层对开发人员黑盒由架构师设计封装">DAO[data access object]数据访问对象 DAO层对开发人员黑盒，由架构师设计封装。</h3>
+<p>在很长一段时间内，我将它理解为对数据库的访问，后面随着项目的积累。</p>
+<p>发现自己的理解相对狭隘，对数据访问不仅仅指的是对数据库的访问。 假如A系统调用B系统的服务获取数据，这时候A系统对B系统访问数据对象的封装也可以称为DAO。</p>
+<h3 id="dtodata-transfer-object数据传输对象-假设数据表中存在20个字段但是在页面展示列表的时候这20个字段显然都不会用到">DTO[data transfer object]数据传输对象 假设数据表中存在20个字段，但是在页面展示列表的时候，这20个字段显然都不会用到。</h3>
+<p>我想对其中的5个字段进行展示，而且这5个字段展示的时候，也并不是数据库中他们原有的样子。</p>
+<p>还需要进行计算、截取、业务代码转名称 …..等等</p>
+<p>数据传输对象因此而被诞生，一是能提高数据传输的速度，二能隐藏后端表结构。</p>
+<h3 id="popersistant-object持久层对象-持久对象属性和数据库中的字段是一一对应的数据库中的一条数据可以理解为一个持久对象">PO[persistant object]持久层对象 持久对象属性和数据库中的字段是一一对应的，数据库中的一条数据可以理解为一个持久对象。</h3>
+<p>因ORM框架的广泛使用而被引入到 JavaEE 项目设计当中。</p>
+<h3 id="bobussiness-object业务对象-业务对象顾名思义是在业务处理中抽象出来的对象里面除了getset-方法外也可以有对字段进行业务处理的方法">BO[bussiness object]业务对象 业务对象顾名思义是在业务处理中抽象出来的对象，里面除了get/set 方法外，也可以有对字段进行业务处理的方法。</h3>
+<p>假设你要对一个班级进行业务处理，其中的学生、教师、甚至是桌椅板凳都是业务对象的组成部分。</p>
+<p>当然其中的学生、教室….都可以是和数据库对应的PO。</p>
+<h3 id="vovalue-object值对象-值对象也可以称做页面对象如果称做页面对象那门它所代表的将是整个页面展示层的对象">VO[value object]值对象 值对象也可以称做页面对象，如果称做页面对象，那门它所代表的将是整个页面展示层的对象。</h3>
+<p>可以由需要的业务对象进行的换算转换而来。</p>
+<p>如果称呼他为值对象的话，那门他可以理解为存放业务对象的一个地方。</p>
+<p>假设锅碗瓢盆分别为对应的业务对象的话，那门整个碗柜就是一个值对象。</p>
+<h3 id="pojoplain-ordiary-java-object-简单java对象-简单java对象应该是javaee世界里面最灵活的对象">POJO[plain ordiary java object] 简单java对象 简单java对象应该是JavaEE世界里面最灵活的对象。</h3>
+<p>在简单系统中，如果从数据库到页面展示都是POJO的话，它可以是DTO。</p>
+<p>如果从数据库中到业务处理中都是POJO的话，他也可以是BO。</p>
+<p>同样如果从数据库到整个页面的展示的话，它同样可以是VO。</p>
+<h3 id="小结">小结：</h3>
+<p>各个数据对象之间的转换是相当灵活的，在项目中可以定义上述对象的全部和其中的几种类型，这取决与架构师和需求。</p>
+<p>在大型项目中，架构师在项目初期的任务除了搭建起整个开发环境以外，定义在系统中流转的数据结构对象同样是重重之重。</p>
+<p>这项工作需要许多项目的积累和长期对软件开发的思考，多实践，多思考，提供最合适的数据对象解决方法，方能展现架构师的魅力。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[（转）CSDN-骆昊《Java就业指导》]]></title>
+        <id>/Users/qqbai/Documents/Gridea/output/post/zhuan-csdn-luo-hao-lesslessjava-jiu-ye-zhi-dao-greatergreater/index.html</id>
+        <link href="/Users/qqbai/Documents/Gridea/output/post/zhuan-csdn-luo-hao-lesslessjava-jiu-ye-zhi-dao-greatergreater/index.html">
+        </link>
+        <updated>2016-05-19T14:18:20.000Z</updated>
+        <content type="html"><![CDATA[<p>想要成为合格的Java程序员或工程师到底需要具备哪些专业技能，面试者在面试之前到底需要准备哪些东西呢？本文陈列的这些内容既可以作为个人简历中的内容，也可以作为面试的时候跟面试官聊的东西，你可以把这些内容写到你的简历中，当然更需要的是你在面试的时候向面试官展示这些专业技能。相信此文对正在寻觅Java程序员（Java工程师）职位的freshman以及希望成为中高级Java开发者的junior都会有所帮助。</p>
+<h3 id="专业技能">专业技能</h3>
+<p>熟练的使用Java语言进行面向对象程序设计，有良好的编程习惯，熟悉常用的Java API，包括集合框架、多线程（并发编程）、I/O（NIO）、Socket、JDBC、XML、反射等。</p>
+<p>熟悉基于JSP和Servlet的Java Web开发，对Servlet和JSP的工作原理和生命周期有深入了解，熟练的使用JSTL和EL编写无脚本动态页面，有使用监听器、过滤器等Web组件以及MVC架构模式进行Java Web项目开发的经验。</p>
+<p>对Spring的IoC容器和AOP原理有深入了解，熟练的运用Spring框架管理各种Web组件及其依赖关系，熟练的使用Spring进行事务、日志、安全性等的管理，有使用Spring MVC作为表示层技术以及使用Spring提供的持久化支持进行Web项目开发的经验，熟悉Spring对其他框架的整合。</p>
+<p>熟练的使用Hibernate、MyBatis等ORM框架，熟悉Hibernate和MyBatis的核心API，对Hibernate的关联映射、继承映射、组件映射、缓存机制、事务管理以及性能调优等有深入的理解。</p>
+<p>熟练的使用HTML、CSS和JavaScript进行Web前端开发，熟悉jQuery和Bootstrap，对Ajax技术在Web项目中的应用有深入理解，有使用前端MVC框架（AngularJS）和JavaScript模板引擎（HandleBars）进行项目开发的经验。</p>
+<p>熟悉常用的关系型数据库产品（MySQL、Oracle），熟练的使用SQL和PL/SQL进行数据库编程。</p>
+<p>熟悉面向对象的设计原则，对GoF设计模式和企业应用架构模式有深入的了解和实际开发的相关经验，熟练的使用UML进行面向对象的分析和设计，有TDD（测试驱动开发）和DDD（领域驱动设计）的经验。</p>
+<p>熟悉Apache、NginX、Tomcat、WildFly、Weblogic等Web服务器和应用服务器的使用，熟悉多种服务器整合、集群和负载均衡的配置。</p>
+<p>熟练的使用产品原型工具Axure，熟练的使用设计建模工具PowerDesigner和Enterprise Architect，熟练的使用Java开发环境Eclipse和IntelliJ，熟练的使用前端开发环境WebStorm，熟练的使用软件版本控制工具SVN和Git，熟练的使用项目构建和管理工具Maven和Gradle。</p>
+<p>说明：上面罗列的这些东西并不是每一项你都要烂熟于心，根据企业招聘的具体要求可以做相应的有针对性的准备。我个人觉得前6项应该是最低要求，是作为一个Java开发者必须要具备的专业技能。</p>
+<h3 id="项目经验">项目经验</h3>
+<h4 id="项目介绍">项目介绍</h4>
+<p>本系统是X委托Y开发的用于Z的系统，系统包括A、B、C、D等模块。系统使用了Java企业级开发的开源框架E以及前端技术F。表示层运用了G架构，使用H作为视图I作为控制器并实现了REST风格的请求；业务逻辑层运用了J模式，并通过K实现事务、日志和安全性等功能，通过L实现缓存服务；持久层使用了M封装CRUD操作，底层使用N实现数据存取。整个项目采用了P开发模型。</p>
+<p>说明：上面的描述中，E通常指Spring（Java企业级开发的一站式选择）；F最有可能是jQuery库及其插件或者是Bootstrap框架，当然如果要构建单页应用（SPA）最佳的方案是前端MVC框架（如AngularJS）和JavaScript模板引擎（如HandleBars）；G显然是MVC（模型-视图-控制），最有可能的实现框架是Spring MVC，除此之外还有Struts 2、JSF以及Apache为JSF提供的MyFaces实现，可以使用JSP作为MVC中的V，也可使用模板引擎（如Freemarker和Velocity）来生成视图，还可以是各种文档或报表（如Excel和PDF等），而Servlet和自定义的控制器是MVC中的C，当然Spring MVC中提供了作为前端控制器的DispatcherServlet；J通常是事务脚本，K应该是AOP（面向切面编程）技术，L目前广泛使用的有memcached和Redis；M的选择方案很多，最有可能的是Hibernate和MyBatis，也可以两种技术同时运用，但通常是将增删改交给Hibernate来处理，而复杂的查询则由MyBatis完成，此外TopLink、jOOQ也是优秀的持久层解决方案；底层的数据存取传统上是使用关系型数据库，可以是MySQL、Oracle、SQLServer、DB2等，随着大数据时代的来临，也可以采用NoSQL（如MongoDB、MemBase、BigTable等）和其他大数据存取方案（如GFS、HDFS等）；项目的开发模型P可以是瀑布模型、快速原型模型、增量模型、螺旋模型、喷泉模型、RAD模型等。</p>
+<h4 id="项目开发流程">项目开发流程</h4>
+<p>可行性分析 &gt;&gt;&gt; 可行性分析报告 / 项目开发计划书</p>
+<p>需求分析 &gt;&gt;&gt; 需求规格说明书 OOAD（用例图、时序图、活动图） 界面原型：帮助理解需求、业务层设计时推导事务脚本</p>
+<p>设计 &gt;&gt;&gt; 概要设计说明书/详细设计说明书 抽取业务实体（领域对象）：类图、E-R图（概念设计阶段） 分层架构：确定各层的技术实现方案（具体到使用的框架、数据库服务器、应用服务器等）。业务层设计：事务脚本模式（事务：用户发送一次请求就是一个事务；脚本：一个方法或一个函数；事务脚本：把一次请求封装为一个方法或一个函数；事务脚本模式：一个事务开始于脚本的打开，终止于脚本的关闭）。业务层涉及的对象有三种类型：事务脚本类（封装了业务的流程）、数据访问对象（DAO，封装了持久化操作）、数据传输对象（DTO，封装了失血/贫血领域对象），三者之间的关系是事务脚本类组合（聚合）数据访问对象，这二者都依赖了数据传输对象 正向工程（UML类图生成Java代码）和逆向工程（Java代码生成UML类图） 数据库物理设计（ER图转换成表间关系图、建库和建表、使用工具插入测试数据）</p>
+<h4 id="编码">编码</h4>
+<p>测试 &gt;&gt;&gt; 测试报告 / 缺陷报告 单元测试：对软件中的最小可测试单元进行检查和验证，在Java中是对类中的方法进行测试，可以使用JUnit工具来实施。 集成测试：集成测试也叫组装测试或联合测试。在单元测试的基础上，将所有模块按照设计要求组装成为子系统进行测试。 系统测试：将已经确认的软件、硬件、外设、网络等元素结合在一起，进行信息系统的各种组装测试和确认测试，系统测试是针对整个产品系统进行的测试，目的是验证系统是否满足了需求规格的定义，找出与需求规格不符或与之矛盾的地方，从而提出更加完善的方案。 验收测试：在软件产品完成了单元测试、集成测试和系统测试之后，产品发布之前所进行的软件测试活动。它是技术测试的最后一个阶段，也称为交付测试。验收测试的目的是确保软件准备就绪，并且可以让最终用户将其用于执行软件的既定功能和任务。</p>
+<p>交付和维护 &gt;&gt;&gt; 用户手册 / 操作手册</p>
+<h4 id="项目管理">项目管理</h4>
+<p>版本控制：CVS/SVN/Git 自动构建：Ant/Maven/Ivy/Gradle 持续集成：Hudson/Jenkins</p>
+<h4 id="系统架构">系统架构</h4>
+<p>负载均衡服务器：F5、A10 应用服务器： HTTP服务器：Apache、NginX（HTTP、反向代理、邮件代理服务器） Servlet容器：Tomcat、Resin EJB容器：WildFly（JBoss Application Server）、GlassFish、Weblogic、Websphere 数据库服务器：MySQL、Oracle</p>
+<h4 id="第三方工具插件应用">第三方工具（插件）应用</h4>
+<p>图表工具：基于jQuery的图表插件（如jQchart、Flot、Charted等）、Chart.js、Highcharts等。 报表工具：Pentaho Reporting、iReport、DynamicReports等。 文档处理：POI、iText等。 工作流引擎：jBPM、OpenWFE、Snaker、SWAMP等。 作业调度：Quartz、JobServer、Oddjob等。 缓存服务：EhCache、memcached、SwarmCache等。 消息队列：Open-MQ、ZeroMQ等。 安全框架：Shiro、PicketBox等。 搜索引擎：IndexTank、Lucene、ElasticSearch等。 Ajax框架：jQuery、ExtJS、DWR等。 UI插件：EasyUI、MiniUI等。 富文本框：UEditor、CKEditor等。</p>
+<h3 id="面试提问">面试提问</h3>
+<p>项目是为哪个公司开发的？项目的投入是多少？ 有多少人参与了项目开发？整个团队中，测试人员、开发人员、项目经理比例是多少？ 项目开发了多长时间？项目总的代码量有多少？你的代码量有多少？ 项目采用了怎样的开发模型或开发流程？项目的架构是怎样的？项目的技术选型是怎样的？ 你在项目中承担了怎样的职责？是否经常开会或加班？项目完成后有哪些收获或是经验教训？ 项目中最困难的部分是什么？如何解决团队开发时遇到的各种冲突？</p>
+<p>说明：对于没有实际项目经验的，可以在前程无忧、智联招聘、拉勾网等网站上搜索招聘Java程序员的公司，找到他们的官方网站了解他们做的项目，查看项目的详细介绍，然后尝试完成其中一部分功能，最好请教一下高人看看自己的设计和代码是否恰当，这样相当于积累了一定的项目经验。</p>
+<h4 id="面试题">面试题</h4>
+<p>Java常见的面试题已经总结成《Java面试题集》、《Java面试题全集》以及《面试编程题拾遗》等文章陆续发布在我的CSDN博客，各大公司的面试题我会继续整理发布。</p>
+<p>其他</p>
+<p>常见错误</p>
+<p>只在计算机上练习</p>
+<p>不做行为面试题演练</p>
+<p>不做模拟面试训练</p>
+<p>试图死记硬背答案</p>
+<p>不大声说出你的解题思路</p>
+<p>代码不够严谨</p>
+<p>不写测试代码</p>
+<p>轻言放弃</p>
+<p>面试时可以反问面试官的问题</p>
+<p>我注意到你们使用了X技术，请问你们是如何解决Y问题的？</p>
+<p>为什么你们的产品使用了X技术而不是Y技术？据我所知，X技术虽然有A、B、C等好处，但也存在D和E问题，而Y技术可以解决D和E问题。</p>
+<p>我对您说的X技术不是太熟悉，但我感觉它是一个不错的解决方案，您能多讲讲它的工作原理吗？</p>
+<p>你们团队是如何进行项目规划的？一周会有几次例会？每周的代码量大概是多少？</p>
+<p>就X问题我能想到的解决方案目前就只有Y了，请问您会怎么解决这个问题？</p>
+<h4 id="sar法则">S.A.R.法则</h4>
+<p>S.A.R法则是指先描述问题的场景，然后解释你采取的行动，最后陈述结果。</p>
+<p>####算法题的五种解法</p>
+<p>举例法：通过举例子发现其中的一般规则。 例子：圆内接三角形是锐角三角形的概率是多少？这是搜狗的一个面试题，可以在圆上随意画三个点连接成三角形就可以知道答案了。</p>
+<p>模式匹配法 例子：一个有序数组的元素经过循环移动，元素的顺序变成”3 4 5 6 1 2”。怎样找到数组中最小的那个元素，假设数组中的元素各不相同。这个题目和折半查找看起来是那么相似，因此可以借鉴折半查找的算法，最小元素显然出现在”mid &gt; right”的转折点。</p>
+<p>简化推广法 说明：简化问题规模和数据类型，然后再发现通用的解法。</p>
+<p>简单构造法 例子：找出”abcde”的所有可能的排列组合。先考虑只有”a”的情况，再考虑”ab”的情况，以此类推。最终你可能会得到一个递归公式。这种方法往往会演变成递归法。</p>
+<p>数据结构头脑风暴法 例子：随机生成一些数字，并找出其中位数。这种问题可以在头脑中将你了解的数据结构过一遍，看看哪种是最合适的数据结构。上面的题目可以建立两个堆，一个大根堆和一个小根堆，较小的元素放在大根堆，较大的元素放在小根堆，如果两个堆不平衡，可以从其中一个堆取出元素放入另一个堆即可。最后中位数应该是两个堆的根之一。</p>
+<h3 id="录用谈判">录用谈判</h3>
+<p>要理直气壮的提出具体的待遇要求</p>
+<p>开出比预期稍高的价码</p>
+<p>不要只盯着薪水（很多公司更愿意就薪水之外的条件做出让步）</p>
+<p>使用最合适的方法（可以尝试在电话或E-mail中谈判待遇）</p>
+<p>自我评价</p>
+<p>学习能力（搞IT行业的人需要不断的了解新的技术、工具和方法）</p>
+<p>团队意识（相比个人英雄主义，IT行业更倡导团队合作）</p>
+<p>抗压能力（很多IT企业的工作强度相对来说还是比较大的）</p>
+]]></content>
+    </entry>
+</feed>
