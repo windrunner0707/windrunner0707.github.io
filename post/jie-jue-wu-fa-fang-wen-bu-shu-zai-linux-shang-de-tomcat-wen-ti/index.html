@@ -3,8 +3,8 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>解决无法访问部署在Linux上的Tomcat问题 | 还施水阁</title>
-<link rel="shortcut icon" href="https://windrunner0707.github.io/favicon.ico?v=1558448135887">
+<title>无法访问部署在服务器上的Tomcat的问题解决 | 还施水阁</title>
+<link rel="shortcut icon" href="https://windrunner0707.github.io/favicon.ico?v=1558453702864">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://windrunner0707.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://windrunner0707.github.io">
-  <img class="avatar" src="https://windrunner0707.github.io/images/avatar.png?v=1558448135887" alt="">
+  <img class="avatar" src="https://windrunner0707.github.io/images/avatar.png?v=1558453702864" alt="">
   </a>
   <h1 class="site-title">
     还施水阁
@@ -79,12 +79,16 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              解决无法访问部署在Linux上的Tomcat问题
+              无法访问部署在服务器上的Tomcat的问题解决
             </h2>
             <div class="post-info">
               <time class="post-time">
                 · 2017-12-20 ·
               </time>
+              
+                <a href="https://windrunner0707.github.io/tag/M_0L5pgS8" class="post-tag">
+                  # DevOps
+                </a>
               
                 <a href="https://windrunner0707.github.io/tag/SwmgpzagZ" class="post-tag">
                   # Linux
@@ -96,14 +100,15 @@
               </div>
             
             <div class="post-content">
-              <p>服务器环境：CentOS Tomcat8</p>
-<p>Tomcat安装运行后，访问提示无法连接至服务器。</p>
-<p>主要原因是linux开启了防火墙，有两种解决方案，一种是关闭防火墙，另外一种是开放所要访问的端口。</p>
-<p>1、关闭防火墙(非常不建议)</p>
+              <p>在服务器安装Tomcat后，访问<code>IP:8080</code>但是提示无法连接至服务器。</p>
+<h2 id="本地服务器">本地服务器</h2>
+<p>我的服务器环境：CentOS Tomcat8</p>
+<p>主要原因是Linux系统的防火墙机制，有两种解决方案，一种是关闭防火墙，另外一种是开放所要访问的端口。</p>
+<h3 id="1-关闭防火墙非常不建议">1、关闭防火墙(非常不建议)</h3>
 <pre><code>service iptables stop –停止    
 service iptables start –启动    
 </code></pre>
-<p>2、使用命令开放端口</p>
+<h3 id="2-使用命令开放端口">2、使用命令开放端口</h3>
 <p>首先查看一下本机防火墙现有的规则列表：</p>
 <p>使用命令：</p>
 <pre><code>iptables -L --line-number 
@@ -122,6 +127,10 @@ num target prot opt source destination
 </code></pre>
 <p>8080为tomcat服务器端口，可根据需要修改自己的端口。</p>
 <p>这条命令执行完成之后，主机就可以访问tomcat了。</p>
+<h2 id="云服务器">云服务器</h2>
+<p>云服务器会有自己的安全组配置，需要我们找到云服务器的安全组配置并且把8080端口暴露出来，这样就能访问Tomcat了。</p>
+<h2 id="问题延伸">问题延伸</h2>
+<p>如果自己在服务器上安装运行MySQL，MQ，Redis等软件无法访问，都可以考虑自己的防火墙是否开启。</p>
 
             </div>
           </article>
