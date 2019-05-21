@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>使用SSR与V2Ray科学上网 | 还施水阁</title>
-<link rel="shortcut icon" href="https://windrunner0707.github.io/favicon.ico?v=1558362446704">
+<link rel="shortcut icon" href="https://windrunner0707.github.io/favicon.ico?v=1558448135887">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://windrunner0707.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://windrunner0707.github.io">
-  <img class="avatar" src="https://windrunner0707.github.io/images/avatar.png?v=1558362446704" alt="">
+  <img class="avatar" src="https://windrunner0707.github.io/images/avatar.png?v=1558448135887" alt="">
   </a>
   <h1 class="site-title">
     还施水阁
@@ -120,25 +120,28 @@
 
         
           
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
 
-          
-            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
-<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
-
-<div id="disqus_thread"></div>
+<div id="gitalk-container"></div>
 
 <script>
 
-var options = {
-  shortname: 'windrunner0707',
-  apikey: 'mLJqtgQ26JEvdpodQGqNrHK1YVeUu7NIDIdlSYIi6kyAU5trJiSyKOqZVLh99Zj8',
-}
-if ('https://disqus.skk.moe/disqus/') {
-  options.api = 'https://disqus.skk.moe/disqus/'
-}
-var dsqjs = new DisqusJS(options)
+  var gitalk = new Gitalk({
+    clientID: 'f2fcada826c4db18dd96',
+    clientSecret: 'b57b20168bd7e44267d00fd78bba6cc21ed6cc32',
+    repo: 'windrunner0707.github.io',
+    owner: 'windrunner0707',
+    admin: ['windrunner0707'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
 
 </script>
+
+          
 
           
         
