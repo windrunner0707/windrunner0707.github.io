@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>使用SSR与V2Ray科学上网 | 还施水阁</title>
-<link rel="shortcut icon" href="https://windrunner0707.github.io/favicon.ico?v=1558453702864">
+<link rel="shortcut icon" href="https://windrunner0707.github.io/favicon.ico?v=1558533728439">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://windrunner0707.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://windrunner0707.github.io">
-  <img class="avatar" src="https://windrunner0707.github.io/images/avatar.png?v=1558453702864" alt="">
+  <img class="avatar" src="https://windrunner0707.github.io/images/avatar.png?v=1558533728439" alt="">
   </a>
   <h1 class="site-title">
     还施水阁
@@ -102,7 +102,70 @@
             <div class="post-content">
               <p>墙角数枝梅，凌寒独自开。</p>
 <!-- more -->
-<p>test</p>
+<h3 id="机场">机场</h3>
+<p>所谓机场，就是指一个服务商购买大量的VPS搭建SSR/V2Ray，并按月/流量计费。因为VPS被称为“小鸡”，众多“小鸡”就成为了机场。一个用户连接SSR时只会占用一台VPS的一个端口，所以机场主会为每个用户分配一个端口号，这样多用户就互不影响。
+与个人搭建相比，机场的优势在于，机场主会租用世界各地的VPS，主要有美国，韩国，日本，香港，新加坡等，所以用户会有多个选择。如果选择个人购买VPS搭建的话，就只有单个选择。除此之外，机场主还会为自己的节点套上CND，这样就可以极大提高网速，使用香港，新加坡这些离我们比较近的国家节点时，延迟往往在几十毫秒。</p>
+<h4 id="购买机场">购买机场</h4>
+<p>因为机场主们都担心自己会被查水表，所以机场的网站域名经常深藏不露，而且会经常更换，机场主们选择在Telegram里面建立自己的频道，方便更换域名时通知用户。大型的机场注册会需要邀请码，因为他们已经有稳定的客户，不希望那些白嫖的用户占用账号。
+所以购买机场服务的最佳去处就是Telegram，可以选择添加一些导航机器人，这些机器人会向用户推广频道。机场主有时也会使用机器人打广告。
+价格一般5-15元一个月，包年的会有优惠。因为有一定风险，机场主也有跑路的可能，所以最好的选择是按月按季度购买。</p>
+<h4 id="公益机场">公益机场</h4>
+<p>有一些古道热肠的大神们天天在为科学上网事业做出贡献，因此他们会开一些公益机场，但是IP也经常被屏蔽。
+这种公益机场，一般在Telegram上也能找到。
+我之前一直关注一个叫做“翻个墙”的网站（已被墙），现在只能通过修改host文件来访问，具体IP如下：
+<img src="https://windrunner0707.github.io/post-images/1558530161553.png" alt="">
+里面会分享一些公益节点及SSR的搭建方法。</p>
+<h3 id="自己搭建">自己搭建</h3>
+<h4 id="准备工作">准备工作</h4>
+<p>首先引用SSR中文网（https://ssr.tools/） 的一段话（V2Ray同理）：</p>
+<blockquote>
+<p>SSR本质上是一种加密代理方式，其服务器搭建在外国的VPS服务器上，客户端在用户终端设备上。服务器作为中间桥梁，使我们间接访问国外网站。同时由于是加密代理，防火墙无法识别内容，访问比较安全。
+<img src="https://windrunner0707.github.io/post-images/1558530666083.png" alt=""></p>
+</blockquote>
+<p>首先就是要购买一台国外的VPS。VPS要求不高一般512M内存的就够我们使用了。一般年付20美刀，遇到节日还会有特价。具体的知名VPS有搬瓦工（这个网站还为我国用户打造了自带SSR的服务器，看来是调查了市场），Vultr，Linode等，支付方式有支付宝，PayPal，信用卡（Visa，万事达）等。
+对了，谷歌云和AWS如果绑定信用卡可以免费试用一年哦。
+我初次入坑是在美国黑色星期五促销时，在VirMach购买了一台3G内存的VPS，年付20美刀，不过服务器在纽约，有300ms的延迟。</p>
+<h4 id="ssr脚本">SSR脚本</h4>
+<p>前人栽树后人乘凉，现在已经有了方便的Shell脚本供我们使用。
+购买VPS后，推荐使用Debian操作系统，因为很多脚本都是要求Debian，方便开启BBR加速。</p>
+<blockquote>
+<p>BBR是由谷歌提供的新的TCP拥塞控制算法，其目的就是要尽量跑满带宽，并且尽量不要有排队的情况</p>
+</blockquote>
+<p>以翻个墙网站脚本为例：</p>
+<pre><code>#安装脚本
+wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubiBackup/doubi/master/ssr.sh &amp;&amp; chmod +x ssr.sh &amp;&amp; bash ssr.sh
+</code></pre>
+<p>因为脚本界面全是中文，所以可以傻瓜式安装。
+<img src="https://windrunner0707.github.io/post-images/1558532859572.png" alt=""></p>
+<ol>
+<li>输入 1 点击回车键开始安装 SSR，再点击回车键自动检测服务器 IP，然后根据需要填写 SSR 用户名和密码，端口 6 位数以内。</li>
+<li>加密方式选择：推荐选择比较复杂的方式，降低被墙概率，如15/2/1。</li>
+<li>SSR 账号速度限制、流量限制、同时在线设备数量限制以及端口限制，根据自己的需要添加或全部点击回车键默认不做限制。</li>
+<li>安装完成之后可以开启BBR加速。</li>
+</ol>
+<pre><code>bash ssr.sh
+</code></pre>
+<p>使用这条命令可以打开主菜单。选择14其他功能，再选择1安装BBR，最后重启服务器即可。</p>
+<p>脚本安装完成后可以选择生成二维码。
+安卓手机可以搜索并下载SSR客户端（小飞机），IOS可以下载小火箭（ShadowRocket）。扫描二维码即可连接服务器。</p>
+<p>（不详细，待补充）</p>
+<h4 id="v2ray脚本">V2Ray脚本</h4>
+<p>我使用的是233Blog（https://233blog.com/） 的脚本：</p>
+<pre><code>bash &lt;(curl -s -L https://git.io/v2ray.sh)
+</code></pre>
+<p>同样是中文脚本，傻瓜式安装。</p>
+<p>（不详细，待补充）</p>
+<h4 id="二者比较">二者比较</h4>
+<p>个人感觉，SSR客户端比V2Ray更加友好，而且支持订阅。
+但是现在SSR已经频繁被墙，而V2Ray可以选择多种协议的特点可以有效防止被墙。</p>
+<h3 id="被墙之后如何挽救">被墙之后如何挽救</h3>
+<p>被墙的方式：</p>
+<ul>
+<li>VPS的IP被墙</li>
+<li>服务器端口被墙</li>
+<li>TCP阻断</li>
+</ul>
+<p>待续……</p>
 
             </div>
           </article>
