@@ -1,0 +1,220 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>我在ThoughtWorks的一些敏捷实践 | 还施水阁</title>
+<link rel="shortcut icon" href="https://windrunner0707.github.io/favicon.ico?v=1561134017694">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://windrunner0707.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.github.io">
+  <img class="avatar" src="https://windrunner0707.github.io/images/avatar.png?v=1561134017694" alt="">
+  </a>
+  <h1 class="site-title">
+    还施水阁
+  </h1>
+  <p class="site-description">
+    <div>Windrunner0707's Blog</div>
+<div>浮生长恨欢娱少，肯爱千金轻一笑</div>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/windrunner0707" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              我在ThoughtWorks的一些敏捷实践
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2019-05-27 ·
+              </time>
+              
+            </div>
+            
+              <div class="post-feature-image" style="background-image: url('https://s2.ax1x.com/2019/06/22/ZpPeoD.md.jpg')">
+              </div>
+            
+            <div class="post-content">
+              <p>Agile Software Development</p>
+<!-- more --> 
+<h3 id="瀑布式软件开发">瀑布式软件开发</h3>
+<p>对于软件工程方面的知识有自己完整的体系，但是作为一个通信专业的人，我从来没有学习过任何理论。仅在平时的阅读和工作里有一些自己的体会。
+维基百科对瀑布式软件开发定义如下：</p>
+<blockquote>
+<p>瀑布模型（Waterfall Model）最早强调系统开发应有完整之周期，且必须完整的经历周期之每一开发阶段，并系统化的考量分析与设计的技术、时间与资源之投入等，因此瀑布模型又可以称为‘系统发展生命周期’（System Development Life Cycle, SDLC）。由于该模式强调系统开发过程需有完整的规划、分析、设计、测试及文件等管理与控制，因此能有效的确保系统质量，它已经成为软体业界大多数软件开发的标准（Boehm, 1988）。</p>
+</blockquote>
+<p>传统软件开发流程会有以下阶段：</p>
+<ul>
+<li>需求设计</li>
+<li>软件设计</li>
+<li>软件实现</li>
+<li>集成与测试</li>
+<li>移交与维护</li>
+</ul>
+<p>具体情境可能就是，业务人员说，我们想要实现数字化办公，所以请你们开发一个物资管理系统，方便员工在电脑办公。然后负责开发的软件团队就开始和业务人员捋清业务，设计模块功能，召集程序员开始开发，到期后交付软件。<br>
+但是在生产实践中，人们发现，需求分析好之后，程序员们就蒙头开发，可能是几个月，也可能是几年，期间不会再与业务人员有沟通，产品的走向就不能保证满足业务人员的期望。只有等完整交付一期项目后，业务人员才能发现，已开发的软件是否与自己现有的业务吻合，然后提出反馈，然后进入下一期开发改进，又是无尽的等待。<br>
+这下程序员就苦逼了，你们TM说要这样做的，现在做好了又说不行，这不是坑我们吗，然后就是无尽的加班……</p>
+<p>于是在2001年，美国的程序员大佬们聚在一起，讨论一个更加英明的软件开发流程，于是敏捷（Agile）就诞生了，他们认为软件开发中应该快速响应需求变化，而不是一条路走到黑，并且发表了一篇敏捷软件开发宣言：</p>
+<ul>
+<li>个体和交互  胜过  过程和工具</li>
+<li>可以工作的软件  胜过  面面俱到的文档</li>
+<li>客户合作  胜过  合同谈判</li>
+<li>响应变化  胜过  遵循计划</li>
+</ul>
+<p>从此开启了新世界的大门。</p>
+<h3 id="敏捷软件开发">敏捷软件开发</h3>
+<p>敏捷的思想提出来后，各个理论，指导思想就层出不穷。我水平有限，还没能精读这些理论，所以就写一些自己的理解。</p>
+<p>敏捷最核心的理论就是在软件开发中小步前进，及时与业务人员沟通，欣然接受需求变化，经常交付可用的软件。即你们团队这2周做好了几个小功能，及时拿出来show一下，恳请业务人员批评指正。因为步子小，所以在业务人员发现软件与期望不合后也能马上修改。</p>
+<p>一个大的需求会被业务分析师BA（Business Analyst）逐个拆分成一个个小的需求，称为“用户故事”（User Story），具体的内容是：作为一个xx用户，我想实现xx功能，以便于xx。然后每一个程序员会领到自己的Story，并完成卡上要求的内容。</p>
+<p>在敏捷开发流程中，大佬们提倡一些最佳实践，极限编程（XP）。我列举一二。</p>
+<ul>
+<li>测试驱动开发（TDD）：在开发过程中先写一个失败的测试，然后写业务代码使其通过。虽然思想很科学，但是在中国，尤其是互联网公司，每个码农最希望的可能是早点下班，会执行TDD的人估计是凤毛麟角。我不得不羡慕老美程序员的生活。</li>
+<li>结对编程：即2个程序员坐一起，一个写测试，一个写业务，及时批评指正互相battle……据实验证明可以大大提高工作效率与软件质量，但是中国公司可能不会这么奢侈。</li>
+<li>持续集成（CI）：即时集成完善自己的软件，比方说用Jenkins，每次提交代码就会触发自动构建，你修改的功能会及时部署到测试服务器，因为“可以工作的软件胜过面面俱到的文档”，我觉得不管是哪个公司，这个实践都是实用的。</li>
+</ul>
+<h3 id="开发中有哪些角色">开发中有哪些角色</h3>
+<p>因为我们践行敏捷，所以在开发中也会有一些有特色的角色。</p>
+<h4 id="da">DA</h4>
+<p>Delivery Assuarance 交付保障人，我感觉一般是熟悉项目流程的老项目经理，可能在敏捷实践方面有很深的造诣，保证项目不翻车的存在。</p>
+<h4 id="pm">PM</h4>
+<p>Project Manager 项目经理，负责沟通协调，保证项目进度，维护团队等。</p>
+<h4 id="po">PO</h4>
+<p>Project Owner 即甲方熟悉业务的人，验收软件的人，因为TW是外包公司。</p>
+<h4 id="ba">BA</h4>
+<p>Business Analyst 业务分析师，思维敏捷，英语流畅，负责与客户沟通，整理需求，拆成故事卡。</p>
+<h4 id="ux">UX</h4>
+<p>User Experience 用户体验设计，传统的UI升级版，不仅要会做图，还要考虑用户体验如何。</p>
+<h4 id="dev">DEV</h4>
+<p>Developer 前端后端的程序猿/媛们。</p>
+<h4 id="qa">QA</h4>
+<p>Quality Analyst 质量分析师，即测试工程师</p>
+<h3 id="我们如何进行敏捷开发">我们如何进行敏捷开发</h3>
+<h4 id="inception">Inception</h4>
+<p>客户联系我们后，表明自己有意向请我们开发软件。我们会派出一些专业人员BA，PM，资深的DEV去客户现场，和客户谈一谈他们到底想搞什么。</p>
+<h4 id="integration-0">Integration-0</h4>
+<p>项目定下来后，DEV凑齐，会开始做技术选型和基础设备搭建。前端用哪个技术，后端用哪个技术，服务器够不够用，Git仓库用哪个，CI（一般用Jenkins）搭好没有……</p>
+<h4 id="ipm">IPM</h4>
+<p>Integration Prepare Meeting 迭代启动会议。开始开发后，我们会把2周分为一个迭代周期，产出可用的新功能。而迭代启动会议就是我们一起商量具体的需求该怎么做，花费多长时间。比方说BA拆好了一个小需求（用户故事），我们就估计这个故事要花费几个人/天才能完成，1个人/天就是1点。我们在卡里标记点数，谁拿到这张卡就去完成这个需求，一般与估计的时间相同。</p>
+<h4 id="sprint">Sprint</h4>
+<p>来自于敏捷项目管理工具Jira。一个迭代（2周）我们会称为一个Sprint。</p>
+<h4 id="daily-meeting">Daily meeting</h4>
+<p>早会。项目组的人每天需要开早会，但是需要站着，所以又叫站会。为了让每个人发言简洁明了，所以站着。我们会有一面物理墙，上面贴满了BA拆好的用户故事，一个故事一张卡。卡的持有者即负责开发这个需求的DEV会讲自己昨天干了什么，有无遇到问题，今天准备干什么。方便项目里的人明确进度。</p>
+<h4 id="code-review">Code Review</h4>
+<p>这也是敏捷中的一部分。可以叫做代码评审，所有的DEV一起回顾今天提交到代码库的代码，互相检查，然后重构自己的代码，防止代码腐化。讲到这里我就不得不提首席科学家Martin Fowler的《重构：改善既有代码设计》，指导我们如何写出整洁代码。
+<img src="https://windrunner0707.github.io/post-images/1561133589133.jpg" alt=""></p>
+<h4 id="retro">Retro</h4>
+<p>每个迭代结束之后，我们会反思在迭代中的问题，分为3类Well（做的好的）Less Well（做的不好的）Suggestion（提出建议），对于做的不好的，和提出建议的条目，我们会产出一些行动（Action）及时改进。</p>
+
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.github.io/post/shi-yong-ssr-yu-v2ray-ke-xue-shang-wang">
+              <h3 class="post-title">
+                使用SSR与V2Ray科学上网
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'f2fcada826c4db18dd96',
+    clientSecret: 'b57b20168bd7e44267d00fd78bba6cc21ed6cc32',
+    repo: 'windrunner0707.github.io',
+    owner: 'windrunner0707',
+    admin: ['windrunner0707'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="https://windrunner0707.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://windrunner0707.github.io</id>
     <title>还施水阁</title>
-    <updated>2019-05-22T14:02:46.435Z</updated>
+    <updated>2019-06-21T16:20:31.802Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://windrunner0707.github.io"/>
     <link rel="self" href="https://windrunner0707.github.io/atom.xml"/>
@@ -11,6 +11,17 @@
     <logo>https://windrunner0707.github.io/images/avatar.png</logo>
     <icon>https://windrunner0707.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 还施水阁</rights>
+    <entry>
+        <title type="html"><![CDATA[我在ThoughtWorks的一些敏捷实践]]></title>
+        <id>https://windrunner0707.github.io/post/wo-zai-thoughtworks-de-yi-xie-min-jie-shi-jian</id>
+        <link href="https://windrunner0707.github.io/post/wo-zai-thoughtworks-de-yi-xie-min-jie-shi-jian">
+        </link>
+        <updated>2019-05-26T17:59:42.000Z</updated>
+        <summary type="html"><![CDATA[<p>Agile Software Development</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>Agile Software Development</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[使用SSR与V2Ray科学上网]]></title>
         <id>https://windrunner0707.github.io/post/shi-yong-ssr-yu-v2ray-ke-xue-shang-wang</id>
@@ -76,17 +87,14 @@
         <updated>2019-05-19T15:24:12.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[程序中的锁]]></title>
-        <id>https://windrunner0707.github.io/post/bian-cheng-zhong-de-suo</id>
-        <link href="https://windrunner0707.github.io/post/bian-cheng-zhong-de-suo">
+        <title type="html"><![CDATA[浅谈支付接口中的加密]]></title>
+        <id>https://windrunner0707.github.io/post/qian-tan-zhi-fu-jie-kou-zhong-de-jia-mi</id>
+        <link href="https://windrunner0707.github.io/post/qian-tan-zhi-fu-jie-kou-zhong-de-jia-mi">
         </link>
-        <updated>2018-08-19T15:24:44.000Z</updated>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Git学习之路]]></title>
-        <id>https://windrunner0707.github.io/post/git-xue-xi-zhi-lu-dai-xu</id>
-        <link href="https://windrunner0707.github.io/post/git-xue-xi-zhi-lu-dai-xu">
-        </link>
-        <updated>2018-05-19T15:18:11.000Z</updated>
+        <updated>2019-04-30T18:08:56.000Z</updated>
+        <summary type="html"><![CDATA[<p>A secret maks a woman woman.</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>A secret maks a woman woman.</p>
+]]></content>
     </entry>
 </feed>
