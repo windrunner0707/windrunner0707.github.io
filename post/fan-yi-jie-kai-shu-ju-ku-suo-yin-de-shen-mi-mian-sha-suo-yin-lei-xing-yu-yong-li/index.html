@@ -1,0 +1,189 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>（翻译）揭开数据库索引的神秘面纱：索引类型与用例 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.github.io/favicon.ico?v=1751381011163">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="（翻译）揭开数据库索引的神秘面纱：索引类型与用例 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="当查询性能下降时，大多数工程师通常会首先检查应用代码，以识别问题。然而，问题的根源也可能出现在数据存储层，而索引则是决定能否精准查找与避免盲目全表扫描、从而提高性能的关键。只要建立了合适的索引，原本需要筛选数百万行的数据查询就能在毫秒级别返..." />
+    <meta name="keywords" content="索引,数据库" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.github.io">
+  <img class="avatar" src="https://windrunner0707.github.io/images/avatar.png?v=1751381011163" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              （翻译）揭开数据库索引的神秘面纱：索引类型与用例
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-07-01
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://windrunner0707.github.io/tag/Fvo3TRNq5I/" class="post-tag">
+                  # 索引
+                </a>
+              
+                <a href="https://windrunner0707.github.io/tag/drZeANo6Ob/" class="post-tag">
+                  # 数据库
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://windrunner0707.github.io/post-images/fan-yi-jie-kai-shu-ju-ku-suo-yin-de-shen-mi-mian-sha-suo-yin-lei-xing-yu-yong-li.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>当查询性能下降时，大多数工程师通常会首先检查应用代码，以识别问题。然而，问题的根源也可能出现在数据存储层，而索引则是决定能否精准查找与避免盲目全表扫描、从而提高性能的关键。只要建立了合适的索引，原本需要筛选数百万行的数据查询就能在毫秒级别返回结果。</p>
+<p>随着数据集的增长，扫描的成本变得不可承受。数据库将数据存储在数据页、行和块中，这些结构并不适合任意读取。没有索引，每次进行筛选或排序的查询都必须扫描更多的行，超出了必要的范围。如果每秒有数千次查询，I/O 压力将加剧，系统会因此承受巨大负担。</p>
+<p>索引通过缩小搜索范围来解决这个问题，数据库引擎利用预计算结构，直接跳转到目标位置，就像翻书时直接查阅索引，而不是逐页翻阅。</p>
+<p>但并非所有索引类型的表现都相同。有些索引是为了加速键值查找而构建的，其他一些则优化了范围扫描，还有一些则通过提前计算优化特定查询的性能，同时可能在其他地方带来开销。</p>
+<p>在这篇文章中，我们将探索数据库索引的基本概念和不同的索引类型。我们还将了解每种索引的作用、何时适用以及其开销。</p>
+<figure data-type="image" tabindex="1"><img src="https://windrunner0707.github.io/post-images/1751380728111.png" alt="" loading="lazy"></figure>
+<h2 id="什么是数据库索引">什么是数据库索引？</h2>
+<p>数据库索引是将列值映射到表中行物理位置的数据结构，其目的是加速数据访问。数据库引擎通过查询索引，直接跳转到相关行，而不需要扫描每一行来查找匹配的值。</p>
+<figure data-type="image" tabindex="2"><img src="https://windrunner0707.github.io/post-images/1751380861720.png" alt="" loading="lazy"></figure>
+<p>假设有一个包含数百万条客户记录的表，以及以下查询：</p>
+<pre><code>SELECT * FROM customers WHERE email = alice@example.com';
+</code></pre>
+<p>没有索引时，像这样的查询需要引擎扫描 customers 表中的每一行。这就是全表扫描，在查找单条记录时，它既昂贵又缓慢，而且是多余的。</p>
+<p>如果在 email 列上有索引，数据库则会查询一个紧凑的查找结构。它找到该邮箱地址的条目，跟随指针直接定位到对应的行。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B4%A2%E5%BC%95">什么是数据库索引？</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.github.io/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/">
+              <h3 class="post-title">
+                 一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
