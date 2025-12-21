@@ -1,0 +1,241 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>面试八股文-死锁 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.tech/favicon.ico?v=1766317230703">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.tech/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="面试八股文-死锁 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.tech/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="死锁的四个必要条件（&quot;Coffman条件&quot;）
+1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。
+2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。
+3.不可剥夺..." />
+    <meta name="keywords" content="死锁,面试八股文" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.tech">
+  <img class="avatar" src="https://windrunner0707.tech/images/avatar.png?v=1766317230703" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              面试八股文-死锁
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-10-23
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://windrunner0707.tech/tag/nCxVsksyDl/" class="post-tag">
+                  # 死锁
+                </a>
+              
+                <a href="https://windrunner0707.tech/tag/w3JPwieMOC/" class="post-tag">
+                  # 面试八股文
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://windrunner0707.tech/post-images/mian-shi-ba-gu-wen-si-suo.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h3 id="死锁的四个必要条件coffman条件">死锁的四个必要条件（&quot;Coffman条件&quot;）</h3>
+<p>1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。<br>
+2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。<br>
+3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。<br>
+4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程又等待线程A的资源，形成环路。</p>
+<h3 id="避免死锁的方案">避免死锁的方案</h3>
+<p>为了避免死锁，可以从打破上述四个必要条件入手，主要有以下几种常用的方案：</p>
+<ol>
+<li>破坏互斥条件</li>
+</ol>
+<ul>
+<li>共享资源：尽可能避免将资源设置为互斥的。如果资源可以并发访问，则不会产生死锁。例如，读写锁（ReadWriteLock）可以允许多个线程同时读取数据而不互相阻塞。</li>
+</ul>
+<ol start="2">
+<li>破坏占有并等待条件</li>
+</ol>
+<ul>
+<li>一次性申请所有资源：确保线程在进入临界区时一次性申请所需的所有资源，避免线程在获得部分资源后再去请求其他资源时发生死锁。例如，使用数据库连接时，提前申请好所有的锁和资源，而不是在过程中逐步申请。</li>
+<li>非阻塞算法：使用非阻塞锁设计，例如采用乐观锁、CAS（Compare And Swap）等，避免在等待时阻塞。</li>
+</ul>
+<ol start="3">
+<li>破坏不可剥夺条件</li>
+</ol>
+<ul>
+<li>可剥夺锁：如果一个线程已经占有了某些资源，但又无法得到其他资源时，可以暂时释放当前占有的资源，稍后重新尝试。这样可以避免资源长时间被占有，减小死锁的可能性。比如在数据库事务处理中，遇到锁冲突时回滚并重试。</li>
+</ul>
+<ol start="4">
+<li>破坏环形等待条件</li>
+</ol>
+<ul>
+<li>资源顺序编号法：将所有的资源按照某个顺序编号，要求所有线程必须按照编号顺序请求资源，保证不会形成环路。例如，要求所有线程首先请求编号最小的资源，接着是第二小的资源，依此类推。这可以有效防止环形等待的产生。</li>
+<li>超时机制：给每个线程设置一个超时时间，如果线程在一定时间内无法获取所需资源，就主动放弃并回滚操作，从而避免长时间等待导致的死锁。</li>
+</ul>
+<h3 id="常见的死锁解决方案">常见的死锁解决方案</h3>
+<ol>
+<li>死锁预防</li>
+</ol>
+<ul>
+<li>死锁预防就是通过编程或者系统设计确保某些死锁条件不成立。</li>
+<li>避免同时持有多个资源：尽可能将任务分解，使得每个线程只需要持有一个资源。</li>
+<li>提高并发粒度：将锁的粒度调细，避免多个线程频繁竞争同一个资源。</li>
+<li>避免循环等待：通过资源分配顺序确保不会发生循环等待。</li>
+</ul>
+<ol start="2">
+<li>死锁检测与恢复</li>
+</ol>
+<ul>
+<li>死锁检测算法：通过系统检测当前的资源占用状态，判断是否存在死锁。如果检测到死锁，可以选择强制终止某个线程以释放资源。例如，银行家算法（Banker’s Algorithm）是一种经典的死锁检测与避免的算法。</li>
+<li>资源回收：一旦检测到死锁，系统可以选择回收某些线程占有的资源，强制它们放弃操作，以恢复系统的正常运行。</li>
+</ul>
+<ol start="3">
+<li>避免死锁的工具和库</li>
+</ol>
+<ul>
+<li>并发工具库：许多高级编程语言提供了处理并发和锁机制的库。例如，Java 的 java.util.concurrent.locks 包提供了 ReentrantLock、ReadWriteLock 等工具，有效帮助开发者避免死锁。</li>
+<li>死锁检测工具：可以使用工具对系统进行分析和监控，检测可能发生的死锁。比如 Java 的 JConsole 或 JVisualVM 可以用于检测 JVM 中的线程死锁情况。</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E6%AD%BB%E9%94%81%E7%9A%84%E5%9B%9B%E4%B8%AA%E5%BF%85%E8%A6%81%E6%9D%A1%E4%BB%B6coffman%E6%9D%A1%E4%BB%B6">死锁的四个必要条件（&quot;Coffman条件&quot;）</a></li>
+<li><a href="#%E9%81%BF%E5%85%8D%E6%AD%BB%E9%94%81%E7%9A%84%E6%96%B9%E6%A1%88">避免死锁的方案</a></li>
+<li><a href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E6%AD%BB%E9%94%81%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88">常见的死锁解决方案</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.tech/post/hua-wei-od-xiang-guan/">
+              <h3 class="post-title">
+                华为OD面试相关
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.tech/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,379 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.tech/favicon.ico?v=1766317230703">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.tech/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.tech/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="效果展示：https://www.windrunner0707.tech/
+技术栈说明
+ChatGPT
+辅助生成样例代码与K8S配置文件
+阿里云
+提供ECS实例和容器镜像仓库
+ECS：活动价99元购入，配置为2vCPU，2G内存，3Mbps..." />
+    <meta name="keywords" content="Kubernetes,Github,阿里云" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.tech">
+  <img class="avatar" src="https://windrunner0707.tech/images/avatar.png?v=1766317230703" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-06-19
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://windrunner0707.tech/tag/ARPS6jsN7_/" class="post-tag">
+                  # Kubernetes
+                </a>
+              
+                <a href="https://windrunner0707.tech/tag/eh-O3cQrkkS/" class="post-tag">
+                  # Github
+                </a>
+              
+                <a href="https://windrunner0707.tech/tag/cfuWsPO3xXD/" class="post-tag">
+                  # 阿里云
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://windrunner0707.tech/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>效果展示：https://www.windrunner0707.tech/</p>
+<h1 id="技术栈说明">技术栈说明</h1>
+<h2 id="chatgpt">ChatGPT</h2>
+<p>辅助生成样例代码与K8S配置文件</p>
+<h2 id="阿里云">阿里云</h2>
+<p>提供ECS实例和容器镜像仓库<br>
+ECS：活动价99元购入，配置为2vCPU，2G内存，3Mbps带宽<br>
+<img src="https://windrunner0707.tech/post-images/1750337198199.png" alt="" loading="lazy"><br>
+容器镜像仓库：阿里云ACR，个人版免费，用于保存前后端代码打包的镜像，在阿里云使用Docker Hub可能会发生超时问题。<br>
+<img src="https://windrunner0707.tech/post-images/1750337576420.png" alt="" loading="lazy"></p>
+<h2 id="k3s">K3S</h2>
+<p>由于Kubernetes占用资源较多，所以无法在我的阿里云ECS部署，这里采用K3S。官网对它的描述是”Lightweight Kubernetes“即轻量化Kubernetes，是为物联网和边缘计算打造的经认证的Kubernetes发行版。</p>
+<h2 id="github-action">GitHub Action</h2>
+<p>GitHub Actions 是 GitHub 提供的持续集成和持续部署（CI/CD）服务，它允许你在代码仓库中定义自动化流程，从而在特定事件发生时自动执行一系列任务，比如：</p>
+<ul>
+<li>push 或 PR 时自动运行测试</li>
+<li>构建和发布 Docker 镜像</li>
+<li>部署代码到服务器或 Kubernetes 集群</li>
+<li>静态分析、格式检查、打包发布等</li>
+</ul>
+<h1 id="准备阶段">准备阶段</h1>
+<h2 id="阿里云ecs安装k3s">阿里云ECS安装K3S</h2>
+<p>由于网络原因，阿里云服务器访问GitHub服务会超时，所以参考官方文档会发生超时的错误。然后我使用了以下方法安装K3S</p>
+<pre><code>wget https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh
+INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=&quot;--system-default-registry registry.cn-hangzhou.aliyuncs.com --tls-san 8.130.108.60&quot; ./k3s-install.sh
+</code></pre>
+<p>首先，安装 K3s 使用的是存储在阿里云对象存储上的 K3s 安装脚本，并且使用存储在国内 channel 去解析对应的 K3s 版本。<br>
+其次，通过 INSTALL_K3S_MIRROR=cn 环境变量来指定 K3s 的二进制文件从国内的阿里云对象存储上去拉取。<br>
+最后，通过--system-default-registry参数来指定 K3s 的系统镜像从国内的阿里云镜像仓库去拉取。</p>
+<h2 id="准备代码仓库">准备代码仓库</h2>
+<p>这里我准备了后端常用的Spring Boot代码仓库和React + Vite代码仓库，具体代码仓库如下：<br>
+前端：https://github.com/windrunner0707/transaction-system-frontend<br>
+后端：https://github.com/windrunner0707/transaction-system<br>
+工程的搭建主要依赖于ChatGPT，并且保证本地能打包成功</p>
+<h1 id="部署阶段">部署阶段</h1>
+<h2 id="配置dockerfile">配置Dockerfile</h2>
+<p>Dockerfile主要用来打包前后端镜像，并push到阿里云ACR镜像仓库。<br>
+前端Dockerfile如下：</p>
+<pre><code>## 构建阶段
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN npm install &amp;&amp; npm run build
+
+# 运行阶段
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+</code></pre>
+<p>后端Dockerfile如下：</p>
+<pre><code># Start with a base image containing Java runtime
+FROM openjdk:21-jdk-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the built jar file into the container
+COPY target/transaction-system-0.0.1-SNAPSHOT.jar /app/transaction-system.jar
+
+# Expose the port the application runs on
+EXPOSE 8080
+
+# Set the command to run the application
+CMD [&quot;java&quot;, &quot;-jar&quot;, &quot;transaction-system.jar&quot;]
+</code></pre>
+<h2 id="配置github-action">配置GitHub Action</h2>
+<p>GitHub Action功能主要在代码仓库中创建这样一个yaml配置文件来使用<br>
+<img src="https://windrunner0707.tech/post-images/1750338735496.png" alt="" loading="lazy"><br>
+其yaml配置文件内容如下：</p>
+<pre><code>name: Build and Deploy to K3s
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: transaction-system
+  ACR_REGISTRY: crpi-kw9b5zmptdsw1y03.cn-wulanchabu.personal.cr.aliyuncs.com
+  ACR_NAMESPACE: windrunner0707
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      - name: Log in to ACR
+        run: echo &quot;${{ secrets.ACR_PASSWORD }}&quot; | docker login ${{ env.ACR_REGISTRY }} -u &quot;${{ secrets.ACR_USERNAME }}&quot; --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build -t $ACR_REGISTRY/$ACR_NAMESPACE/$IMAGE_NAME:latest .
+
+      - name: Push Docker Image to ACR
+        run: |
+          docker push $ACR_REGISTRY/$ACR_NAMESPACE/$IMAGE_NAME:latest
+
+      - name: Upload deployment.yaml to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: deployment.yaml
+          target: /home/${{ secrets.SERVER_USER }}/deploy
+
+      - name: Deploy to K3s via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+            kubectl delete deployment transaction-system --ignore-not-found
+            kubectl apply -f /home/${{ secrets.SERVER_USER }}/deploy/deployment.yaml
+
+</code></pre>
+<p>主要步骤为：设置环境 -&gt; Maven打包 -&gt; 登陆阿里云ACR -&gt; 打包Docker镜像 -&gt; push Docker镜像 -&gt; 上传K8S配置文件至阿里云ECS -&gt; 登陆ECS服务器使用kubectl完成部署。<br>
+将配置文件push至GitHub仓库后，可以在Actions下看到该pipeline的所有流程，如图所示：<br>
+<img src="https://windrunner0707.tech/post-images/1750339084011.png" alt="" loading="lazy"></p>
+<h2 id="检查服务部署情况">检查服务部署情况</h2>
+<p>登陆至ECS服务器，使用kubectl get pods命令可以查看前后端部署的Pods情况<br>
+<img src="https://windrunner0707.tech/post-images/1750339210712.png" alt="" loading="lazy"></p>
+<h2 id="域名解析">域名解析</h2>
+<p>在阿里云购买域名后，使用云解析DNS，将域名解析到我们的ECS服务器，并填写个人资料，完成备案流程<br>
+<img src="https://windrunner0707.tech/post-images/1750339466100.png" alt="" loading="lazy"></p>
+<h2 id="配置https">配置HTTPS</h2>
+<p>在阿里云数字证书管理服务购买个人测试用的免费证书，一般有效期为3个月<br>
+<img src="https://windrunner0707.tech/post-images/1750339585045.png" alt="" loading="lazy"><br>
+然后下载公钥与私钥，上传到ECS服务器<br>
+<img src="https://windrunner0707.tech/post-images/1750339731140.png" alt="" loading="lazy"><br>
+将密钥加入K8S的Secret</p>
+<pre><code>kubectl create secret tls windrunner-tls   --cert=www.windrunner0707.tech.pem   --key=www.windrunner0707.tech.key   --namespace=default
+</code></pre>
+<p><img src="https://windrunner0707.tech/post-images/1750339865254.png" alt="" loading="lazy"><br>
+配置Ingress并开启HTTPS</p>
+<pre><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  tls:
+    - hosts:
+        - www.windrunner0707.tech
+      secretName: windrunner-tls
+  rules:
+    - host: www.windrunner0707.tech
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: transaction-system-frontend
+                port:
+                  number: 80
+</code></pre>
+<h1 id="后续开发todo">后续开发（TODO）</h1>
+<p>至此已完成了一个Demo的部署，后续还有前后端的连通，开发更多feature</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E6%8A%80%E6%9C%AF%E6%A0%88%E8%AF%B4%E6%98%8E">技术栈说明</a>
+<ul>
+<li><a href="#chatgpt">ChatGPT</a></li>
+<li><a href="#%E9%98%BF%E9%87%8C%E4%BA%91">阿里云</a></li>
+<li><a href="#k3s">K3S</a></li>
+<li><a href="#github-action">GitHub Action</a></li>
+</ul>
+</li>
+<li><a href="#%E5%87%86%E5%A4%87%E9%98%B6%E6%AE%B5">准备阶段</a>
+<ul>
+<li><a href="#%E9%98%BF%E9%87%8C%E4%BA%91ecs%E5%AE%89%E8%A3%85k3s">阿里云ECS安装K3S</a></li>
+<li><a href="#%E5%87%86%E5%A4%87%E4%BB%A3%E7%A0%81%E4%BB%93%E5%BA%93">准备代码仓库</a></li>
+</ul>
+</li>
+<li><a href="#%E9%83%A8%E7%BD%B2%E9%98%B6%E6%AE%B5">部署阶段</a>
+<ul>
+<li><a href="#%E9%85%8D%E7%BD%AEdockerfile">配置Dockerfile</a></li>
+<li><a href="#%E9%85%8D%E7%BD%AEgithub-action">配置GitHub Action</a></li>
+<li><a href="#%E6%A3%80%E6%9F%A5%E6%9C%8D%E5%8A%A1%E9%83%A8%E7%BD%B2%E6%83%85%E5%86%B5">检查服务部署情况</a></li>
+<li><a href="#%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90">域名解析</a></li>
+<li><a href="#%E9%85%8D%E7%BD%AEhttps">配置HTTPS</a></li>
+</ul>
+</li>
+<li><a href="#%E5%90%8E%E7%BB%AD%E5%BC%80%E5%8F%91todo">后续开发（TODO）</a></li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/">
+              <h3 class="post-title">
+                Spring Bean注入：循环依赖与构造器注入最佳实践
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.tech/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

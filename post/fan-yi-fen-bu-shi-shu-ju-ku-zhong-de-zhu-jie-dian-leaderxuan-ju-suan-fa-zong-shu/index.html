@@ -1,0 +1,173 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>（翻译）分布式数据库中的主节点（Leader）选举算法综述 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.tech/favicon.ico?v=1766317230703">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.tech/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="（翻译）分布式数据库中的主节点（Leader）选举算法综述 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.tech/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="分布式数据库系统依赖节点之间的协调才能正常工作。当多个节点在不同区域或可用区之间复制数据并处理请求时，必须有一个特定的节点来负责写入操作。这个节点通常被称为主节点（Leader）：它是唯一负责排序更新、提交变更，并在故障情况下仍能确保系统一..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.tech">
+  <img class="avatar" src="https://windrunner0707.tech/images/avatar.png?v=1766317230703" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              （翻译）分布式数据库中的主节点（Leader）选举算法综述
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-08-02
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>分布式数据库系统依赖节点之间的协调才能正常工作。当多个节点在不同区域或可用区之间复制数据并处理请求时，必须有一个特定的节点来负责写入操作。这个节点通常被称为主节点（Leader）：它是唯一负责排序更新、提交变更，并在故障情况下仍能确保系统一致性的节点。</p>
+<p>主节点选举的存在是为了回答一个简单却至关重要的问题：当前由哪个节点负责？</p>
+<p>这个答案不能依赖于假设、静态配置或人工干预。它必须在真实世界的压力下仍然可靠，即使在进程崩溃、网络延迟、网络分区、重启和消息丢失等不可预知的情况下也不例外。</p>
+<p>当主节点发生故障时，系统必须能够检测到故障，达成一致选出新的主节点，并继续运行，同时避免数据损坏或重复处理同一个请求。这是一个**容错与共识（consensus）**问题，也是分布式数据库设计的核心难题。</p>
+<p>基于主节点（Leader-based）的架构，通过以下方式简化了分布式状态管理中最困难的部分：</p>
+<p>它们简化了跨副本的写入序列化过程。</p>
+<p>它们协调了多数节点写入（quorum write），确保每次变更都能达成大多数节点的一致。</p>
+<p>它们避免了冲突操作以不一致的方式相互影响。</p>
+<p>当系统不可避免地出现故障时，它们能降低恢复的复杂度。</p>
+<p>然而，这种表面上的简单性，依赖于底层一个强健的选举机制。数据库系统需要在任何时刻都明确知道当前的主节点是谁，确保该主节点的数据是最新的，并且在必要时能快速且安全地选出新的主节点。</p>
+<p>在本文中，我们将介绍五种主节点选举的主要方法，每种方法都有其假设前提、优势与权衡。</p>
+<figure data-type="image" tabindex="1"><img src="https://windrunner0707.tech/post-images/1754141610505.png" alt="" loading="lazy"></figure>
+<h2 id="bully算法霸主算法">Bully算法（霸主算法）</h2>
+<p>Bully算法是分布式系统中最简单的主节点选举方法之一。它遵循一个非常基础的规则：ID最高的节点成为主节点。当某个节点发现当前主节点失去响应时，它会尝试接管主节点的职责。</p>
+<p>系统中的每个节点都会被分配一个唯一的数值ID。ID越大，节点的“优先级”越高。所有节点在一开始就知道彼此的ID，这对于算法的运行至关重要。</p>
+<p>假设系统中有五个节点，它们的ID分别为：1、2、3、4 和 5。当前由节点5担任主节点。</p>
+<p>如果节点5宕机了，而节点3检测到该故障（例如停止接收到心跳信号），节点3将发起一次选举。它会向所有ID比自己高的节点发送选举消息。在这个例子中，这些节点是节点4和节点5。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#bully%E7%AE%97%E6%B3%95%E9%9C%B8%E4%B8%BB%E7%AE%97%E6%B3%95">Bully算法（霸主算法）</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.tech/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

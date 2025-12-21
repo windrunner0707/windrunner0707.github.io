@@ -1,0 +1,212 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kubernetes基础组件详解 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.tech/favicon.ico?v=1766317230703">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.tech/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Kubernetes基础组件详解 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.tech/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+概述
+Kubernetes（简称 K8S）是目前最流行的容器编排平台，能够自动化地完成容器化应用的部署、伸缩、负载均衡和运维管理。它的强大之处在于一整套架构设计，这套架构由控制平面（Control Plane）和工作节点（Worker N..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.tech">
+  <img class="avatar" src="https://windrunner0707.tech/images/avatar.png?v=1766317230703" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Kubernetes基础组件详解
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-09-30
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://windrunner0707.tech/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <figure data-type="image" tabindex="1"><img src="https://windrunner0707.tech/post-images/1759237881724.png" alt="" loading="lazy"></figure>
+<h1 id="概述">概述</h1>
+<p>Kubernetes（简称 K8S）是目前最流行的容器编排平台，能够自动化地完成容器化应用的部署、伸缩、负载均衡和运维管理。它的强大之处在于一整套架构设计，这套架构由控制平面（Control Plane）和工作节点（Worker Node）共同组成。每个部分承担着特定的职责，相互协作保证集群的稳定运行。本文将基于一张经典架构图，带你了解 Kubernetes 的基础组件及其作用。</p>
+<h1 id="介绍">介绍</h1>
+<h2 id="控制平面control-plane">控制平面（Control Plane）</h2>
+<p>控制平面是整个集群的大脑，负责对集群进行全局调度和管理，主要组件包括：</p>
+<h3 id="api-server">API Server</h3>
+<p>API Server 是 Kubernetes 的“门面”，是所有请求的统一入口。无论是通过命令行（kubectl）、UI 管理界面还是自动化控制器，所有操作都会通过 API Server 进行交互。</p>
+<h3 id="etcd">etcd</h3>
+<p>etcd 是一个分布式的键值数据库，用来保存整个集群的状态信息。比如有哪些节点、有哪些 Pod、服务的配置等，都存储在 etcd 中。可以理解为 Kubernetes 的“账本”。</p>
+<h3 id="scheduler">Scheduler</h3>
+<p>Scheduler 负责把新建的 Pod 分配到合适的节点上。它会综合考虑节点的 CPU、内存、亲和性、反亲和性等条件，尽量做到资源合理分配。</p>
+<h3 id="controller-manager">Controller Manager</h3>
+<p>Controller Manager 保证集群的状态与用户的期望一致。比如用户声明需要三个副本，如果其中一个 Pod 挂掉，Controller Manager 会自动启动新的 Pod 来补齐。</p>
+<h2 id="工作节点worker-node">工作节点（Worker Node）</h2>
+<p>工作节点是真正运行应用的地方，每个节点上都包含以下组件：</p>
+<h3 id="kubelet">kubelet</h3>
+<p>kubelet 负责与 API Server 通信，确保节点上运行的容器与期望状态保持一致。比如 Pod 定义了 2 个副本，kubelet 会负责监控并保持容器的存活。</p>
+<h3 id="kube-proxy">kube-proxy</h3>
+<p>kube-proxy 处理 Pod 与 Pod 之间的网络通信和负载均衡。它确保服务能通过虚拟 IP 正确转发到后端的 Pod。</p>
+<h3 id="container-runtime">Container Runtime</h3>
+<p>Container Runtime 是运行容器的引擎，常见的有 Docker、containerd 等。Pod 内的容器最终都是通过它来启动的。</p>
+<h3 id="pods">Pods</h3>
+<p>Pod 是 Kubernetes 中最小的调度单元，每个 Pod 包含一个或多个紧密相关的容器。Pod 会共享网络和存储卷，方便容器之间的通信。</p>
+<h1 id="总结">总结</h1>
+<p>Kubernetes 的强大在于它通过一套精心设计的组件，完成了从集群调度到应用运行的全链路管理。控制平面（Control Plane）负责“全局大脑”的调度与状态维护，而工作节点（Worker Node）则是具体运行应用的“执行者”。理解这些核心组件的作用，是进一步学习 Kubernetes 网络、存储、安全和扩展性的基础。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#%E4%BB%8B%E7%BB%8D">介绍</a>
+<ul>
+<li><a href="#%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2control-plane">控制平面（Control Plane）</a>
+<ul>
+<li><a href="#api-server">API Server</a></li>
+<li><a href="#etcd">etcd</a></li>
+<li><a href="#scheduler">Scheduler</a></li>
+<li><a href="#controller-manager">Controller Manager</a></li>
+</ul>
+</li>
+<li><a href="#%E5%B7%A5%E4%BD%9C%E8%8A%82%E7%82%B9worker-node">工作节点（Worker Node）</a>
+<ul>
+<li><a href="#kubelet">kubelet</a></li>
+<li><a href="#kube-proxy">kube-proxy</a></li>
+<li><a href="#container-runtime">Container Runtime</a></li>
+<li><a href="#pods">Pods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.tech/post/api-xue-xi-lu-xian-tu-quan-jie-xi-cong-ru-men-dao-jin-jie/">
+              <h3 class="post-title">
+                API学习路线图全解析：从入门到进阶
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.tech/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

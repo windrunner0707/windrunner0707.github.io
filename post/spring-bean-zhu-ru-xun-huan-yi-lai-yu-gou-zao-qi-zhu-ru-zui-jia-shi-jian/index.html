@@ -1,0 +1,247 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spring Bean注入：循环依赖与构造器注入最佳实践 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.tech/favicon.ico?v=1766317230703">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.tech/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Spring Bean注入：循环依赖与构造器注入最佳实践 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.tech/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="概述
+在Spring框架中，Bean的注入是核心功能之一，它帮助开发者以声明式的方式管理对象之间的依赖，从而实现松耦合设计。然而，Bean注入也可能面临循环依赖的问题。@Lazy提供了一种通过延迟初始化解决循环依赖的方法，但这种方式可能隐藏..." />
+    <meta name="keywords" content="Spring" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.tech">
+  <img class="avatar" src="https://windrunner0707.tech/images/avatar.png?v=1766317230703" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Spring Bean注入：循环依赖与构造器注入最佳实践
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-12-14
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://windrunner0707.tech/tag/f0kgKf1vsx/" class="post-tag">
+                  # Spring
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://windrunner0707.tech/post-images/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h1 id="概述">概述</h1>
+<p>在Spring框架中，Bean的注入是核心功能之一，它帮助开发者以声明式的方式管理对象之间的依赖，从而实现松耦合设计。然而，Bean注入也可能面临循环依赖的问题。@Lazy提供了一种通过延迟初始化解决循环依赖的方法，但这种方式可能隐藏设计上的缺陷。<br>
+本文将从循环依赖的角度切入，探讨@Autowired、@Inject以及构造器注入三种主要注入方式的原理，详细分析@Lazy解决循环依赖的工作机制及其弊端，并重点阐述构造器注入的优势。通过构造器注入，可以在启动时及早发现循环依赖问题，符合单一职责原则，并且有助于解耦合类的设计。最后，我们还将介绍如何通过@RequiredArgsConstructor注解简化构造器注入的实现。</p>
+<h2 id="autowired的原理">@Autowired的原理</h2>
+<p>@Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的依赖注入（DI）框架：<br>
+自动装配方式：Spring会根据类型（byType）在容器中查找匹配的Bean，并将其注入到目标对象中。<br>
+细粒度控制：可以与@Qualifier搭配使用，基于Bean名称进行更精确的注入。<br>
+工作原理：</p>
+<ul>
+<li>Spring容器在启动时，会扫描@Autowired标注的字段、方法或构造器。</li>
+<li>通过AutowiredAnnotationBeanPostProcessor来解析并处理这些注解。</li>
+<li>如果发现多个候选Bean，且未指定@Qualifier，Spring将抛出NoUniqueBeanDefinitionException。</li>
+</ul>
+<h2 id="inject的原理">@Inject的原理</h2>
+<p>@Inject是Java标准（JSR-330）中的依赖注入注解，由Spring兼容支持。与@Autowired类似，它也是基于类型的自动装配。<br>
+主要特点：</p>
+<ul>
+<li>提供了与框架无关的依赖注入方式。</li>
+<li>同样支持@Qualifier用于细粒度控制。<br>
+差异点：</li>
+<li>不支持required属性（@Autowired的required属性允许强制或非强制注入）。</li>
+<li>更倾向于与其他符合JSR-330规范的框架协同工作。</li>
+</ul>
+<h2 id="构造器注入的原理">构造器注入的原理</h2>
+<p>构造器注入是一种通过构造器传递依赖的方式，Spring容器在创建Bean实例时，会自动调用标注了@Autowired或@Inject的构造器，将所需的依赖注入。<br>
+实现细节：</p>
+<ul>
+<li>Spring会查找所有符合条件的构造器，如果仅存在一个构造器，Spring会默认使用它。</li>
+<li>如果存在多个构造器，则需要明确标注@Autowired或@Inject。<br>
+原理：</li>
+<li>构造器参数会被Spring容器自动解析，容器会找到与参数类型匹配的Bean并完成注入。</li>
+<li>如果未找到匹配的依赖且未设置可选性，Spring会抛出异常。</li>
+</ul>
+<h2 id="用lazy解决循环依赖的原理">用@Lazy解决循环依赖的原理</h2>
+<p>在某些场景中，两个或多个Bean可能会相互依赖，导致Spring容器在初始化时发生循环依赖错误。为了缓解这种问题，可以使用@Lazy注解：<br>
+工作机制：</p>
+<ul>
+<li>标注@Lazy的Bean不会在容器启动时立即初始化，而是在第一次被使用时才会实例化。</li>
+<li>通过延迟加载，Spring能够暂时跳过依赖解析，直到所有Bean的创建过程完成。<br>
+应用场景：</li>
+<li>循环依赖无法通过构造器注入解决时，可以使用@Lazy配合字段或setter注入。</li>
+<li>虽然@Lazy提供了一种有效的解决循环依赖的方法，但从单一职责和解耦的角度出发，推荐通过构造器注入尽早发现循环依赖，并重构代码以消除循环依赖。</li>
+</ul>
+<h2 id="构造器注入的好处">构造器注入的好处</h2>
+<ul>
+<li>不可变性： 构造器注入强制在对象创建时提供所有必需的依赖，从而保证对象的状态在创建后是完整且不可变的。</li>
+<li>简化测试： 构造器注入使得单元测试更容易编写，因为可以直接通过构造器传递Mock依赖，而无需依赖Spring容器。</li>
+<li>避免循环依赖： Spring的构造器注入在对象创建时即解析依赖，因此可以在编译期或启动期检测出潜在的循环依赖问题。</li>
+<li>更好的代码可读性： 构造器明确地声明了依赖关系，减少了通过注解或方法查找依赖的复杂性。<br>
+与不可变对象模式的契合： 现代开发更倾向于不可变对象，而构造器注入与这种模式高度一致。</li>
+<li>解耦合与单一职责： 构造器注入能显式地揭示Bean的依赖关系，使得类更加专注于自己的职责。通过合理的依赖设计，能够避免类之间的耦合，提升系统的可维护性。</li>
+</ul>
+<h2 id="推荐使用requiredargsconstructor">推荐使用@RequiredArgsConstructor</h2>
+<p>为了简化构造器注入的代码，Spring项目中推荐使用Lombok提供的@RequiredArgsConstructor注解：<br>
+功能：<br>
+自动生成一个包含所有final字段的构造器。<br>
+结合Spring容器，可以轻松实现构造器注入而无需手动编写构造器。<br>
+示例：</p>
+<pre><code>@Component
+@RequiredArgsConstructor
+public class MyService {
+    private final MyRepository myRepository;
+    private final AnotherDependency anotherDependency;
+}
+</code></pre>
+<p>在上述代码中，MyService的依赖会通过构造器注入完成，而无需显式声明构造器，代码更加简洁。</p>
+<p>总结<br>
+Spring的依赖注入为开发者提供了多种选择：@Autowired适合快速开发，@Inject支持标准化，而构造器注入则在安全性、测试性和代码可读性方面表现尤为出色。通过合理选择注入方式，我们可以在不同的场景下构建更加稳定、高效的应用程序。<br>
+从单一职责和解耦的角度考虑，构造器注入不仅能显式定义依赖，还能尽早发现循环依赖问题，从而推动更优质的设计。同时，结合@RequiredArgsConstructor注解的使用，可以进一步提高代码的简洁性和可维护性。<br>
+希望本文能为你理解Spring Bean注入提供清晰的思路，并在实际开发中有所助益。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a>
+<ul>
+<li><a href="#autowired%E7%9A%84%E5%8E%9F%E7%90%86">@Autowired的原理</a></li>
+<li><a href="#inject%E7%9A%84%E5%8E%9F%E7%90%86">@Inject的原理</a></li>
+<li><a href="#%E6%9E%84%E9%80%A0%E5%99%A8%E6%B3%A8%E5%85%A5%E7%9A%84%E5%8E%9F%E7%90%86">构造器注入的原理</a></li>
+<li><a href="#%E7%94%A8lazy%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E7%9A%84%E5%8E%9F%E7%90%86">用@Lazy解决循环依赖的原理</a></li>
+<li><a href="#%E6%9E%84%E9%80%A0%E5%99%A8%E6%B3%A8%E5%85%A5%E7%9A%84%E5%A5%BD%E5%A4%84">构造器注入的好处</a></li>
+<li><a href="#%E6%8E%A8%E8%8D%90%E4%BD%BF%E7%94%A8requiredargsconstructor">推荐使用@RequiredArgsConstructor</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.tech/post/clean-gitrang-dai-ma-ban-ben-kong-zhi-geng-qing-xi-geng-gao-xiao-de-shi-jian-zhi-nan/">
+              <h3 class="post-title">
+                Clean Git：让代码版本控制更清晰、更高效的实践指南
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.tech/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

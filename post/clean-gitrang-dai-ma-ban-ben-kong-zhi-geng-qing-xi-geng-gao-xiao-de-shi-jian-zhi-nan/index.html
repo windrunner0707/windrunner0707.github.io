@@ -1,0 +1,594 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Clean Git：让代码版本控制更清晰、更高效的实践指南 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.tech/favicon.ico?v=1766317230703">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.tech/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Clean Git：让代码版本控制更清晰、更高效的实践指南 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.tech/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="# 概述
+在现代软件开发中，Git 已成为不可或缺的版本控制工具。然而，随着项目规模的增长和团队协作的深入，开发者常常面临提交记录混乱、分支管理无序以及冲突处理低效等问题。本篇文章将从提交历史优化、分支管理、冲突解决、git hooks在C..." />
+    <meta name="keywords" content="Git" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.tech">
+  <img class="avatar" src="https://windrunner0707.tech/images/avatar.png?v=1766317230703" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Clean Git：让代码版本控制更清晰、更高效的实践指南
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-12-04
+              </span>
+              <span>
+                14 min read
+              </span>
+              
+                <a href="https://windrunner0707.tech/tag/j8h6lvpIHA/" class="post-tag">
+                  # Git
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://windrunner0707.tech/post-images/clean-gitrang-dai-ma-ban-ben-kong-zhi-geng-qing-xi-geng-gao-xiao-de-shi-jian-zhi-nan.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><img src="https://windrunner0707.tech/post-images/1745380904972.jpg" alt="" loading="lazy"># 概述</p>
+<p>在现代软件开发中，Git 已成为不可或缺的版本控制工具。然而，随着项目规模的增长和团队协作的深入，开发者常常面临提交记录混乱、分支管理无序以及冲突处理低效等问题。本篇文章将从提交历史优化、分支管理、冲突解决、git hooks在CI/CD中的应用等几个方面，结合实际场景，分享一系列实用的 Git 最佳实践与技巧。同时，还将介绍如何利用 IDEA 集成的 Git 工具高效完成常见任务，帮助大家在提升开发效率的同时，让代码管理更加清晰规范。</p>
+<h1 id="提交历史优化">提交历史优化</h1>
+<p>清晰、整洁的提交历史是高效代码协作和维护的基石。一个明确的提交历史不仅能清晰描述代码的变更内容，还能帮助团队快速理解功能迭代的过程，便于问题追踪和代码审查。在实际开发中，合理利用 Git 提供的工具，例如 <code>git rebase</code>、<code>git amend</code> 和 <code>git squash</code>，可以优化提交历史，移除多余的提交，合并相关变更，甚至修正已有的提交信息，从而让提交历史更具可读性和逻辑性。这种优化不仅能提升团队协作的效率，还能在代码审查和版本管理中带来巨大的便利。</p>
+<h3 id="撰写清晰的提交信息">撰写清晰的提交信息</h3>
+<p>模糊的提交信息无法清楚描述改动内容，日后追溯时很难理解具体变更。</p>
+<p>正面示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">feat: 新增用户注册功能- 增加了用户注册表单验证逻辑- 使用邮件发送了注册确认链接- 优化了表单输入的错误提示</th>
+</tr>
+</thead>
+</table>
+<p>反面示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">fix: 改了一些东西update: 更新了代码</th>
+</tr>
+</thead>
+</table>
+<h3 id="分割和合并提交">分割和合并提交</h3>
+<p>将多个功能混在一起的提交，难以进行代码回溯和版本管理，后期维护成本高。</p>
+<p>正面示例：每个提交只完成一个独立的功能或修复，避免 “杂糅提交”。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">feat: 实现用户登录功能fix: 修复登录页面的样式问题test: 添加登录功能的单元测试</th>
+</tr>
+</thead>
+</table>
+<p>反面示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">feat: 完成了用户注册和部分登录功能，还有一些小问题</th>
+</tr>
+</thead>
+</table>
+<h3 id="git-提交历史重写技巧">Git 提交历史重写技巧</h3>
+<p>在开发过程中，提交历史可能会因为小错误、冗余提交或逻辑混乱而变得凌乱。通过 Git 提供的历史重写工具，如 <code>git amend</code> 和 <code>git squash</code>，可以对提交记录进行细致的调整，让提交历史更加清晰、合理。</p>
+<h4 id="git-commit-amend修改最近一次提交"><strong><code>git commit --amend</code>：修改最近一次提交</strong></h4>
+<p><code>git amend</code> 用于修改最近一次提交，无需新增一个提交记录。它可以用来修正提交信息、补充漏掉的文件，或者调整提交内容。</p>
+<p><strong>常见场景及用法</strong>：</p>
+<p><strong>修正提交信息</strong><br>
+如果最近一次提交的描述有误，可以使用以下命令重新编辑提交信息：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git commit --amend</th>
+</tr>
+</thead>
+</table>
+<p>Git 会打开默认的编辑器，允许修改提交说明。保存后，原提交记录将被替换为新的提交。</p>
+<p><strong>补充漏提交的文件</strong><br>
+假如在提交后发现漏掉了某些文件：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git add &lt;missed-file&gt;git commit --amend</th>
+</tr>
+</thead>
+</table>
+<p>这样，新增的文件会被追加到最近一次提交中，提交历史保持整洁。</p>
+<p><strong>注意事项</strong>：使用 <code>--amend</code> 会重写提交历史，不要对已经推送到远程的提交执行此操作，避免影响他人代码。对于自己的分支，需要使用git push -f 强行覆盖已经push到远端的提交。</p>
+<h4 id="git-rebase-i使用-git-squash-合并提交"><strong><code>git rebase -i</code>：使用 <code>git squash</code> 合并提交</strong></h4>
+<p><code>git squash</code> 是在交互式 rebase (<code>git rebase -i</code>) 中用于合并多个相关提交的命令。通过合并零散的提交，可以让提交历史更具逻辑性和条理性。</p>
+<p><strong>常见场景及用法</strong>：</p>
+<p><strong>开始交互式 Rebase</strong><br>
+假设你想合并最近的 3 次提交：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git rebase -i HEAD~3</th>
+</tr>
+</thead>
+</table>
+<p>此时会打开一个交互式编辑器，显示如下内容：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">pick abc123 First commitpick def456 Second commitpick ghi789 Third commit</th>
+</tr>
+</thead>
+</table>
+<p><strong>指定合并方式</strong><br>
+将后续需要合并的提交改为 <code>squash</code> 或 <code>s</code>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">pick abc123 First commitsquash def456 Second commitsquash ghi789 Third commit</th>
+</tr>
+</thead>
+</table>
+<p><strong>编辑合并后的提交信息</strong><br>
+保存后，Git 会提示编辑合并后的提交信息：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"># This is a combination of 3 commits.# The first commit message:First commit# The following commit messages:Second commitThird commit</th>
+</tr>
+</thead>
+</table>
+<p>你可以选择保留、合并或重写提交信息。编辑完成后保存退出，Git 将自动合并提交，最终的提交历史将更加简洁。</p>
+<h2 id="idea中的提交历史修改">IDEA中的提交历史修改</h2>
+<p>IDEA中提交当前代码的快捷键是Ctrl + K 我们在提交信息栏中可以找到amend选项，对应了git amend操作，把当前提交合并入上次提交。<br>
+![][image1]</p>
+<p>另外，在集成的git工具中，我们右键选中的提交，可以选择编辑提交信息与squash操作。<br>
+![][image2]</p>
+<h1 id="分支管理">分支管理</h1>
+<h2 id="分支命名与使用规范">分支命名与使用规范</h2>
+<p>正面示例：使用统一的命名规范，根据功能或类型划分，使用 develop、feature、release、hotfix 等规范分支</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">feature/add-user-loginbugfix/fix-login-errorhotfix/security-patch</th>
+</tr>
+</thead>
+</table>
+<p>反面示例：随意创建分支，缺乏明确的管理策略</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">branch123myfixtemp</th>
+</tr>
+</thead>
+</table>
+<h2 id="合并分支">合并分支</h2>
+<p>在团队协作中，本地分支需要定期与远程分支同步，以确保代码最新。传统方式是通过 <code>git merge</code> 合入远程分支的变更，但这通常会产生冗余的合并提交，导致提交历史杂乱。通过 <code>git rebase</code>，可以将远程分支的更新“平滑地”合并到本地分支，提交历史更显整洁。</p>
+<h4 id="git-merge-合并分支">git merge (合并分支)</h4>
+<p>将两个分支的最新提交整合，生成一个新的合并提交（merge commit）。不修改已有提交历史，保留所有原始提交。<br>
+示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">A---B---C (main)     \      D---E (feature)</th>
+</tr>
+</thead>
+</table>
+<p>使用 git merge 后：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">A---B---C---M (main)        \  /         D---E (feature)</th>
+</tr>
+</thead>
+</table>
+<p>其中 M 是新的合并提交。</p>
+<h4 id="git-rebase-变基">git rebase (变基)</h4>
+<p>将 feature 分支的更改移至 main 的最新提交之上，相当于重新应用一遍。<br>
+修改提交历史，使其看起来更线性、更整洁。<br>
+示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">A---B---C (main)     \      D---E (feature)</th>
+</tr>
+</thead>
+</table>
+<p>使用 git rebase 后：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">A---B---C---D'---E' (feature rebased onto main)</th>
+</tr>
+</thead>
+</table>
+<h4 id="git-rebase-的好处">git rebase 的好处</h4>
+<p>保持提交历史线性、简洁。git rebase 使提交历史看起来像一个单独的分支线，避免了额外的合并提交。适合需要清晰、连续历史记录的场景，如开源项目或长期维护的项目。<br>
+示例对比：<br>
+使用 git merge：</p>
+<p>| *   Merge branch 'feature' into 'main'|\| * Feature Commit E| * Feature Commit D* | Main Commit C|/* Main Commit B |<br>
+| :---- |</p>
+<p>使用 git rebase:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">* Feature Commit E* Feature Commit D* Main Commit C* Main Commit B</th>
+</tr>
+</thead>
+</table>
+<ul>
+<li>
+<p><strong>避免不必要的合并提交</strong><br>
+每次 git merge 都会生成一个合并提交，如果频繁操作，提交历史会显得冗余和凌乱。git rebase 则直接将变更应用到主分支，避免合并提交的累积。</p>
+</li>
+<li>
+<p><strong>更容易阅读与回溯</strong><br>
+团队或个人在回溯历史时，可以更直观地理解每个提交的变化和原因。git rebase 生成的历史记录更清晰，无需额外理解复杂的分支结构。</p>
+</li>
+<li>
+<p><strong>提升代码质量（中间冲突修复）</strong><br>
+git rebase 过程中可以逐个修复冲突，确保每个提交都是完整且正确的。避免在合并时出现大规模冲突，一次解决多个问题带来的风险。</p>
+</li>
+</ul>
+<h4 id="什么时候选择-git-rebase">什么时候选择 git rebase？</h4>
+<p>个人开发分支的整合：当你在一个独立分支上完成开发，并希望提交历史清晰时，git rebase 是最佳选择。<br>
+小团队协作或线性开发：适用于保持代码库整洁、简洁的场景。</p>
+<h4 id="什么时候选择-git-merge">什么时候选择 git merge？</h4>
+<p>大型团队协作：当多人在同一分支上工作时，git merge 保留了完整的开发历史，可以追溯并发工作。<br>
+保留真实历史：当你希望完整记录合并的每个分支历史时，git merge 更合适。</p>
+<h2 id="合并冲突之git-rerere">合并冲突之git rerere</h2>
+<h4 id="git-rerere-的使用场景"><strong><code>git rerere</code> 的使用场景</strong></h4>
+<ol>
+<li><strong>反复 Rebase 或 Merge</strong><br>
+当在长时间存在的功能分支上开发时，频繁从主分支合并更新可能会遇到相同的冲突。启用 <code>git rerere</code> 后，Git 会自动应用之前的冲突解决，避免重复劳动。</li>
+<li><strong>团队协作中的复杂冲突</strong><br>
+在多人合作时，如果不同开发者在多个地方解决了相同冲突，团队可以共享冲突解决记录，统一冲突处理方式。</li>
+</ol>
+<h4 id="git-rerere-的工作原理"><strong><code>git rerere</code> 的工作原理</strong></h4>
+<ol>
+<li>记录冲突解决方式：当你解决了一次冲突并提交后，<code>git rerere</code> 会自动记录该冲突的解决方式。</li>
+<li>自动复用解决方案：下一次遇到相同冲突时，Git 会自动应用之前的解决方案，减少手动解决冲突的步骤</li>
+</ol>
+<h4 id="如何启用-git-rerere"><strong>如何启用 <code>git rerere</code></strong></h4>
+<p>全局启用：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git config --global rerere.enabled true</th>
+</tr>
+</thead>
+</table>
+<p>针对单个仓库启用：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git config rerere.enabled true</th>
+</tr>
+</thead>
+</table>
+<h4 id=""></h4>
+<h4 id="实际操作流程"><strong>实际操作流程</strong></h4>
+<p><strong>处理初次冲突</strong><br>
+遇到冲突时，解决冲突并标记为已解决：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git add &lt;resolved-file&gt;git commit</th>
+</tr>
+</thead>
+</table>
+<p><strong>复用解决方案</strong><br>
+当再次遇到相同冲突时，Git 会自动应用之前的解决方案，并标记文件为已解决。如果需要验证：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git status</th>
+</tr>
+</thead>
+</table>
+<ol>
+<li>可以看到冲突已被自动解决。</li>
+<li>**手动确认或调整：**如果自动解决不完全正确，可以手动编辑文件，然后重复 <code>git add</code> 和 <code>git commit</code>。</li>
+</ol>
+<h4 id="git-rerere-的优缺点"><strong><code>git rerere</code> 的优缺点</strong></h4>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>减少重复冲突解决的时间，特别适合长时间开发的功能分支。</li>
+<li>提高复杂项目的冲突解决效率。</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>需要团队成员统一使用，且冲突记录可能需要共享才能充分发挥作用。</li>
+<li>在解决方式不完全匹配时，仍需手动调整。</li>
+</ul>
+<h2 id="idea中的pull代码">IDEA中的pull代码</h2>
+<p>IDEA中pull远程代码的快捷键是Ctrl + T我们在拉代码过程中可以选择rebase或者merge远程代码到本地。<br>
+![][image3]</p>
+<h1 id="git-patch-与-git-apply">git patch 与 git apply</h1>
+<p>在代码协作与提交历史优化中，git patch 和 git apply 是一对强大的工具组合。git patch 用于生成变更补丁文件，而 git apply 则可以将这些补丁应用到工作目录中。它们可以帮助开发者在跨分支、跨仓库传递变更，或在代码回滚、细化提交时精确控制变更内容。</p>
+<h2 id="git-patch-生成补丁"><code>git patch</code> 生成补丁</h2>
+<p>Git 可以生成包含代码修改内容的补丁文件，供其他人应用到自己的代码库中。</p>
+<p>生成补丁文件的常见方法</p>
+<p><strong>使用 <code>git diff</code> 生成基础补丁</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git diff &gt; changes.patch</th>
+</tr>
+</thead>
+</table>
+<ul>
+<li>此命令生成工作区未提交的更改的补丁文件。</li>
+<li><code>changes.patch</code> 是一个包含代码差异的文本文件，记录了具体的新增、删除或修改。</li>
+</ul>
+<h2 id="git-apply-应用补丁"><code>git apply</code> 应用补丁</h2>
+<p><code>git apply</code> 用于将补丁文件中的修改应用到当前代码库，但不会自动生成提交记录。</p>
+<h5 id="基本用法"><strong>基本用法</strong></h5>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git apply changes.patch</th>
+</tr>
+</thead>
+</table>
+<p>此命令将 <code>changes.patch</code> 中的修改应用到当前工作区。</p>
+<h5 id="查看补丁应用的效果-在实际应用补丁前可以通过-check-检查补丁是否能成功应用">查看补丁应用的效果 在实际应用补丁前，可以通过 <code>--check</code> 检查补丁是否能成功应用：</h5>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git apply --check changes.patch</th>
+</tr>
+</thead>
+</table>
+<h5 id="将补丁文件应用为提交"><strong>将补丁文件应用为提交</strong></h5>
+<p>如果希望直接将补丁文件作为一次提交，可以使用 <code>git am</code> 命令（适用于由 <code>git format-patch</code> 生成的补丁文件）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git am changes.patch</th>
+</tr>
+</thead>
+</table>
+<h2 id="idea中的patch与apply操作">IDEA中的patch与apply操作</h2>
+<p>IDEA中可以使用集成的git工具生成和应用patch文件，具体位置如截图所示。<br>
+![][image4]![][image5]</p>
+<h1 id="git-hooks">git hooks</h1>
+<p>在团队协作开发中，开发者可能会因为疏忽忘记在本地运行测试，直接将代码提交到远程仓库，导致在 CI/CD 流程中测试失败，浪费时间。通过 Git Hooks，我们可以在本地 <code>push</code> 或 <code>commit</code> 代码时，自动执行测试命令，如运行 Maven 的单元测试，确保代码的质量和稳定性。</p>
+<h2 id="git-hooks-简介">Git Hooks 简介</h2>
+<p>Git Hooks 是 Git 提供的脚本功能，可在特定的 Git 操作（如 <code>commit</code>、<code>push</code>）之前或之后触发自定义逻辑。例如：</p>
+<ul>
+<li><code>pre-commit</code>：在 <code>git commit</code> 命令之前执行。</li>
+<li><code>pre-push</code>：在 <code>git push</code> 命令之前执行。</li>
+</ul>
+<h2 id="在-push-时运行-maven-单元测试">在 push 时运行 Maven 单元测试</h2>
+<p>在团队协作开发中，开发者可能会因为疏忽忘记在本地运行测试，直接将代码提交到远程仓库，导致在 CI/CD 流程中测试失败，浪费时间。通过 Git Hooks，我们可以在本地 <code>push</code> 或 <code>commit</code> 代码时，自动执行测试命令，如运行 Maven 的单元测试，确保代码的质量和稳定性。</p>
+<p>我们可以使用 <code>pre-push</code> Hook 在推送前执行单元测试。以下是具体实现步骤：</p>
+<p>创建 <code>pre-push</code> Hook 文件</p>
+<p>进入项目的 Git 配置目录：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">cd .git/hooks</th>
+</tr>
+</thead>
+</table>
+<p>创建并编辑 <code>pre-push</code> 文件：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">touch pre-pushchmod +x pre-push  # 确保 Hook 文件具有可执行权限</th>
+</tr>
+</thead>
+</table>
+<p>在 <code>pre-push</code> 文件中添加以下脚本：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">#!/bin/bashecho &quot;Running Maven tests before pushing...&quot;# 运行 Maven 单元测试mvn testif [ $? -ne 0 ]; then    echo &quot;Unit tests failed. Push aborted.&quot;    exit 1fiecho &quot;All tests passed. Proceeding with push.&quot;exit 0</th>
+</tr>
+</thead>
+</table>
+<h2 id="测试-hook-是否生效">测试 Hook 是否生效</h2>
+<ol>
+<li>在代码中故意引入一个可能导致单元测试失败的错误。</li>
+<li>尝试执行 <code>git push</code>：
+<ul>
+<li>如果测试失败，<code>pre-push</code> Hook 会中止推送，并提示错误原因。</li>
+<li>如果测试成功，代码会正常推送到远程仓库。</li>
+</ul>
+</li>
+</ol>
+<h1 id="总结">总结</h1>
+<p>Git 的强大不仅体现在版本控制的基础能力上，更在于其灵活的操作方式和丰富的工具支持。通过优化提交历史、规范分支管理以及高效处理冲突，开发者可以更有条理地管理代码版本，提升协作效率，降低开发过程中的复杂性。希望本文的实践分享能够为您和您的团队提供有价值的参考，助力构建一套高效、规范的 Clean Git 工作流。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2%E4%BC%98%E5%8C%96">提交历史优化</a><br>
+*
+<ul>
+<li><a href="#%E6%92%B0%E5%86%99%E6%B8%85%E6%99%B0%E7%9A%84%E6%8F%90%E4%BA%A4%E4%BF%A1%E6%81%AF">撰写清晰的提交信息</a></li>
+<li><a href="#%E5%88%86%E5%89%B2%E5%92%8C%E5%90%88%E5%B9%B6%E6%8F%90%E4%BA%A4">分割和合并提交</a></li>
+<li><a href="#git-%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2%E9%87%8D%E5%86%99%E6%8A%80%E5%B7%A7">Git 提交历史重写技巧</a>
+<ul>
+<li><a href="#git-commit-amend%E4%BF%AE%E6%94%B9%E6%9C%80%E8%BF%91%E4%B8%80%E6%AC%A1%E6%8F%90%E4%BA%A4"><strong><code>git commit --amend</code>：修改最近一次提交</strong></a></li>
+<li><a href="#git-rebase-i%E4%BD%BF%E7%94%A8-git-squash-%E5%90%88%E5%B9%B6%E6%8F%90%E4%BA%A4"><strong><code>git rebase -i</code>：使用 <code>git squash</code> 合并提交</strong></a></li>
+</ul>
+</li>
+<li><a href="#idea%E4%B8%AD%E7%9A%84%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2%E4%BF%AE%E6%94%B9">IDEA中的提交历史修改</a></li>
+</ul>
+</li>
+<li><a href="#%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86">分支管理</a>
+<ul>
+<li><a href="#%E5%88%86%E6%94%AF%E5%91%BD%E5%90%8D%E4%B8%8E%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83">分支命名与使用规范</a></li>
+<li><a href="#%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF">合并分支</a><br>
+*
+<ul>
+<li><a href="#git-merge-%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF">git merge (合并分支)</a></li>
+<li><a href="#git-rebase-%E5%8F%98%E5%9F%BA">git rebase (变基)</a></li>
+<li><a href="#git-rebase-%E7%9A%84%E5%A5%BD%E5%A4%84">git rebase 的好处</a></li>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E9%80%89%E6%8B%A9-git-rebase">什么时候选择 git rebase？</a></li>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E9%80%89%E6%8B%A9-git-merge">什么时候选择 git merge？</a></li>
+</ul>
+</li>
+<li><a href="#%E5%90%88%E5%B9%B6%E5%86%B2%E7%AA%81%E4%B9%8Bgit-rerere">合并冲突之git rerere</a><br>
+*
+<ul>
+<li><a href="#git-rerere-%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><strong><code>git rerere</code> 的使用场景</strong></a></li>
+<li><a href="#git-rerere-%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><strong><code>git rerere</code> 的工作原理</strong></a></li>
+<li><a href="#%E5%A6%82%E4%BD%95%E5%90%AF%E7%94%A8-git-rerere"><strong>如何启用 <code>git rerere</code></strong></a></li>
+<li></li>
+<li><a href="#%E5%AE%9E%E9%99%85%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B"><strong>实际操作流程</strong></a></li>
+<li><a href="#git-rerere-%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><strong><code>git rerere</code> 的优缺点</strong></a></li>
+</ul>
+</li>
+<li><a href="#idea%E4%B8%AD%E7%9A%84pull%E4%BB%A3%E7%A0%81">IDEA中的pull代码</a></li>
+</ul>
+</li>
+<li><a href="#git-patch-%E4%B8%8E-git-apply">git patch 与 git apply</a>
+<ul>
+<li><a href="#git-patch-%E7%94%9F%E6%88%90%E8%A1%A5%E4%B8%81"><code>git patch</code> 生成补丁</a></li>
+<li><a href="#git-apply-%E5%BA%94%E7%94%A8%E8%A1%A5%E4%B8%81"><code>git apply</code> 应用补丁</a><br>
+*<br>
+*<br>
+* <a href="#%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><strong>基本用法</strong></a><br>
+* <a href="#%E6%9F%A5%E7%9C%8B%E8%A1%A5%E4%B8%81%E5%BA%94%E7%94%A8%E7%9A%84%E6%95%88%E6%9E%9C-%E5%9C%A8%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8%E8%A1%A5%E4%B8%81%E5%89%8D%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87-check-%E6%A3%80%E6%9F%A5%E8%A1%A5%E4%B8%81%E6%98%AF%E5%90%A6%E8%83%BD%E6%88%90%E5%8A%9F%E5%BA%94%E7%94%A8">查看补丁应用的效果 在实际应用补丁前，可以通过 <code>--check</code> 检查补丁是否能成功应用：</a><br>
+* <a href="#%E5%B0%86%E8%A1%A5%E4%B8%81%E6%96%87%E4%BB%B6%E5%BA%94%E7%94%A8%E4%B8%BA%E6%8F%90%E4%BA%A4"><strong>将补丁文件应用为提交</strong></a></li>
+<li><a href="#idea%E4%B8%AD%E7%9A%84patch%E4%B8%8Eapply%E6%93%8D%E4%BD%9C">IDEA中的patch与apply操作</a></li>
+</ul>
+</li>
+<li><a href="#git-hooks">git hooks</a>
+<ul>
+<li><a href="#git-hooks-%E7%AE%80%E4%BB%8B">Git Hooks 简介</a></li>
+<li><a href="#%E5%9C%A8-push-%E6%97%B6%E8%BF%90%E8%A1%8C-maven-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95">在 push 时运行 Maven 单元测试</a></li>
+<li><a href="#%E6%B5%8B%E8%AF%95-hook-%E6%98%AF%E5%90%A6%E7%94%9F%E6%95%88">测试 Hook 是否生效</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/">
+              <h3 class="post-title">
+                面试八股文-线上问题排查
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.tech/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

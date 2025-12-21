@@ -1,0 +1,1489 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://windrunner0707.tech</id>
+    <title>0707‘s Blog</title>
+    <updated>2025-12-21T11:45:31.717Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://windrunner0707.tech"/>
+    <link rel="self" href="https://windrunner0707.tech/atom.xml"/>
+    <subtitle>Software Developer</subtitle>
+    <logo>https://windrunner0707.tech/images/avatar.png</logo>
+    <icon>https://windrunner0707.tech/favicon.ico</icon>
+    <rights>All rights reserved 2025, 0707‘s Blog</rights>
+    <entry>
+        <title type="html"><![CDATA[Kubernetes基础组件详解]]></title>
+        <id>https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/</id>
+        <link href="https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/">
+        </link>
+        <updated>2025-09-30T12:55:56.000Z</updated>
+        <content type="html"><![CDATA[<figure data-type="image" tabindex="1"><img src="https://windrunner0707.tech/post-images/1759237881724.png" alt="" loading="lazy"></figure>
+<h1 id="概述">概述</h1>
+<p>Kubernetes（简称 K8S）是目前最流行的容器编排平台，能够自动化地完成容器化应用的部署、伸缩、负载均衡和运维管理。它的强大之处在于一整套架构设计，这套架构由控制平面（Control Plane）和工作节点（Worker Node）共同组成。每个部分承担着特定的职责，相互协作保证集群的稳定运行。本文将基于一张经典架构图，带你了解 Kubernetes 的基础组件及其作用。</p>
+<h1 id="介绍">介绍</h1>
+<h2 id="控制平面control-plane">控制平面（Control Plane）</h2>
+<p>控制平面是整个集群的大脑，负责对集群进行全局调度和管理，主要组件包括：</p>
+<h3 id="api-server">API Server</h3>
+<p>API Server 是 Kubernetes 的“门面”，是所有请求的统一入口。无论是通过命令行（kubectl）、UI 管理界面还是自动化控制器，所有操作都会通过 API Server 进行交互。</p>
+<h3 id="etcd">etcd</h3>
+<p>etcd 是一个分布式的键值数据库，用来保存整个集群的状态信息。比如有哪些节点、有哪些 Pod、服务的配置等，都存储在 etcd 中。可以理解为 Kubernetes 的“账本”。</p>
+<h3 id="scheduler">Scheduler</h3>
+<p>Scheduler 负责把新建的 Pod 分配到合适的节点上。它会综合考虑节点的 CPU、内存、亲和性、反亲和性等条件，尽量做到资源合理分配。</p>
+<h3 id="controller-manager">Controller Manager</h3>
+<p>Controller Manager 保证集群的状态与用户的期望一致。比如用户声明需要三个副本，如果其中一个 Pod 挂掉，Controller Manager 会自动启动新的 Pod 来补齐。</p>
+<h2 id="工作节点worker-node">工作节点（Worker Node）</h2>
+<p>工作节点是真正运行应用的地方，每个节点上都包含以下组件：</p>
+<h3 id="kubelet">kubelet</h3>
+<p>kubelet 负责与 API Server 通信，确保节点上运行的容器与期望状态保持一致。比如 Pod 定义了 2 个副本，kubelet 会负责监控并保持容器的存活。</p>
+<h3 id="kube-proxy">kube-proxy</h3>
+<p>kube-proxy 处理 Pod 与 Pod 之间的网络通信和负载均衡。它确保服务能通过虚拟 IP 正确转发到后端的 Pod。</p>
+<h3 id="container-runtime">Container Runtime</h3>
+<p>Container Runtime 是运行容器的引擎，常见的有 Docker、containerd 等。Pod 内的容器最终都是通过它来启动的。</p>
+<h3 id="pods">Pods</h3>
+<p>Pod 是 Kubernetes 中最小的调度单元，每个 Pod 包含一个或多个紧密相关的容器。Pod 会共享网络和存储卷，方便容器之间的通信。</p>
+<h1 id="总结">总结</h1>
+<p>Kubernetes 的强大在于它通过一套精心设计的组件，完成了从集群调度到应用运行的全链路管理。控制平面（Control Plane）负责“全局大脑”的调度与状态维护，而工作节点（Worker Node）则是具体运行应用的“执行者”。理解这些核心组件的作用，是进一步学习 Kubernetes 网络、存储、安全和扩展性的基础。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[API学习路线图全解析：从入门到进阶]]></title>
+        <id>https://windrunner0707.tech/post/api-xue-xi-lu-xian-tu-quan-jie-xi-cong-ru-men-dao-jin-jie/</id>
+        <link href="https://windrunner0707.tech/post/api-xue-xi-lu-xian-tu-quan-jie-xi-cong-ru-men-dao-jin-jie/">
+        </link>
+        <updated>2025-09-30T12:34:54.000Z</updated>
+        <content type="html"><![CDATA[<figure data-type="image" tabindex="1"><img src="https://windrunner0707.tech/post-images/1759235815489.png" alt="" loading="lazy"></figure>
+<p>在现代软件开发中，API（应用程序接口，Application Programming Interface） 已经成为不可或缺的核心。它就像城市里的高速公路，连接着不同的应用、服务和系统。无论是打开手机上的外卖应用，还是登录银行的在线系统，背后都离不开 API 的支持。</p>
+<p>这篇文章将基于 《API Learning Roadmap》 的知识脉络，带大家从基础概念一路走到实际应用，帮助你快速建立一幅清晰的学习地图。</p>
+<h1 id="一-api-是什么为什么重要">一、API 是什么？为什么重要？</h1>
+<p>简单来说，API 是一套约定，规定了两个软件系统之间如何交流。</p>
+<p>没有 API：每个系统都像一个孤岛，数据无法顺畅流动。</p>
+<p>有了 API：就像统一的语言和协议，不同系统可以无缝沟通。</p>
+<p>API 不仅仅是开发者的工具，更是推动 数字化转型、平台化战略、生态开放 的基石。</p>
+<h1 id="二-api-学习路线详解">二、API 学习路线详解</h1>
+<h2 id="1-introduction-to-apisapi-基础">1. Introduction to APIs（API 基础）</h2>
+<p>API 定义：一组规则与协议，用来让应用之间进行通信。</p>
+<p>API 类型：</p>
+<p>Public API：对外开放（例如微信/支付宝支付 API）</p>
+<p>Private API：企业内部使用（比如内部微服务接口）</p>
+<p>Partner API：合作伙伴间使用（例如电商平台和物流系统对接）</p>
+<p>👉 记忆小技巧：Public 面向大众，Private 内部用，Partner 用于 B2B 合作。</p>
+<h2 id="2-api-terminologies常见术语">2. API Terminologies（常见术语）</h2>
+<p>学习 API，就绕不开 HTTP 协议：</p>
+<p>HTTP Versions：HTTP/1.1（广泛使用）、HTTP/2（多路复用）、HTTP/3（基于 QUIC，更快）。</p>
+<p>HTTP Methods：GET（获取）、POST（新增）、PUT（修改）、DELETE（删除）。</p>
+<p>HTTP Status：200 成功，404 未找到，500 服务器错误。</p>
+<p>HTTP Headers：传递附加信息，比如 Content-Type、Authorization。</p>
+<p>Cookies 和 Caching：实现状态保持与性能优化。</p>
+<p>👉 可以把 HTTP 理解成寄快递：</p>
+<p>方法（Method）= 选择快递服务（寄件、退货）</p>
+<p>状态码（Status）= 快递单上的签收结果</p>
+<p>Header = 包装标签</p>
+<p>Cookie = 快递单号</p>
+<h2 id="3-api-stylesapi-风格">3. API Styles（API 风格）</h2>
+<p>不同 API 风格，适合不同场景：</p>
+<p>REST：最常见，基于 HTTP 资源操作。</p>
+<p>GraphQL：前端友好，按需取数。</p>
+<p>gRPC：高性能，适合微服务内部通信。</p>
+<p>SOAP：偏老，但在金融、电信等领域仍广泛使用。</p>
+<p>WebSocket：实时通信（例如在线聊天、股票行情）。</p>
+<h2 id="4-api-authentication认证机制">4. API Authentication（认证机制）</h2>
+<p>API 安全离不开认证：</p>
+<p>Basic Auth：最简单的用户名+密码。</p>
+<p>Token Auth：发放一次性令牌，代替密码。</p>
+<p>JWT（JSON Web Token）：无状态认证，常见于微服务。</p>
+<p>OAuth：第三方授权（例如用微信/谷歌账号登录第三方应用）。</p>
+<p>Session Auth：依赖服务端保存会话。</p>
+<p>👉 类比一下：</p>
+<p>Basic Auth = 出示身份证</p>
+<p>Token = 临时通行证</p>
+<p>JWT = 一次性加密签名的通行证</p>
+<p>OAuth = 委托别人替你担保</p>
+<h2 id="5-api-documentation文档工具">5. API Documentation（文档工具）</h2>
+<p>好的文档能让 API 更易用：</p>
+<p>Swagger / OpenAPI Spec：常见的 API 设计与文档标准。</p>
+<p>Postman：调试和测试接口的利器。</p>
+<p>Redoc / DapperDox：文档生成工具。</p>
+<p>👉 没有文档的 API，就像没有说明书的电器，根本没法用。</p>
+<h2 id="6-api-features功能特性">6. API Features（功能特性）</h2>
+<p>API 不只是“能用”，还要“好用”：</p>
+<p>Pagination：分页，避免一次返回过多数据。</p>
+<p>Idempotency：幂等性，避免重复提交导致的错误。</p>
+<p>HATEOAS：超媒体驱动 API，让客户端通过链接获取下一步操作。</p>
+<p>参数传递：URL、Query、Path 参数。</p>
+<p>API Versioning：不同版本兼容升级。</p>
+<p>Content Negotiation：返回 JSON 还是 XML。</p>
+<h2 id="7-api-performance性能优化">7. API Performance（性能优化）</h2>
+<p>保证 API 快速稳定：</p>
+<p>Caching：减少重复请求。</p>
+<p>Rate Limiting：防止恶意刷接口。</p>
+<p>Load Balancing：分摊请求压力。</p>
+<p>Pagination：避免数据过大拖垮接口。</p>
+<p>Indexing &amp; Scaling：数据库优化和系统扩展。</p>
+<p>Performance Testing：压测，提前发现瓶颈。</p>
+<h2 id="8-api-gateways网关">8. API Gateways（网关）</h2>
+<p>网关是 API 的“门卫”：</p>
+<p>负责请求路由、限流、认证。</p>
+<p>常见产品：AWS API Gateway、Kong、Azure API Service、Apigee、Nginx。</p>
+<p>👉 没有网关，就像没有保安的社区，既混乱又不安全。</p>
+<h2 id="9-api-implementation-frameworks开发框架">9. API Implementation Frameworks（开发框架）</h2>
+<p>常见的 API 开发框架：</p>
+<p>Flask、Django（Python）</p>
+<p>Node.js（JavaScript/TypeScript）</p>
+<p>Spring（Java）</p>
+<p>FastAPI（Python，高性能异步支持）</p>
+<p>👉 不同框架适合不同语言与团队习惯，可以根据技术栈选择。</p>
+<h2 id="10-api-integration-patterns集成模式">10. API Integration Patterns（集成模式）</h2>
+<p>复杂系统里，API 往往不是单打独斗：</p>
+<p>Sync vs Async：同步/异步调用。</p>
+<p>API Gateway：统一入口管理。</p>
+<p>Microservices：微服务架构下的 API 通信。</p>
+<p>Webhooks：事件驱动的回调机制。</p>
+<p>Polling / Batch Processing / Message Queue：处理大规模数据的常见模式。</p>
+<p>👉 类比一下：</p>
+<p>Webhooks = 快递员敲门通知</p>
+<p>Polling = 你主动去快递点查询</p>
+<p>Message Queue = 中转仓库，解耦发送和接收</p>
+<h1 id="三-总结">三、总结</h1>
+<p>API 是现代应用世界的“血液循环系统”。<br>
+从 基础概念 → 协议术语 → 风格与认证 → 文档 → 性能 → 网关 → 框架 → 集成模式，我们可以逐步建立起完整的 API 知识图谱。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[API-Led 架构解析：从理念到实践]]></title>
+        <id>https://windrunner0707.tech/post/api-led-jia-gou-jie-xi-cong-li-nian-dao-shi-jian/</id>
+        <link href="https://windrunner0707.tech/post/api-led-jia-gou-jie-xi-cong-li-nian-dao-shi-jian/">
+        </link>
+        <updated>2025-09-30T12:10:23.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="概述">概述</h1>
+<p>在数字化转型的浪潮中，API（应用程序接口） 已经不仅仅是技术上的一个接口，而逐渐演变为组织与外部世界交互的“产品化能力”。企业希望通过 API 将内部系统的价值释放出来，实现更快的创新和更强的业务弹性。<br>
+在众多集成架构中，API-Led 架构（API-Led Connectivity） 逐渐成为主流，尤其在金融、零售和制造业等领域广泛采用。</p>
+<h1 id="什么是-api-led-架构">什么是 API-Led 架构</h1>
+<p>API-Led 架构由 MuleSoft 提出，它强调通过分层API 来实现系统集成和业务能力的复用。核心思想是：</p>
+<p>不再直接做点对点集成，也不仅仅是暴露单一 API，而是将 API 进行分层设计。</p>
+<figure data-type="image" tabindex="1"><img src="https://windrunner0707.tech/post-images/1759238612483.png" alt="" loading="lazy"></figure>
+<p>典型的三层：</p>
+<ul>
+<li>
+<p>System API：屏蔽底层系统的复杂性，负责访问数据库、ERP、CRM 等。</p>
+</li>
+<li>
+<p>Process API：聚合和编排多个系统 API，实现业务逻辑。</p>
+</li>
+<li>
+<p>Experience API：面向不同渠道（Web、App、合作伙伴），提供定制化的数据和服务。</p>
+</li>
+</ul>
+<p>这种分层方式的好处是：降低耦合、增强复用、提升敏捷性。</p>
+<figure data-type="image" tabindex="2"><img src="https://windrunner0707.tech/post-images/1759238658029.png" alt="" loading="lazy"></figure>
+<h1 id="api-led架构与微服务架构的区别">API-Led架构与微服务架构的区别</h1>
+<p>很多人会把API-Led和微服务混淆，二者虽然相关，但关注点不同：</p>
+<h2 id="关注层面不同">关注层面不同</h2>
+<p>微服务架构：强调将单体应用拆分为小而独立的服务，每个服务独立开发、部署、扩展。</p>
+<p>API-Led 架构：强调系统之间如何互联互通，如何通过 API 实现复用与治理。</p>
+<h2 id="目标不同">目标不同</h2>
+<p>微服务：解决“系统内部分解”的问题。</p>
+<p>API-Led：解决“跨系统集成”的问题。</p>
+<h2 id="实现方式不同">实现方式不同</h2>
+<p>微服务内部可能直接暴露 API，但往往没有分层概念。</p>
+<p>API-Led 强调分层 API，避免直接对接，提升灵活性。</p>
+<p>可以理解为：微服务是系统构建方式，而 API-Led 是系统之间的连接方式。两者是互补关系，而不是替代关系。</p>
+<h1 id="api-led-架构为什么在银行领域广泛使用">API-Led 架构为什么在银行领域广泛使用</h1>
+<p>银行 IT 系统复杂，往往包含核心账务系统、支付清算系统、风控系统、CRM、渠道系统（柜面、网银、手机银行）等。这种环境下：</p>
+<ul>
+<li>
+<p>系统异构严重：老的核心系统可能基于 COBOL，新应用可能基于 Java 或微服务。</p>
+</li>
+<li>
+<p>集成需求频繁：需要快速上线新产品（如理财、贷款、联合营销）。</p>
+</li>
+<li>
+<p>安全与合规要求高：需要统一的 API 管理与访问控制。</p>
+</li>
+</ul>
+<p>API-Led 架构能够在银行中带来显著价值：</p>
+<ul>
+<li>
+<p>屏蔽遗留系统复杂性（通过 System API 封装）。</p>
+</li>
+<li>
+<p>支持快速业务编排（通过 Process API 实现跨系统流程）。</p>
+</li>
+<li>
+<p>支撑多渠道一致体验（通过 Experience API 同时服务网银、手机 App、合作伙伴接口）。</p>
+</li>
+<li>
+<p>统一治理和合规（API 网关+API 管理平台）。</p>
+</li>
+</ul>
+<p>因此，几乎所有大型银行都在推行 API-Led 架构，用于支持开放银行和数字化转型。</p>
+<h1 id="api-led-架构的优缺点">API-Led 架构的优缺点</h1>
+<h2 id="优点">优点：</h2>
+<ul>
+<li>
+<p>解耦性强：通过分层 API，底层系统改造不会影响上层应用。</p>
+</li>
+<li>
+<p>复用性高：System API 和 Process API 可被多个 Experience API 重用。</p>
+</li>
+<li>
+<p>敏捷性好：业务逻辑调整只需修改 Process API，开发效率提升。</p>
+</li>
+<li>
+<p>治理完善：便于统一做 API 管理、监控、安全认证。</p>
+</li>
+<li>
+<p>支持开放生态：银行、保险等可快速对接合作伙伴 API。</p>
+</li>
+</ul>
+<h2 id="缺点">缺点：</h2>
+<ul>
+<li>
+<p>设计复杂度提升：需要良好的 API 设计规范和治理体系。</p>
+</li>
+<li>
+<p>实现成本高：需要 API 管理平台（如 MuleSoft、Kong、Apigee）。</p>
+</li>
+<li>
+<p>性能挑战：层级过多可能带来调用链路长、延迟增加。</p>
+</li>
+<li>
+<p>组织协同要求高：API-Led 要求跨部门统一治理，否则容易变成“新的烟囱”。</p>
+</li>
+</ul>
+<h1 id="总结">总结</h1>
+<p>API-Led 架构代表了企业集成架构的新趋势。它通过分层API将底层系统能力“产品化”，实现跨系统的复用、解耦和治理。与微服务架构相比，API-Led 更关注“连接”与“复用”，在金融、零售、制造等多系统并存的行业尤其重要。<br>
+在银行领域，API-Led架构不仅解决了遗留系统与新系统的集成问题，也为开放银行和金融科技创新提供了基础。<br>
+当然，API-Led 架构也带来设计、治理、性能等方面的新挑战。企业在落地时，需要结合自身情况，配合 API 网关、监控体系、团队治理机制，才能真正发挥其价值。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[（翻译）揭开数据库索引的神秘面纱：索引类型与用例]]></title>
+        <id>https://windrunner0707.tech/post/fan-yi-jie-kai-shu-ju-ku-suo-yin-de-shen-mi-mian-sha-suo-yin-lei-xing-yu-yong-li/</id>
+        <link href="https://windrunner0707.tech/post/fan-yi-jie-kai-shu-ju-ku-suo-yin-de-shen-mi-mian-sha-suo-yin-lei-xing-yu-yong-li/">
+        </link>
+        <updated>2025-07-01T14:33:15.000Z</updated>
+        <content type="html"><![CDATA[<p>当查询性能下降时，大多数工程师通常会首先检查应用代码，以识别问题。然而，问题的根源也可能出现在数据存储层，而索引则是决定能否精准查找与避免盲目全表扫描、从而提高性能的关键。只要建立了合适的索引，原本需要筛选数百万行的数据查询就能在毫秒级别返回结果。</p>
+<p>随着数据集的增长，扫描的成本变得不可承受。数据库将数据存储在数据页、行和块中，这些结构并不适合任意读取。没有索引，每次进行筛选或排序的查询都必须扫描更多的行，超出了必要的范围。如果每秒有数千次查询，I/O 压力将加剧，系统会因此承受巨大负担。</p>
+<p>索引通过缩小搜索范围来解决这个问题，数据库引擎利用预计算结构，直接跳转到目标位置，就像翻书时直接查阅索引，而不是逐页翻阅。</p>
+<p>但并非所有索引类型的表现都相同。有些索引是为了加速键值查找而构建的，其他一些则优化了范围扫描，还有一些则通过提前计算优化特定查询的性能，同时可能在其他地方带来开销。</p>
+<p>在这篇文章中，我们将探索数据库索引的基本概念和不同的索引类型。我们还将了解每种索引的作用、何时适用以及其开销。</p>
+<figure data-type="image" tabindex="1"><img src="https://windrunner0707.tech/post-images/1751380728111.png" alt="" loading="lazy"></figure>
+<h2 id="什么是数据库索引">什么是数据库索引？</h2>
+<p>数据库索引是将列值映射到表中行物理位置的数据结构，其目的是加速数据访问。数据库引擎通过查询索引，直接跳转到相关行，而不需要扫描每一行来查找匹配的值。</p>
+<figure data-type="image" tabindex="2"><img src="https://windrunner0707.tech/post-images/1751380861720.png" alt="" loading="lazy"></figure>
+<p>假设有一个包含数百万条客户记录的表，以及以下查询：</p>
+<pre><code>SELECT * FROM customers WHERE email = alice@example.com';
+</code></pre>
+<p>没有索引时，像这样的查询需要引擎扫描 customers 表中的每一行。这就是全表扫描，在查找单条记录时，它既昂贵又缓慢，而且是多余的。</p>
+<p>如果在 email 列上有索引，数据库则会查询一个紧凑的查找结构。它找到该邮箱地址的条目，跟随指针直接定位到对应的行。</p>
+<figure data-type="image" tabindex="3"><img src="https://windrunner0707.tech/post-images/1751977368364.png" alt="" loading="lazy"></figure>
+<p>索引是建立在一个或多个列上的。它们可以定义在单个字段上（如 email），也可以是多个字段的组合（如 last_name 和 first_name），用于复合查询。当索引与查询的过滤、连接或排序模式相匹配时，性能提升最为明显。</p>
+<p>但索引并非没有代价。它们会占用存储空间，并且在插入、更新或删除数据时需要维护。每新增一个索引，都会增加写操作的成本。因此，索引的设计并不是“越多越好”，关键在于选择真正反映数据访问模式的合适索引。</p>
+<h2 id="索引是如何工作的">索引是如何工作的？</h2>
+<p>正如前文所述，索引的作用在于减少数据库在执行查询时所需读取的数据量。数据库引擎无需再逐行扫描以判断是否匹配筛选条件，而是通过索引直接跳转到可能的候选行，从而加快查询效率。</p>
+<p>下面我们逐步了解索引在查询执行过程中是如何被使用的：</p>
+<p>第一步：解析并规划查询<br>
+数据库引擎会解析 SQL 语句，并开始构建执行计划。它会检查查询中用于过滤、连接和排序的列上是否存在可用的索引。</p>
+<p>第二步：选择最优的可用索引<br>
+如果存在合适的索引（例如 customer_id 上的索引），查询优化器会评估是否使用它。这取决于预计的匹配行数，以及使用该索引与直接进行全表扫描之间的性能成本。如果判断使用索引能够减少 I/O 开销，则会优先选择索引。</p>
+<p>第三步：遍历索引结构<br>
+大多数通用索引采用 B 树结构实现。数据库引擎会从索引的根节点开始，沿着分支向下遍历，最终定位到包含目标值的叶子节点。每一层都在缩小搜索范围，就像查字典时利用字母分隔标签快速定位一样。</p>
+<p>第四步：获取行指针<br>
+一旦找到匹配项，索引将返回一个行指针：如果是聚簇索引，则直接指向实际数据行；如果是非聚簇索引，则提供主键或行 ID 的引用。</p>
+<p>第五步：获取实际数据<br>
+如果索引已经包含了查询所需的全部字段，数据库可以直接返回结果，无需访问表本身。否则，它会根据索引指针，从磁盘或内存中检索完整的数据行。</p>
+<p>第六步：返回查询结果<br>
+拿到目标数据后，数据库引擎会组装最终的结果集，并将其返回给应用程序。</p>
+<figure data-type="image" tabindex="4"><img src="https://windrunner0707.tech/post-images/1751978711661.png" alt="" loading="lazy"></figure>
+<p>这个过程使数据库能够在毫秒级的时间内，将数百万行数据缩小到少量候选记录。尽管开发者通常无法控制索引的底层结构（如 B 树或哈希表），但他们可以决定在哪些列上建立索引、如何组合这些列，以及为哪些访问模式优化索引设计——这正是索引设计真正发挥作用的地方。</p>
+<h2 id="核心索引类型基于结构的分类">核心索引类型：基于结构的分类</h2>
+<p>索引在数据库中可以扮演不同的角色，这取决于它与数据表结构和数据布局之间的关系。最基本的区分在于：索引是否决定了表中数据的物理存储方式（即聚簇索引），还是仅仅作为一种辅助的访问路径（即非聚簇索引）。</p>
+<p>接下来，我们来逐一解析三种核心索引类型。</p>
+<h3 id="1-主索引primary-index">1. 主索引（Primary Index）</h3>
+<p>当在表上定义主键时，数据库会自动创建主索引。主索引保证被索引的列（或列集合）中的每个值都是唯一且非空的。</p>
+<p>请参考下图来理解主索引的概念。</p>
+<figure data-type="image" tabindex="5"><img src="https://windrunner0707.tech/post-images/1751981068416.png" alt="" loading="lazy"></figure>
+<p>在许多数据库中，例如 MySQL 的 InnoDB 引擎，主索引也被用作聚簇索引。这意味着，表中的数据行在磁盘上的物理存储顺序是由主键决定的。</p>
+<p>例如，考虑以下客户信息表：</p>
+<pre><code>CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100)
+);
+</code></pre>
+<p>在这个表中，customer_id 列即作为主索引。再看下面这个查询：</p>
+<pre><code>SELECT * FROM customers WHERE customer_id = 501;
+</code></pre>
+<p>该查询可以利用主索引直接跳转到目标数据行，无需扫描其他行。由于 InnoDB 将主索引作为聚簇索引，数据行就实际存储在索引所指向的位置上。</p>
+<p>主索引的几个关键特性如下：</p>
+<ul>
+<li>强制唯一性</li>
+<li>在某些数据库引擎中具有物理排序功能</li>
+<li>通常作为其他索引的基础引用</li>
+</ul>
+<h3 id="2-聚簇索引clustered-index">2. 聚簇索引（Clustered Index）</h3>
+<p>聚簇索引决定了表中数据行的物理存储顺序。由于数据在磁盘上同一时间只能按照一种顺序存储，因此每个表只能有一个聚簇索引。</p>
+<p>这种存储方式对于范围查询、有序扫描以及提高 I/O 效率非常有利，因为相关的数据行在磁盘上的物理位置是连续的，能够减少磁盘寻址开销。</p>
+<figure data-type="image" tabindex="6"><img src="https://windrunner0707.tech/post-images/1751981519757.png" alt="" loading="lazy"></figure>
+<p>例如，考虑一个订单表，order_id 为自增主键：</p>
+<pre><code>CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE
+);
+</code></pre>
+<p>在这个表中，order_id 就是聚簇索引。再来看一个范围查询：</p>
+<pre><code>SELECT * FROM orders WHERE order_id BETWEEN 1000 AND 1100;
+</code></pre>
+<p>该查询的性能非常好，因为聚簇索引使得这些行在磁盘上的存储是连续的，从而提升了 I/O 效率。</p>
+<p>在某些数据库引擎（如 SQL Server）中，即使某列不是主键，开发者也可以显式指定其为聚簇索引。</p>
+<p>聚簇索引的几个关键特性包括：</p>
+<ul>
+<li>决定数据行的物理存储顺序</li>
+<li>优化范围查询与有序查询</li>
+<li>每个表只能有一个聚簇索引</li>
+<li>作为非聚簇索引查找的基础</li>
+</ul>
+<h3 id="3-非聚簇索引non-clustered-index-辅助索引">3. 非聚簇索引（Non-Clustered Index / 辅助索引）</h3>
+<p>非聚簇索引是一种独立的数据结构，它保存了一个或多个列的副本，并包含指向表中实际数据行的指针。与聚簇索引不同，非聚簇索引不会改变表中数据的物理存储顺序。</p>
+<p>非聚簇索引常用于优化主键以外列上的查询操作，例如过滤、连接和聚合等。</p>
+<p>请参考下图：</p>
+<figure data-type="image" tabindex="7"><img src="https://windrunner0707.tech/post-images/1751981858197.png" alt="" loading="lazy"></figure>
+<p>例如，假设我们经常需要通过客户的邮箱地址查询订单记录：</p>
+<pre><code>CREATE INDEX idx_email_id ON orders(email);
+</code></pre>
+<p>此时查询语句如下：</p>
+<pre><code>SELECT * FROM orders WHERE email = &quot;john@example.com&quot;;
+</code></pre>
+<p>通过 idx_email_id 索引，数据库引擎可以避免全表扫描，先根据索引定位所有匹配的行指针，再通过聚簇索引逐条“回表”获取完整的数据行。</p>
+<p>这种“两步查找”方式虽然能提升查询效率，但也会引入额外的 I/O 开销，尤其是在匹配结果较多，且该索引不是覆盖索引的情况下更为明显。</p>
+<p>辅助索引（非聚簇索引）的关键特性包括：</p>
+<ul>
+<li>不影响数据的物理存储顺序</li>
+<li>每张表可以创建多个辅助索引</li>
+<li>常用于优化过滤条件与连接操作</li>
+<li>若不是覆盖索引，查询需要额外读取完整数据行</li>
+</ul>
+<h2 id="索引类型按数据覆盖度分类">索引类型：按数据覆盖度分类</h2>
+<p>并非所有索引都需要覆盖表中的每一行数据。有些索引为每一个键值建立记录，也就是说每一行数据都可以通过索引直接访问。</p>
+<p>而另一些索引则采取更轻量的方式，仅对部分数据建立索引，其余部分则依赖数据的物理邻近性或块级布局进行定位。</p>
+<p>这些设计选择会影响索引的查找精度、存储空间占用，以及在高并发或高负载压力下的响应能力。</p>
+<h3 id="1-稠密索引dense-index">1. 稠密索引（Dense Index）</h3>
+<p>稠密索引为表中的每一行都建立一个对应的索引项。</p>
+<p>对于每一个唯一的键值，索引会保存一个指针，直接定位到该数据行在磁盘上的物理位置。这种结构提供了较高的查找精度和稳定的性能，尤其适合每条记录都需要通过索引访问的业务场景。</p>
+<p>请参考下图：<br>
+<img src="https://windrunner0707.tech/post-images/1752320917942.png" alt="" loading="lazy"></p>
+<p>稠密索引特别适用于读操作密集且需要细粒度查找的系统。</p>
+<p>例如，假设在 users 表的 email 字段上建立了一个稠密索引：</p>
+<pre><code>CREATE INDEX idx_email ON users(email);
+</code></pre>
+<p>在这个索引中，表中每一个邮箱地址都对应一条索引项。现在来看下面这个查询语句，用于查找特定用户：</p>
+<pre><code>SELECT * FROM users WHERE email = 'sam@demo.com';
+</code></pre>
+<p>这个查询可以直接通过索引定位到对应的数据行，无需执行全表扫描。由于每一行数据都在索引中有记录，数据库引擎可以以一种稳定、可预测、且高效的方式完成访问。</p>
+<p>稠密索引适用的场景包括：</p>
+<ul>
+<li>事务型系统中的等值查找</li>
+<li>每一行数据都可能被独立查询的表结构</li>
+<li>对查找响应时间一致性要求较高的系统</li>
+</ul>
+<p>稠密索引的权衡点：</p>
+<ul>
+<li>占用较多存储空间（索引体积较大）</li>
+<li>插入和更新操作较慢，需要额外的索引维护开销</li>
+</ul>
+<h3 id="2-稀疏索引sparse-index">2. 稀疏索引（Sparse Index）</h3>
+<p>稀疏索引仅为表中的部分行建立索引项。</p>
+<p>通常情况下，它会为每个数据块（block）或数据页（page）的第一行建立索引。当查询的目标值在索引中没有直接匹配项时，数据库引擎会定位到最近的索引键值，然后从该位置向后扫描，直到找到目标数据行为止。</p>
+<p>请参考下图：<br>
+<img src="https://windrunner0707.tech/post-images/1752321571440.png" alt="" loading="lazy"></p>
+<p>稀疏索引可以显著减少索引的存储体积和维护成本，但它依赖于数据在表中的物理组织方式，以尽可能缩短后续的扫描距离。</p>
+<p>例如，假设有一张按 order_date 排序、针对读取优化的 orders 表，稀疏索引可能只为每个日期块（如每一天）创建一个索引项。现在来看下面这个查询语句：</p>
+<pre><code>SELECT * FROM orders WHERE order_date = '2024-12-01';
+</code></pre>
+<p>数据库引擎可以使用稀疏索引直接跳转到该日期段的起始位置，然后在该数据块中继续扫描以找到目标数据行。</p>
+<p>这种方法在以下场景中表现良好：</p>
+<ul>
+<li>表中数据按字段顺序存储</li>
+<li>查询请求与索引粒度保持一致</li>
+<li>数据变更频率低、适合批量分析</li>
+</ul>
+<p>稀疏索引的典型使用场景：</p>
+<ul>
+<li>针对排序数据集的分析型查询</li>
+<li>数据仓库中的批量加载场景，更新较少</li>
+<li>查找精度要求不高的范围型查询</li>
+</ul>
+<p>稀疏索引的权衡点：</p>
+<ul>
+<li>占用更少的存储空间，写入成本更低</li>
+<li>查找精度依赖于数据的物理布局</li>
+<li>命中索引后，仍可能需要额外的块内扫描</li>
+</ul>
+<h2 id="逻辑索引类型logical-index-types">逻辑索引类型（Logical Index Types）</h2>
+<p>除了主索引和结构性索引外，现代数据库还引入了一些逻辑索引类型，它们专为适配特定的查询模式而设计。</p>
+<p>这类索引不影响数据在物理层的存储结构，而是用于优化那些无法通过传统主键查找高效执行的查询行为。</p>
+<h3 id="1-过滤索引filtered-index">1. 过滤索引（Filtered Index）</h3>
+<p>过滤索引只为满足特定条件的数据行创建索引项，因此相比在同一列上建立完整索引，它更轻量、更有针对性。</p>
+<p>这种索引非常适合大部分查询只涉及数据子集的场景。例如，假设一个 users 表中只有“活跃用户”经常被查询，在 SQL Server 中可以这样创建一个过滤索引：</p>
+<pre><code>CREATE INDEX idx_active_users ON users(last_login) WHERE status = 'ACTIVE';
+</code></pre>
+<p>如果我们执行如下查询：</p>
+<pre><code>SELECT last_login FROM users WHERE status = 'ACTIVE';
+</code></pre>
+<p>数据库引擎就可以直接利用这个过滤（或在 PostgreSQL 中的“部分”）索引返回结果，无需扫描非活跃用户的记录。这样不仅加快了查询速度，还有效节省了索引空间和维护成本。</p>
+<p>过滤索引的典型应用场景包括：</p>
+<ul>
+<li>包含归档数据或访问频率较低的表</li>
+<li>经常基于布尔或状态字段过滤的查询</li>
+<li>面向大型数据集、希望借助部分索引提升缓存效率的系统</li>
+</ul>
+<h3 id="2-覆盖索引covering-index">2. 覆盖索引（Covering Index）</h3>
+<p>覆盖索引是指一个索引中包含了查询所需的所有字段，包括出现在 WHERE 筛选条件、JOIN 关联字段以及 SELECT 查询结果中的列。</p>
+<p>由于所需数据已完全包含在索引中，数据库引擎在执行查询时无需访问原始表（即无需回表）。这大大减少了磁盘 I/O，显著提升了查询响应时间。</p>
+<p>请看下面这个示例：<br>
+<img src="https://windrunner0707.tech/post-images/1752322281457.png" alt="" loading="lazy"></p>
+<p>例如，假设我们需要查询一位名为 &quot;Bob Decker&quot; 的用户的邮箱地址：</p>
+<pre><code>SELECT Email FROM users WHERE Name = 'Bob Decker';
+</code></pre>
+<p>这个查询中，WHERE 子句根据 Name 进行筛选，而 SELECT 子句返回的是 Email 字段。如果我们为这两个字段建立索引：</p>
+<pre><code>CREATE INDEX idx_name_email ON users(Name, Email);
+</code></pre>
+<p>那么这个查询就可以完全通过该索引完成，而无需回表，从而显著提升查询性能。需要注意的是，不同数据库在语法上可能略有差异，但实现原理是一致的。</p>
+<p>覆盖索引的典型使用场景包括：</p>
+<ul>
+<li>读取密集型系统，且查询结构稳定</li>
+<li>高频访问的仪表盘、业务报表</li>
+<li>对响应时间要求严格的核心接口</li>
+</ul>
+<h3 id="3-函数索引function-based-index">3. 函数索引（Function-Based Index）</h3>
+<p>函数索引是指在索引列上应用某种函数或表达式后再进行索引的一种方式。它使得对计算值进行过滤的查询也能利用索引加速，从而避免全表扫描。</p>
+<p>例如，如果系统中经常需要对邮箱进行大小写不敏感的匹配：</p>
+<pre><code>SELECT * FROM users WHERE LOWER(email) = 'ana@example.com';
+</code></pre>
+<p>此时，普通的 email 索引无法命中。我们可以通过如下方式创建一个函数索引：</p>
+<pre><code>CREATE INDEX idx_lower_email ON users(LOWER(email));
+</code></pre>
+<p>这样，数据库就能识别该查询中的 LOWER(email) 表达式，并直接使用索引返回结果，避免不必要的行扫描。</p>
+<p>函数索引的典型应用场景包括：</p>
+<ul>
+<li>不区分大小写或去除空格的字符串比较</li>
+<li>从时间戳中提取日期、年份等字段（如：DATE(timestamp)）</li>
+<li>查询时涉及业务逻辑函数计算（如状态转换、数值映射等）</li>
+</ul>
+<h3 id="4-全文索引full-text-index">4. 全文索引（Full-Text Index）</h3>
+<p>全文索引支持对大文本字段（如产品描述、博客文章或评论）进行搜索。它通过将文本内容拆分成多个词项，并构建一个倒排索引，将词项映射到对应的数据行，从而实现快速的关键词搜索、短语匹配以及基于相关性的检索。</p>
+<p>见下图示意:<br>
+<img src="https://windrunner0707.tech/post-images/1752323070410.png" alt="" loading="lazy"></p>
+<p>全文索引的应用场景包括：</p>
+<ul>
+<li>电商平台或内容平台的搜索栏</li>
+<li>文档索引与检索系统</li>
+<li>需要模糊匹配或部分匹配的应用场景</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>我们已经详细了解了数据库索引的核心原理及多种索引类型。以下是本文的关键要点回顾：</p>
+<p>索引对于提升性能至关重要，因为它减少了查询需要扫描的行数。</p>
+<p>数据库索引是一种派生结构，将列值映射到数据行的位置，用存储和写入成本换取更快的读取速度。不同类型的索引满足不同的需求。</p>
+<p>主索引（Primary Index）保证唯一性，通常也作为聚集索引使用。</p>
+<p>聚集索引（Clustered Index）定义了数据行的物理排序，适合范围查询和有序扫描。</p>
+<p>非聚集索引（Non-Clustered Index）将指针与表数据分开存储，支持对非主键列的过滤、查找和连接。</p>
+<p>稠密索引（Dense Index）为每行记录包含一条索引项，访问精准，但存储和维护成本较高。</p>
+<p>稀疏索引（Sparse Index）索引条目较少，依赖数据的邻近关系来完成查询，开销较低但精度有限。</p>
+<p>过滤索引（Filtered Index）仅包含满足特定条件的行，减小索引大小并提升针对性查询的性能。</p>
+<p>覆盖索引（Covering Index）包含查询所需的全部列，允许数据库无需回表即可返回结果。</p>
+<p>函数索引（Function-Based Index）存储计算后的值，优化对表达式过滤或排序的查询。</p>
+<p>全文索引（Full-Text Index）支持对非结构化文本字段进行分词和短语搜索。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ 一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂]]></title>
+        <id>https://windrunner0707.tech/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/</id>
+        <link href="https://windrunner0707.tech/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/">
+        </link>
+        <updated>2025-06-20T01:19:09.000Z</updated>
+        <content type="html"><![CDATA[<hr>
+<p>私房慢煮，用一杯咖啡和时间对话。<br>
+本文将带你穿越手冲咖啡的起源，学习标准操作流程，探索精选咖啡豆的风味魅力。</p>
+<hr>
+<h2 id="一-手冲咖啡的前世今生-一段关于慢的历史">🌍 一、手冲咖啡的前世今生 —— 一段关于「慢」的历史</h2>
+<p>手冲咖啡的历史，要从 1908 年的德国说起。梅丽塔·本茨（Melitta Bentz）当时还只是个为孩子泡咖啡的德国太太，她为了避免煮出的咖啡布满咖啡渣，用针在铜壶底打孔，再钻研出烘焙纸滤器，发明了纸滤手冲咖啡法，并于当年获得专利，成立 Melitta 公司（Melitta）(<a href="https://www.melitta.com/en/Our-Passion-through-the-Years-628.html?utm_source=chatgpt.com" title="Our Passion through the Years - Melitta">melitta.com</a>)。</p>
+<p>之后，纸锥形过滤器逐渐改良并普及。直到 2004 年，日本 Hario 公司提出了“V60”手冲杯，60°锥面、螺旋肋设计、底部大孔，让萃取通过“注水密闭—重力自由流出”的精细控制方式成为可能，代表了第三波精品咖啡（Third Wave Coffee）的技术美学(<a href="https://japanesecoffeeco.com/blogs/japanese-coffee-blog/hario-v60-everything-you-need-to-know?srsltid=AfmBOopCoNG5ddFT6GGmYACcVVfN8XBo5CekdsAyXMBeErMgrZ_U2le3&amp;utm_source=chatgpt.com" title="HARIO V60 – Everything You Need to Know - Japanese Coffee Co.">japanesecoffeeco.com</a>)。</p>
+<figure data-type="image" tabindex="1"><img src="https://windrunner0707.tech/post-images/1751379087642.jpeg" alt="" loading="lazy"></figure>
+<hr>
+<h2 id="二-手冲咖啡的技法-手里的温度心里的节奏">🔬 二、手冲咖啡的技法 —— 手里的温度，心里的节奏</h2>
+<h3 id="1-必备器具">1. 必备器具</h3>
+<ul>
+<li><strong>滤杯</strong>：常见的 Hario V60 / Kalita Wave / Bee House 等</li>
+<li><strong>滤纸</strong>：根据滤杯型号选择（如 V60 01/02/03）</li>
+<li><strong>手冲壶</strong>：鹅颈壶助力精准注水</li>
+<li><strong>电子秤、温度计、计时器</strong>：助你掌控精确数据</li>
+<li><strong>研磨机</strong>：中细粉均匀萃取</li>
+</ul>
+<figure data-type="image" tabindex="2"><img src="https://windrunner0707.tech/post-images/1751379165577.jpg" alt="" loading="lazy"></figure>
+<h3 id="2-基本冲泡步骤">2. 基本冲泡步骤</h3>
+<p>预热与润纸：倒入热水润滤纸与滤杯，保持杯体温度<br>
+称豆与研磨：建议比率为 1:15~1:17，单份 15g 对 225g 水<br>
+倒入咖啡粉：摆平咖啡粉床，置于秤上归零<br>
+预浸润 (bloom) ：注入首段水（约粉量两倍），静置30-45秒促气泡释放<br>
+分段注水：沿螺旋由中心冲向边缘，保持水流细如铅笔，控制水位<br>
+完成出杯 ：萃取时间控制在 2:30–3:30 分钟，口感平衡颇佳</p>
+<h3 id="3-手冲要点与调节建议">3. 手冲要点与调节建议</h3>
+<ul>
+<li><strong>水温控制</strong>：88–94 °C 是最佳范围</li>
+<li><strong>研磨度调整</strong>：时间过长，加粗研磨；太快则细粉</li>
+<li><strong>注水手法</strong>：螺旋方式均匀覆盖，避免中心和边缘萃取不均</li>
+<li><strong>萃取时间</strong>：控制在 2.5–4 分钟，以平衡酸、苦、甜风味</li>
+</ul>
+<blockquote>
+<p>手冲像是在给咖啡豆洗热水澡：要温柔，也要精准。</p>
+</blockquote>
+<hr>
+<h2 id="三-精品咖啡豆推荐-每一颗都有自己的故事">🍇 三、精品咖啡豆推荐 —— 每一颗都有自己的故事</h2>
+<h3 id="1-非洲风味">1. 非洲风味</h3>
+<ul>
+<li><strong>埃塞俄比亚 耶加雪菲（Yirgacheffe）</strong><br>
+花香四溢，柑橘清酸，余韵中带蜂蜜甜。</li>
+</ul>
+<figure data-type="image" tabindex="3"><img src="https://windrunner0707.tech/post-images/1751379219766.jpg" alt="" loading="lazy"></figure>
+<ul>
+<li><strong>肯尼亚 AA</strong><br>
+梅果果香浓郁，酸度活泼明亮，口感结构鲜明。</li>
+</ul>
+<figure data-type="image" tabindex="4"><img src="https://windrunner0707.tech/post-images/1751379273736.jpg" alt="" loading="lazy"></figure>
+<h3 id="2-南美经典">2. 南美经典</h3>
+<ul>
+<li><strong>哥伦比亚 单品</strong><br>
+坚果、焦糖与可可香，口感圆润，是日常好选择。</li>
+</ul>
+<figure data-type="image" tabindex="5"><img src="https://windrunner0707.tech/post-images/1751379373135.webp" alt="" loading="lazy"></figure>
+<ul>
+<li><strong>巴拿马 赫希雅庄园瑰夏（Geisha）</strong><br>
+被誉为“咖啡界的香槟”，花香与复杂果香层次丰富，适合特别场合尝试。</li>
+</ul>
+<figure data-type="image" tabindex="6"><img src="https://windrunner0707.tech/post-images/1751379416204.jpg" alt="" loading="lazy"></figure>
+<h3 id="3-亚洲风味">3. 亚洲风味</h3>
+<ul>
+<li><strong>印尼 曼特宁（Sumatra Mandheling）</strong><br>
+低酸度、厚重巧克力体质，适合喜欢浓郁风味的饮家。</li>
+</ul>
+<h2 id=""><img src="https://windrunner0707.tech/post-images/1751379606159.jpg" alt="" loading="lazy"></h2>
+<h2 id="四-常见问题-小贴士">💡 四、常见问题 &amp; 小贴士</h2>
+<ul>
+<li><strong>水质</strong>：建议使用中硬度矿泉水，过软会导致味道平淡</li>
+<li><strong>豆新鲜度</strong>：烘焙后7–14 天风味最佳</li>
+<li><strong>废液处理</strong>：滤渣可用于园艺作肥料或生物堆肥</li>
+</ul>
+<hr>
+<h2 id="结语-手冲不只是煮一杯咖啡">💭 结语 —— 手冲，不只是煮一杯咖啡</h2>
+<blockquote>
+<p>“每一杯手冲咖啡，都像是在和时间对话。”</p>
+</blockquote>
+<p>如果你想从第一杯慢慢练习注水与研磨，到终能调出自己喜欢的风味，手冲绝对是一次美妙的旅程。试试看吧，让自己放慢节奏，感受一滴一滴的密意。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站]]></title>
+        <id>https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/</id>
+        <link href="https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/">
+        </link>
+        <updated>2025-06-19T12:13:02.000Z</updated>
+        <content type="html"><![CDATA[<p>效果展示：https://www.windrunner0707.tech/</p>
+<h1 id="技术栈说明">技术栈说明</h1>
+<h2 id="chatgpt">ChatGPT</h2>
+<p>辅助生成样例代码与K8S配置文件</p>
+<h2 id="阿里云">阿里云</h2>
+<p>提供ECS实例和容器镜像仓库<br>
+ECS：活动价99元购入，配置为2vCPU，2G内存，3Mbps带宽<br>
+<img src="https://windrunner0707.tech/post-images/1750337198199.png" alt="" loading="lazy"><br>
+容器镜像仓库：阿里云ACR，个人版免费，用于保存前后端代码打包的镜像，在阿里云使用Docker Hub可能会发生超时问题。<br>
+<img src="https://windrunner0707.tech/post-images/1750337576420.png" alt="" loading="lazy"></p>
+<h2 id="k3s">K3S</h2>
+<p>由于Kubernetes占用资源较多，所以无法在我的阿里云ECS部署，这里采用K3S。官网对它的描述是”Lightweight Kubernetes“即轻量化Kubernetes，是为物联网和边缘计算打造的经认证的Kubernetes发行版。</p>
+<h2 id="github-action">GitHub Action</h2>
+<p>GitHub Actions 是 GitHub 提供的持续集成和持续部署（CI/CD）服务，它允许你在代码仓库中定义自动化流程，从而在特定事件发生时自动执行一系列任务，比如：</p>
+<ul>
+<li>push 或 PR 时自动运行测试</li>
+<li>构建和发布 Docker 镜像</li>
+<li>部署代码到服务器或 Kubernetes 集群</li>
+<li>静态分析、格式检查、打包发布等</li>
+</ul>
+<h1 id="准备阶段">准备阶段</h1>
+<h2 id="阿里云ecs安装k3s">阿里云ECS安装K3S</h2>
+<p>由于网络原因，阿里云服务器访问GitHub服务会超时，所以参考官方文档会发生超时的错误。然后我使用了以下方法安装K3S</p>
+<pre><code>wget https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh
+INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=&quot;--system-default-registry registry.cn-hangzhou.aliyuncs.com --tls-san 8.130.108.60&quot; ./k3s-install.sh
+</code></pre>
+<p>首先，安装 K3s 使用的是存储在阿里云对象存储上的 K3s 安装脚本，并且使用存储在国内 channel 去解析对应的 K3s 版本。<br>
+其次，通过 INSTALL_K3S_MIRROR=cn 环境变量来指定 K3s 的二进制文件从国内的阿里云对象存储上去拉取。<br>
+最后，通过--system-default-registry参数来指定 K3s 的系统镜像从国内的阿里云镜像仓库去拉取。</p>
+<h2 id="准备代码仓库">准备代码仓库</h2>
+<p>这里我准备了后端常用的Spring Boot代码仓库和React + Vite代码仓库，具体代码仓库如下：<br>
+前端：https://github.com/windrunner0707/transaction-system-frontend<br>
+后端：https://github.com/windrunner0707/transaction-system<br>
+工程的搭建主要依赖于ChatGPT，并且保证本地能打包成功</p>
+<h1 id="部署阶段">部署阶段</h1>
+<h2 id="配置dockerfile">配置Dockerfile</h2>
+<p>Dockerfile主要用来打包前后端镜像，并push到阿里云ACR镜像仓库。<br>
+前端Dockerfile如下：</p>
+<pre><code>## 构建阶段
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN npm install &amp;&amp; npm run build
+
+# 运行阶段
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+</code></pre>
+<p>后端Dockerfile如下：</p>
+<pre><code># Start with a base image containing Java runtime
+FROM openjdk:21-jdk-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the built jar file into the container
+COPY target/transaction-system-0.0.1-SNAPSHOT.jar /app/transaction-system.jar
+
+# Expose the port the application runs on
+EXPOSE 8080
+
+# Set the command to run the application
+CMD [&quot;java&quot;, &quot;-jar&quot;, &quot;transaction-system.jar&quot;]
+</code></pre>
+<h2 id="配置github-action">配置GitHub Action</h2>
+<p>GitHub Action功能主要在代码仓库中创建这样一个yaml配置文件来使用<br>
+<img src="https://windrunner0707.tech/post-images/1750338735496.png" alt="" loading="lazy"><br>
+其yaml配置文件内容如下：</p>
+<pre><code>name: Build and Deploy to K3s
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: transaction-system
+  ACR_REGISTRY: crpi-kw9b5zmptdsw1y03.cn-wulanchabu.personal.cr.aliyuncs.com
+  ACR_NAMESPACE: windrunner0707
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      - name: Log in to ACR
+        run: echo &quot;${{ secrets.ACR_PASSWORD }}&quot; | docker login ${{ env.ACR_REGISTRY }} -u &quot;${{ secrets.ACR_USERNAME }}&quot; --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build -t $ACR_REGISTRY/$ACR_NAMESPACE/$IMAGE_NAME:latest .
+
+      - name: Push Docker Image to ACR
+        run: |
+          docker push $ACR_REGISTRY/$ACR_NAMESPACE/$IMAGE_NAME:latest
+
+      - name: Upload deployment.yaml to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: deployment.yaml
+          target: /home/${{ secrets.SERVER_USER }}/deploy
+
+      - name: Deploy to K3s via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+            kubectl delete deployment transaction-system --ignore-not-found
+            kubectl apply -f /home/${{ secrets.SERVER_USER }}/deploy/deployment.yaml
+
+</code></pre>
+<p>主要步骤为：设置环境 -&gt; Maven打包 -&gt; 登陆阿里云ACR -&gt; 打包Docker镜像 -&gt; push Docker镜像 -&gt; 上传K8S配置文件至阿里云ECS -&gt; 登陆ECS服务器使用kubectl完成部署。<br>
+将配置文件push至GitHub仓库后，可以在Actions下看到该pipeline的所有流程，如图所示：<br>
+<img src="https://windrunner0707.tech/post-images/1750339084011.png" alt="" loading="lazy"></p>
+<h2 id="检查服务部署情况">检查服务部署情况</h2>
+<p>登陆至ECS服务器，使用kubectl get pods命令可以查看前后端部署的Pods情况<br>
+<img src="https://windrunner0707.tech/post-images/1750339210712.png" alt="" loading="lazy"></p>
+<h2 id="域名解析">域名解析</h2>
+<p>在阿里云购买域名后，使用云解析DNS，将域名解析到我们的ECS服务器，并填写个人资料，完成备案流程<br>
+<img src="https://windrunner0707.tech/post-images/1750339466100.png" alt="" loading="lazy"></p>
+<h2 id="配置https">配置HTTPS</h2>
+<p>在阿里云数字证书管理服务购买个人测试用的免费证书，一般有效期为3个月<br>
+<img src="https://windrunner0707.tech/post-images/1750339585045.png" alt="" loading="lazy"><br>
+然后下载公钥与私钥，上传到ECS服务器<br>
+<img src="https://windrunner0707.tech/post-images/1750339731140.png" alt="" loading="lazy"><br>
+将密钥加入K8S的Secret</p>
+<pre><code>kubectl create secret tls windrunner-tls   --cert=www.windrunner0707.tech.pem   --key=www.windrunner0707.tech.key   --namespace=default
+</code></pre>
+<p><img src="https://windrunner0707.tech/post-images/1750339865254.png" alt="" loading="lazy"><br>
+配置Ingress并开启HTTPS</p>
+<pre><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  tls:
+    - hosts:
+        - www.windrunner0707.tech
+      secretName: windrunner-tls
+  rules:
+    - host: www.windrunner0707.tech
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: transaction-system-frontend
+                port:
+                  number: 80
+</code></pre>
+<h1 id="后续开发todo">后续开发（TODO）</h1>
+<p>至此已完成了一个Demo的部署，后续还有前后端的连通，开发更多feature</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Spring Bean注入：循环依赖与构造器注入最佳实践]]></title>
+        <id>https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/</id>
+        <link href="https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/">
+        </link>
+        <updated>2024-12-14T14:33:19.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="概述">概述</h1>
+<p>在Spring框架中，Bean的注入是核心功能之一，它帮助开发者以声明式的方式管理对象之间的依赖，从而实现松耦合设计。然而，Bean注入也可能面临循环依赖的问题。@Lazy提供了一种通过延迟初始化解决循环依赖的方法，但这种方式可能隐藏设计上的缺陷。<br>
+本文将从循环依赖的角度切入，探讨@Autowired、@Inject以及构造器注入三种主要注入方式的原理，详细分析@Lazy解决循环依赖的工作机制及其弊端，并重点阐述构造器注入的优势。通过构造器注入，可以在启动时及早发现循环依赖问题，符合单一职责原则，并且有助于解耦合类的设计。最后，我们还将介绍如何通过@RequiredArgsConstructor注解简化构造器注入的实现。</p>
+<h2 id="autowired的原理">@Autowired的原理</h2>
+<p>@Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的依赖注入（DI）框架：<br>
+自动装配方式：Spring会根据类型（byType）在容器中查找匹配的Bean，并将其注入到目标对象中。<br>
+细粒度控制：可以与@Qualifier搭配使用，基于Bean名称进行更精确的注入。<br>
+工作原理：</p>
+<ul>
+<li>Spring容器在启动时，会扫描@Autowired标注的字段、方法或构造器。</li>
+<li>通过AutowiredAnnotationBeanPostProcessor来解析并处理这些注解。</li>
+<li>如果发现多个候选Bean，且未指定@Qualifier，Spring将抛出NoUniqueBeanDefinitionException。</li>
+</ul>
+<h2 id="inject的原理">@Inject的原理</h2>
+<p>@Inject是Java标准（JSR-330）中的依赖注入注解，由Spring兼容支持。与@Autowired类似，它也是基于类型的自动装配。<br>
+主要特点：</p>
+<ul>
+<li>提供了与框架无关的依赖注入方式。</li>
+<li>同样支持@Qualifier用于细粒度控制。<br>
+差异点：</li>
+<li>不支持required属性（@Autowired的required属性允许强制或非强制注入）。</li>
+<li>更倾向于与其他符合JSR-330规范的框架协同工作。</li>
+</ul>
+<h2 id="构造器注入的原理">构造器注入的原理</h2>
+<p>构造器注入是一种通过构造器传递依赖的方式，Spring容器在创建Bean实例时，会自动调用标注了@Autowired或@Inject的构造器，将所需的依赖注入。<br>
+实现细节：</p>
+<ul>
+<li>Spring会查找所有符合条件的构造器，如果仅存在一个构造器，Spring会默认使用它。</li>
+<li>如果存在多个构造器，则需要明确标注@Autowired或@Inject。<br>
+原理：</li>
+<li>构造器参数会被Spring容器自动解析，容器会找到与参数类型匹配的Bean并完成注入。</li>
+<li>如果未找到匹配的依赖且未设置可选性，Spring会抛出异常。</li>
+</ul>
+<h2 id="用lazy解决循环依赖的原理">用@Lazy解决循环依赖的原理</h2>
+<p>在某些场景中，两个或多个Bean可能会相互依赖，导致Spring容器在初始化时发生循环依赖错误。为了缓解这种问题，可以使用@Lazy注解：<br>
+工作机制：</p>
+<ul>
+<li>标注@Lazy的Bean不会在容器启动时立即初始化，而是在第一次被使用时才会实例化。</li>
+<li>通过延迟加载，Spring能够暂时跳过依赖解析，直到所有Bean的创建过程完成。<br>
+应用场景：</li>
+<li>循环依赖无法通过构造器注入解决时，可以使用@Lazy配合字段或setter注入。</li>
+<li>虽然@Lazy提供了一种有效的解决循环依赖的方法，但从单一职责和解耦的角度出发，推荐通过构造器注入尽早发现循环依赖，并重构代码以消除循环依赖。</li>
+</ul>
+<h2 id="构造器注入的好处">构造器注入的好处</h2>
+<ul>
+<li>不可变性： 构造器注入强制在对象创建时提供所有必需的依赖，从而保证对象的状态在创建后是完整且不可变的。</li>
+<li>简化测试： 构造器注入使得单元测试更容易编写，因为可以直接通过构造器传递Mock依赖，而无需依赖Spring容器。</li>
+<li>避免循环依赖： Spring的构造器注入在对象创建时即解析依赖，因此可以在编译期或启动期检测出潜在的循环依赖问题。</li>
+<li>更好的代码可读性： 构造器明确地声明了依赖关系，减少了通过注解或方法查找依赖的复杂性。<br>
+与不可变对象模式的契合： 现代开发更倾向于不可变对象，而构造器注入与这种模式高度一致。</li>
+<li>解耦合与单一职责： 构造器注入能显式地揭示Bean的依赖关系，使得类更加专注于自己的职责。通过合理的依赖设计，能够避免类之间的耦合，提升系统的可维护性。</li>
+</ul>
+<h2 id="推荐使用requiredargsconstructor">推荐使用@RequiredArgsConstructor</h2>
+<p>为了简化构造器注入的代码，Spring项目中推荐使用Lombok提供的@RequiredArgsConstructor注解：<br>
+功能：<br>
+自动生成一个包含所有final字段的构造器。<br>
+结合Spring容器，可以轻松实现构造器注入而无需手动编写构造器。<br>
+示例：</p>
+<pre><code>@Component
+@RequiredArgsConstructor
+public class MyService {
+    private final MyRepository myRepository;
+    private final AnotherDependency anotherDependency;
+}
+</code></pre>
+<p>在上述代码中，MyService的依赖会通过构造器注入完成，而无需显式声明构造器，代码更加简洁。</p>
+<p>总结<br>
+Spring的依赖注入为开发者提供了多种选择：@Autowired适合快速开发，@Inject支持标准化，而构造器注入则在安全性、测试性和代码可读性方面表现尤为出色。通过合理选择注入方式，我们可以在不同的场景下构建更加稳定、高效的应用程序。<br>
+从单一职责和解耦的角度考虑，构造器注入不仅能显式定义依赖，还能尽早发现循环依赖问题，从而推动更优质的设计。同时，结合@RequiredArgsConstructor注解的使用，可以进一步提高代码的简洁性和可维护性。<br>
+希望本文能为你理解Spring Bean注入提供清晰的思路，并在实际开发中有所助益。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Clean Git：让代码版本控制更清晰、更高效的实践指南]]></title>
+        <id>https://windrunner0707.tech/post/clean-gitrang-dai-ma-ban-ben-kong-zhi-geng-qing-xi-geng-gao-xiao-de-shi-jian-zhi-nan/</id>
+        <link href="https://windrunner0707.tech/post/clean-gitrang-dai-ma-ban-ben-kong-zhi-geng-qing-xi-geng-gao-xiao-de-shi-jian-zhi-nan/">
+        </link>
+        <updated>2024-12-04T14:18:15.000Z</updated>
+        <content type="html"><![CDATA[<p><img src="https://windrunner0707.tech/post-images/1745380904972.jpg" alt="" loading="lazy"># 概述</p>
+<p>在现代软件开发中，Git 已成为不可或缺的版本控制工具。然而，随着项目规模的增长和团队协作的深入，开发者常常面临提交记录混乱、分支管理无序以及冲突处理低效等问题。本篇文章将从提交历史优化、分支管理、冲突解决、git hooks在CI/CD中的应用等几个方面，结合实际场景，分享一系列实用的 Git 最佳实践与技巧。同时，还将介绍如何利用 IDEA 集成的 Git 工具高效完成常见任务，帮助大家在提升开发效率的同时，让代码管理更加清晰规范。</p>
+<h1 id="提交历史优化">提交历史优化</h1>
+<p>清晰、整洁的提交历史是高效代码协作和维护的基石。一个明确的提交历史不仅能清晰描述代码的变更内容，还能帮助团队快速理解功能迭代的过程，便于问题追踪和代码审查。在实际开发中，合理利用 Git 提供的工具，例如 <code>git rebase</code>、<code>git amend</code> 和 <code>git squash</code>，可以优化提交历史，移除多余的提交，合并相关变更，甚至修正已有的提交信息，从而让提交历史更具可读性和逻辑性。这种优化不仅能提升团队协作的效率，还能在代码审查和版本管理中带来巨大的便利。</p>
+<h3 id="撰写清晰的提交信息">撰写清晰的提交信息</h3>
+<p>模糊的提交信息无法清楚描述改动内容，日后追溯时很难理解具体变更。</p>
+<p>正面示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">feat: 新增用户注册功能- 增加了用户注册表单验证逻辑- 使用邮件发送了注册确认链接- 优化了表单输入的错误提示</th>
+</tr>
+</thead>
+</table>
+<p>反面示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">fix: 改了一些东西update: 更新了代码</th>
+</tr>
+</thead>
+</table>
+<h3 id="分割和合并提交">分割和合并提交</h3>
+<p>将多个功能混在一起的提交，难以进行代码回溯和版本管理，后期维护成本高。</p>
+<p>正面示例：每个提交只完成一个独立的功能或修复，避免 “杂糅提交”。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">feat: 实现用户登录功能fix: 修复登录页面的样式问题test: 添加登录功能的单元测试</th>
+</tr>
+</thead>
+</table>
+<p>反面示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">feat: 完成了用户注册和部分登录功能，还有一些小问题</th>
+</tr>
+</thead>
+</table>
+<h3 id="git-提交历史重写技巧">Git 提交历史重写技巧</h3>
+<p>在开发过程中，提交历史可能会因为小错误、冗余提交或逻辑混乱而变得凌乱。通过 Git 提供的历史重写工具，如 <code>git amend</code> 和 <code>git squash</code>，可以对提交记录进行细致的调整，让提交历史更加清晰、合理。</p>
+<h4 id="git-commit-amend修改最近一次提交"><strong><code>git commit --amend</code>：修改最近一次提交</strong></h4>
+<p><code>git amend</code> 用于修改最近一次提交，无需新增一个提交记录。它可以用来修正提交信息、补充漏掉的文件，或者调整提交内容。</p>
+<p><strong>常见场景及用法</strong>：</p>
+<p><strong>修正提交信息</strong><br>
+如果最近一次提交的描述有误，可以使用以下命令重新编辑提交信息：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git commit --amend</th>
+</tr>
+</thead>
+</table>
+<p>Git 会打开默认的编辑器，允许修改提交说明。保存后，原提交记录将被替换为新的提交。</p>
+<p><strong>补充漏提交的文件</strong><br>
+假如在提交后发现漏掉了某些文件：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git add &lt;missed-file&gt;git commit --amend</th>
+</tr>
+</thead>
+</table>
+<p>这样，新增的文件会被追加到最近一次提交中，提交历史保持整洁。</p>
+<p><strong>注意事项</strong>：使用 <code>--amend</code> 会重写提交历史，不要对已经推送到远程的提交执行此操作，避免影响他人代码。对于自己的分支，需要使用git push -f 强行覆盖已经push到远端的提交。</p>
+<h4 id="git-rebase-i使用-git-squash-合并提交"><strong><code>git rebase -i</code>：使用 <code>git squash</code> 合并提交</strong></h4>
+<p><code>git squash</code> 是在交互式 rebase (<code>git rebase -i</code>) 中用于合并多个相关提交的命令。通过合并零散的提交，可以让提交历史更具逻辑性和条理性。</p>
+<p><strong>常见场景及用法</strong>：</p>
+<p><strong>开始交互式 Rebase</strong><br>
+假设你想合并最近的 3 次提交：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git rebase -i HEAD~3</th>
+</tr>
+</thead>
+</table>
+<p>此时会打开一个交互式编辑器，显示如下内容：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">pick abc123 First commitpick def456 Second commitpick ghi789 Third commit</th>
+</tr>
+</thead>
+</table>
+<p><strong>指定合并方式</strong><br>
+将后续需要合并的提交改为 <code>squash</code> 或 <code>s</code>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">pick abc123 First commitsquash def456 Second commitsquash ghi789 Third commit</th>
+</tr>
+</thead>
+</table>
+<p><strong>编辑合并后的提交信息</strong><br>
+保存后，Git 会提示编辑合并后的提交信息：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"># This is a combination of 3 commits.# The first commit message:First commit# The following commit messages:Second commitThird commit</th>
+</tr>
+</thead>
+</table>
+<p>你可以选择保留、合并或重写提交信息。编辑完成后保存退出，Git 将自动合并提交，最终的提交历史将更加简洁。</p>
+<h2 id="idea中的提交历史修改">IDEA中的提交历史修改</h2>
+<p>IDEA中提交当前代码的快捷键是Ctrl + K 我们在提交信息栏中可以找到amend选项，对应了git amend操作，把当前提交合并入上次提交。<br>
+![][image1]</p>
+<p>另外，在集成的git工具中，我们右键选中的提交，可以选择编辑提交信息与squash操作。<br>
+![][image2]</p>
+<h1 id="分支管理">分支管理</h1>
+<h2 id="分支命名与使用规范">分支命名与使用规范</h2>
+<p>正面示例：使用统一的命名规范，根据功能或类型划分，使用 develop、feature、release、hotfix 等规范分支</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">feature/add-user-loginbugfix/fix-login-errorhotfix/security-patch</th>
+</tr>
+</thead>
+</table>
+<p>反面示例：随意创建分支，缺乏明确的管理策略</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">branch123myfixtemp</th>
+</tr>
+</thead>
+</table>
+<h2 id="合并分支">合并分支</h2>
+<p>在团队协作中，本地分支需要定期与远程分支同步，以确保代码最新。传统方式是通过 <code>git merge</code> 合入远程分支的变更，但这通常会产生冗余的合并提交，导致提交历史杂乱。通过 <code>git rebase</code>，可以将远程分支的更新“平滑地”合并到本地分支，提交历史更显整洁。</p>
+<h4 id="git-merge-合并分支">git merge (合并分支)</h4>
+<p>将两个分支的最新提交整合，生成一个新的合并提交（merge commit）。不修改已有提交历史，保留所有原始提交。<br>
+示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">A---B---C (main)     \      D---E (feature)</th>
+</tr>
+</thead>
+</table>
+<p>使用 git merge 后：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">A---B---C---M (main)        \  /         D---E (feature)</th>
+</tr>
+</thead>
+</table>
+<p>其中 M 是新的合并提交。</p>
+<h4 id="git-rebase-变基">git rebase (变基)</h4>
+<p>将 feature 分支的更改移至 main 的最新提交之上，相当于重新应用一遍。<br>
+修改提交历史，使其看起来更线性、更整洁。<br>
+示例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">A---B---C (main)     \      D---E (feature)</th>
+</tr>
+</thead>
+</table>
+<p>使用 git rebase 后：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">A---B---C---D'---E' (feature rebased onto main)</th>
+</tr>
+</thead>
+</table>
+<h4 id="git-rebase-的好处">git rebase 的好处</h4>
+<p>保持提交历史线性、简洁。git rebase 使提交历史看起来像一个单独的分支线，避免了额外的合并提交。适合需要清晰、连续历史记录的场景，如开源项目或长期维护的项目。<br>
+示例对比：<br>
+使用 git merge：</p>
+<p>| *   Merge branch 'feature' into 'main'|\| * Feature Commit E| * Feature Commit D* | Main Commit C|/* Main Commit B |<br>
+| :---- |</p>
+<p>使用 git rebase:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">* Feature Commit E* Feature Commit D* Main Commit C* Main Commit B</th>
+</tr>
+</thead>
+</table>
+<ul>
+<li>
+<p><strong>避免不必要的合并提交</strong><br>
+每次 git merge 都会生成一个合并提交，如果频繁操作，提交历史会显得冗余和凌乱。git rebase 则直接将变更应用到主分支，避免合并提交的累积。</p>
+</li>
+<li>
+<p><strong>更容易阅读与回溯</strong><br>
+团队或个人在回溯历史时，可以更直观地理解每个提交的变化和原因。git rebase 生成的历史记录更清晰，无需额外理解复杂的分支结构。</p>
+</li>
+<li>
+<p><strong>提升代码质量（中间冲突修复）</strong><br>
+git rebase 过程中可以逐个修复冲突，确保每个提交都是完整且正确的。避免在合并时出现大规模冲突，一次解决多个问题带来的风险。</p>
+</li>
+</ul>
+<h4 id="什么时候选择-git-rebase">什么时候选择 git rebase？</h4>
+<p>个人开发分支的整合：当你在一个独立分支上完成开发，并希望提交历史清晰时，git rebase 是最佳选择。<br>
+小团队协作或线性开发：适用于保持代码库整洁、简洁的场景。</p>
+<h4 id="什么时候选择-git-merge">什么时候选择 git merge？</h4>
+<p>大型团队协作：当多人在同一分支上工作时，git merge 保留了完整的开发历史，可以追溯并发工作。<br>
+保留真实历史：当你希望完整记录合并的每个分支历史时，git merge 更合适。</p>
+<h2 id="合并冲突之git-rerere">合并冲突之git rerere</h2>
+<h4 id="git-rerere-的使用场景"><strong><code>git rerere</code> 的使用场景</strong></h4>
+<ol>
+<li><strong>反复 Rebase 或 Merge</strong><br>
+当在长时间存在的功能分支上开发时，频繁从主分支合并更新可能会遇到相同的冲突。启用 <code>git rerere</code> 后，Git 会自动应用之前的冲突解决，避免重复劳动。</li>
+<li><strong>团队协作中的复杂冲突</strong><br>
+在多人合作时，如果不同开发者在多个地方解决了相同冲突，团队可以共享冲突解决记录，统一冲突处理方式。</li>
+</ol>
+<h4 id="git-rerere-的工作原理"><strong><code>git rerere</code> 的工作原理</strong></h4>
+<ol>
+<li>记录冲突解决方式：当你解决了一次冲突并提交后，<code>git rerere</code> 会自动记录该冲突的解决方式。</li>
+<li>自动复用解决方案：下一次遇到相同冲突时，Git 会自动应用之前的解决方案，减少手动解决冲突的步骤</li>
+</ol>
+<h4 id="如何启用-git-rerere"><strong>如何启用 <code>git rerere</code></strong></h4>
+<p>全局启用：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git config --global rerere.enabled true</th>
+</tr>
+</thead>
+</table>
+<p>针对单个仓库启用：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git config rerere.enabled true</th>
+</tr>
+</thead>
+</table>
+<h4 id=""></h4>
+<h4 id="实际操作流程"><strong>实际操作流程</strong></h4>
+<p><strong>处理初次冲突</strong><br>
+遇到冲突时，解决冲突并标记为已解决：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git add &lt;resolved-file&gt;git commit</th>
+</tr>
+</thead>
+</table>
+<p><strong>复用解决方案</strong><br>
+当再次遇到相同冲突时，Git 会自动应用之前的解决方案，并标记文件为已解决。如果需要验证：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git status</th>
+</tr>
+</thead>
+</table>
+<ol>
+<li>可以看到冲突已被自动解决。</li>
+<li>**手动确认或调整：**如果自动解决不完全正确，可以手动编辑文件，然后重复 <code>git add</code> 和 <code>git commit</code>。</li>
+</ol>
+<h4 id="git-rerere-的优缺点"><strong><code>git rerere</code> 的优缺点</strong></h4>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>减少重复冲突解决的时间，特别适合长时间开发的功能分支。</li>
+<li>提高复杂项目的冲突解决效率。</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>需要团队成员统一使用，且冲突记录可能需要共享才能充分发挥作用。</li>
+<li>在解决方式不完全匹配时，仍需手动调整。</li>
+</ul>
+<h2 id="idea中的pull代码">IDEA中的pull代码</h2>
+<p>IDEA中pull远程代码的快捷键是Ctrl + T我们在拉代码过程中可以选择rebase或者merge远程代码到本地。<br>
+![][image3]</p>
+<h1 id="git-patch-与-git-apply">git patch 与 git apply</h1>
+<p>在代码协作与提交历史优化中，git patch 和 git apply 是一对强大的工具组合。git patch 用于生成变更补丁文件，而 git apply 则可以将这些补丁应用到工作目录中。它们可以帮助开发者在跨分支、跨仓库传递变更，或在代码回滚、细化提交时精确控制变更内容。</p>
+<h2 id="git-patch-生成补丁"><code>git patch</code> 生成补丁</h2>
+<p>Git 可以生成包含代码修改内容的补丁文件，供其他人应用到自己的代码库中。</p>
+<p>生成补丁文件的常见方法</p>
+<p><strong>使用 <code>git diff</code> 生成基础补丁</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git diff &gt; changes.patch</th>
+</tr>
+</thead>
+</table>
+<ul>
+<li>此命令生成工作区未提交的更改的补丁文件。</li>
+<li><code>changes.patch</code> 是一个包含代码差异的文本文件，记录了具体的新增、删除或修改。</li>
+</ul>
+<h2 id="git-apply-应用补丁"><code>git apply</code> 应用补丁</h2>
+<p><code>git apply</code> 用于将补丁文件中的修改应用到当前代码库，但不会自动生成提交记录。</p>
+<h5 id="基本用法"><strong>基本用法</strong></h5>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git apply changes.patch</th>
+</tr>
+</thead>
+</table>
+<p>此命令将 <code>changes.patch</code> 中的修改应用到当前工作区。</p>
+<h5 id="查看补丁应用的效果-在实际应用补丁前可以通过-check-检查补丁是否能成功应用">查看补丁应用的效果 在实际应用补丁前，可以通过 <code>--check</code> 检查补丁是否能成功应用：</h5>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git apply --check changes.patch</th>
+</tr>
+</thead>
+</table>
+<h5 id="将补丁文件应用为提交"><strong>将补丁文件应用为提交</strong></h5>
+<p>如果希望直接将补丁文件作为一次提交，可以使用 <code>git am</code> 命令（适用于由 <code>git format-patch</code> 生成的补丁文件）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">git am changes.patch</th>
+</tr>
+</thead>
+</table>
+<h2 id="idea中的patch与apply操作">IDEA中的patch与apply操作</h2>
+<p>IDEA中可以使用集成的git工具生成和应用patch文件，具体位置如截图所示。<br>
+![][image4]![][image5]</p>
+<h1 id="git-hooks">git hooks</h1>
+<p>在团队协作开发中，开发者可能会因为疏忽忘记在本地运行测试，直接将代码提交到远程仓库，导致在 CI/CD 流程中测试失败，浪费时间。通过 Git Hooks，我们可以在本地 <code>push</code> 或 <code>commit</code> 代码时，自动执行测试命令，如运行 Maven 的单元测试，确保代码的质量和稳定性。</p>
+<h2 id="git-hooks-简介">Git Hooks 简介</h2>
+<p>Git Hooks 是 Git 提供的脚本功能，可在特定的 Git 操作（如 <code>commit</code>、<code>push</code>）之前或之后触发自定义逻辑。例如：</p>
+<ul>
+<li><code>pre-commit</code>：在 <code>git commit</code> 命令之前执行。</li>
+<li><code>pre-push</code>：在 <code>git push</code> 命令之前执行。</li>
+</ul>
+<h2 id="在-push-时运行-maven-单元测试">在 push 时运行 Maven 单元测试</h2>
+<p>在团队协作开发中，开发者可能会因为疏忽忘记在本地运行测试，直接将代码提交到远程仓库，导致在 CI/CD 流程中测试失败，浪费时间。通过 Git Hooks，我们可以在本地 <code>push</code> 或 <code>commit</code> 代码时，自动执行测试命令，如运行 Maven 的单元测试，确保代码的质量和稳定性。</p>
+<p>我们可以使用 <code>pre-push</code> Hook 在推送前执行单元测试。以下是具体实现步骤：</p>
+<p>创建 <code>pre-push</code> Hook 文件</p>
+<p>进入项目的 Git 配置目录：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">cd .git/hooks</th>
+</tr>
+</thead>
+</table>
+<p>创建并编辑 <code>pre-push</code> 文件：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">touch pre-pushchmod +x pre-push  # 确保 Hook 文件具有可执行权限</th>
+</tr>
+</thead>
+</table>
+<p>在 <code>pre-push</code> 文件中添加以下脚本：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">#!/bin/bashecho &quot;Running Maven tests before pushing...&quot;# 运行 Maven 单元测试mvn testif [ $? -ne 0 ]; then    echo &quot;Unit tests failed. Push aborted.&quot;    exit 1fiecho &quot;All tests passed. Proceeding with push.&quot;exit 0</th>
+</tr>
+</thead>
+</table>
+<h2 id="测试-hook-是否生效">测试 Hook 是否生效</h2>
+<ol>
+<li>在代码中故意引入一个可能导致单元测试失败的错误。</li>
+<li>尝试执行 <code>git push</code>：
+<ul>
+<li>如果测试失败，<code>pre-push</code> Hook 会中止推送，并提示错误原因。</li>
+<li>如果测试成功，代码会正常推送到远程仓库。</li>
+</ul>
+</li>
+</ol>
+<h1 id="总结">总结</h1>
+<p>Git 的强大不仅体现在版本控制的基础能力上，更在于其灵活的操作方式和丰富的工具支持。通过优化提交历史、规范分支管理以及高效处理冲突，开发者可以更有条理地管理代码版本，提升协作效率，降低开发过程中的复杂性。希望本文的实践分享能够为您和您的团队提供有价值的参考，助力构建一套高效、规范的 Clean Git 工作流。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[面试八股文-线上问题排查]]></title>
+        <id>https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/</id>
+        <link href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/">
+        </link>
+        <updated>2024-10-25T03:54:07.000Z</updated>
+        <content type="html"><![CDATA[<p>在面试中回答如何排查线上内存、CPU负载过高或死锁问题时，结构化的回答可以帮助你清晰地展示出排查思路和操作步骤。以下是可以参考的一套话术，分为现象识别、初步诊断、深入排查、解决措施和预防手段几个部分，结合你的实际经验可以进行调整和深入。</p>
+<ol>
+<li>现象识别<br>
+首先，描述一下线上系统出现内存、CPU负载过高或者死锁问题的典型表现，并且通过现象识别问题的类型。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象：<br>
+CPU负载高：请求响应时间增加，服务性能下降，甚至出现服务宕机。<br>
+内存负载高：可能会出现频繁的垃圾回收（GC）操作，尤其是 Full GC，或者出现内存溢出（OutOfMemoryError）。<br>
+死锁问题：程序无响应，线程一直等待，CPU使用率突然降低，系统几乎卡死。</p>
+<p>通过监控工具（如 Prometheus、Grafana、Kibana 等），我们可以实时监控系统的 CPU 和内存使用情况，还可以结合 APM 工具（如 New Relic、Pinpoint）监控请求性能。</p>
+</blockquote>
+<ol start="2">
+<li>初步诊断<br>
+接下来，我们可以根据不同的现象进行初步诊断，说明会优先查看哪些指标，并使用什么工具。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>对于CPU负载过高的问题，我通常首先会使用 top、htop 或者类似的监控工具查看系统中占用 CPU 最高的进程和线程，进而确定是系统负载问题还是应用本身的热点问题。同时会使用 Java 相关的监控工具如jstack 来查看线程的运行状态，判断是否存在CPU热点代码或死循环问题。</p>
+</blockquote>
+<blockquote>
+<p>对于内存负载过高，我会检查 GC 日志（通过设置 -XX:+PrintGCDetails），以判断是否是由于频繁的垃圾回收导致内存回收不及时。同时可以使用 jmap 命令生成堆内存快照（Heap Dump），并结合 MAT（Memory Analyzer Tool） 来分析哪些对象占用了大量内存。</p>
+</blockquote>
+<blockquote>
+<p>对于死锁问题，最常见的是通过 jstack 查看线程堆栈，检查是否有线程处于等待锁的状态。如果是多线程引发的死锁问题，线程堆栈中会显示哪些线程正在等待获得其他线程持有的锁资源。</p>
+</blockquote>
+<ol start="3">
+<li>深入排查<br>
+当初步定位了问题后，深入分析和排查的步骤就显得尤为关键。此时你可以展示一些具体的排查工具和操作步骤。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>CPU负载高：如果 top 或 htop 确定是某个 Java 进程占用 CPU 过高，我会通过 jstack 查看当前线程的 CPU 使用情况，确定是否有死循环或热点代码。通过查找 占用 CPU 高的线程（可以通过 top -H -p {pid} 命令找到线程 ID，然后将其转换为十六进制查看在 jstack 中对应的线程状态）来确定代码中的问题。</p>
+</blockquote>
+<blockquote>
+<p>内存问题：生成堆内存快照后，我会使用 MAT 等工具分析哪些类或对象占用了大量内存。例如，如果发现大量不可达对象占用了内存，可能是内存泄漏导致的。此外，也可以根据 jmap -histo 命令查看当前 JVM 内存中各类对象的数量分布，结合业务场景找出内存热点。</p>
+</blockquote>
+<blockquote>
+<p>死锁问题：通过 jstack 可以分析哪些线程进入了死锁状态。如果确认有死锁，通常会在堆栈中看到 Thread-1 等待 Thread-2 的锁，而 Thread-2 又在等待 Thread-1 的锁。此时可以使用线程转储信息（如 jstack 或 jconsole）找到具体的锁争用代码，并通过代码审查或调整锁的顺序来解决死锁问题。</p>
+</blockquote>
+<ol start="4">
+<li>解决措施<br>
+在定位了问题后，接下来是提出相应的解决方案。展示你如何在实际项目中应对这些问题，解决内存、CPU负载过高或死锁问题。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>CPU负载高的解决措施：</p>
+</blockquote>
+<blockquote>
+<p>对于热点代码问题，我会优化代码逻辑，避免不必要的复杂计算或耗时操作。对于 IO 密集型操作，可以考虑使用异步处理或批量处理的方式，降低 CPU 占用。<br>
+如果是由于垃圾回收频繁导致的 CPU 负载问题，可以调整 JVM 参数，如 -Xmx 和 -Xms，或者调整 GC 策略，比如从 CMS 切换到 G1 垃圾收集器，以减少 Full GC 的次数。</p>
+</blockquote>
+<blockquote>
+<p>内存负载高的解决措施：</p>
+</blockquote>
+<blockquote>
+<p>如果是内存泄漏问题，通常会通过分析堆内存快照找到未及时释放的对象，修复对象生命周期管理中的问题。<br>
+调整堆内存大小，例如通过调整 -Xmx 参数增加堆内存上限，或者通过优化代码减少大对象的创建频率，避免内存占用过高。</p>
+</blockquote>
+<blockquote>
+<p>死锁问题的解决措施：</p>
+</blockquote>
+<blockquote>
+<p>对于代码中的锁争用问题，我会检查代码中的锁的使用顺序，确保锁的获取顺序一致，避免产生环形等待。如果需要在高并发环境中使用锁，可以使用诸如 ReentrantLock 或使用无锁并发算法来降低锁的使用频率。<br>
+可以通过 tryLock() 方法替代传统的 synchronized 来实现非阻塞锁，并设置合理的超时机制，避免长时间等待锁。</p>
+</blockquote>
+<ol start="5">
+<li>预防手段<br>
+最后，可以介绍如何在日常开发和设计中预防这些问题，展现你对问题预防的关注和经验。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>为了避免 CPU、内存负载过高和死锁问题，我们可以采取以下预防措施：</p>
+</blockquote>
+<blockquote>
+<p>代码层面优化：定期进行代码审查，关注性能瓶颈，避免无效循环和阻塞操作。在并发编程时，使用更高级别的并发控制工具如 ConcurrentHashMap 或者 ForkJoinPool 来提高并发处理的效率。<br>
+内存管理：通过设置合理的 JVM 参数和使用工具如 JVisualVM、Prometheus 等对应用的内存使用情况进行监控，提前发现潜在问题。还可以引入内存池等机制来管理大对象。<br>
+监控与报警：借助 APM 工具（如 Skywalking、Prometheus 等），实时监控 CPU 和内存的使用情况，设置预警阈值，确保在问题恶化之前就能处理。</p>
+</blockquote>
+<p>示例总结话术：</p>
+<blockquote>
+<p>排查线上 CPU 或内存负载过高以及死锁问题，我通常会遵循以下步骤：首先，使用 top 或者 jstack 确定是 CPU 还是内存引发的问题。对于 CPU 问题，我会查找热点线程并排查是否有死循环或复杂计算导致的性能瓶颈；对于内存问题，则会通过分析堆内存快照，找到内存泄漏或垃圾回收频繁的根本原因。最后，针对死锁问题，我会分析线程堆栈，找到锁的争用位置，并通过优化锁的顺序或使用无锁机制来解决。通过调整 JVM 参数、监控系统性能，以及对代码逻辑的持续优化，我们可以有效预防和应对这些问题。</p>
+</blockquote>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[面试八股文-数据库事务，隔离级别]]></title>
+        <id>https://windrunner0707.tech/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/</id>
+        <link href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/">
+        </link>
+        <updated>2024-10-24T03:28:39.000Z</updated>
+        <summary type="html"><![CDATA[<p>本文主要介绍数据库事务属性与隔离级别的使用</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>本文主要介绍数据库事务属性与隔离级别的使用</p>
+<!-- more -->
+<h3 id="acid-属性">ACID 属性</h3>
+<p>ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括：</p>
+<ol>
+<li>原子性（Atomicity）</li>
+</ol>
+<ul>
+<li>原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rollback）。这保证了在系统崩溃的情况下，数据不会处于部分更新的状态。</li>
+<li>例如：如果一个事务需要将某个账户的余额从100减少到50，并将另一账户的余额从50增加到100，这两个操作必须要么同时成功，要么同时失败。</li>
+</ul>
+<ol start="2">
+<li>一致性（Consistency）</li>
+</ol>
+<ul>
+<li>一致性保证事务的执行不会破坏数据库的规则或约束条件。事务开始之前和结束之后，数据库必须保持在一致的状态。任何事务都必须从一致状态转换为另一个一致状态。</li>
+<li>例如：在银行转账中，转账后的账户余额总和必须与转账前一致，不能因为转账导致总金额丢失或增加。</li>
+</ul>
+<ol start="3">
+<li>隔离性（Isolation）</li>
+</ol>
+<ul>
+<li>隔离性确保并发执行的事务互不干扰，每个事务的执行结果不会被其他事务所看到，直到事务完成。即便多个事务同时执行，也要让它们看起来像是串行执行的一样。</li>
+<li>例如：在多用户环境中，多个用户同时进行数据库操作，一个用户的操作不应影响到其他用户的事务结果。</li>
+</ul>
+<ol start="4">
+<li>持久性（Durability）</li>
+</ol>
+<ul>
+<li>持久性保证了事务一旦提交，其结果将永久保存在数据库中，即使系统崩溃或电源中断也不会丢失数据。持久性通常通过将数据写入磁盘来保证。</li>
+<li>例如：如果用户完成了银行转账操作，即便系统在操作后崩溃，数据仍应正确地反映转账的结果。<br>
+使用原子性，隔离性，持久性保证一致性。</li>
+</ul>
+<h3 id="事务的隔离级别">事务的隔离级别</h3>
+<p>隔离性是ACID中的一个重要属性，它控制事务之间的可见性。数据库通过定义不同的隔离级别来平衡并发性能和数据一致性。SQL标准定义了四种隔离级别，每种隔离级别允许不同程度的并发干扰。<br>
+隔离级别及其可能的问题：</p>
+<ol>
+<li>读未提交（Read Uncommitted）</li>
+</ol>
+<ul>
+<li>描述：最低的隔离级别，事务可以读取其他事务未提交的数据。</li>
+<li>可能问题：脏读（Dirty Read）——一个事务可以读取到另一个事务尚未提交的修改，如果后者回滚，则前者读取到无效数据。</li>
+<li>应用场景：很少使用，因为数据一致性无法保证。</li>
+</ul>
+<ol start="2">
+<li>读已提交（Read Committed）</li>
+</ol>
+<ul>
+<li>描述：一个事务只能读取到其他事务已提交的数据，防止脏读的发生。</li>
+<li>可能问题：不可重复读（Non-repeatable Read）——同一个事务中的两次相同查询可能会得到不同的结果，因为其他事务可能在它的中途修改并提交数据。</li>
+<li>应用场景：大多数数据库默认使用的隔离级别，如 Oracle。</li>
+</ul>
+<ol start="3">
+<li>可重复读（Repeatable Read）</li>
+</ol>
+<ul>
+<li>描述：一个事务在开始时对某个数据的读操作，在整个事务过程中保持一致。即使有其他事务修改并提交了该数据，本事务仍会看到它最初的值。</li>
+<li>可能问题：幻读（Phantom Read）——同一事务在不同时间段查询时，可能会发现数据集合不一致，例如第一次查询到的结果没有某条记录，但第二次查询时该记录出现了。</li>
+<li>应用场景：MySQL的默认隔离级别，解决了不可重复读，但可能存在幻读问题。</li>
+</ul>
+<ol start="4">
+<li>可串行化（Serializable）</li>
+</ol>
+<ul>
+<li>描述：最高的隔离级别，它通过强制事务串行化执行来防止所有并发问题。所有事务依次执行，确保没有并发访问冲突。</li>
+<li>可能问题：性能下降，因为并发能力几乎为零，事务必须等待其他事务执行完毕。</li>
+<li>应用场景：保证数据完全一致的场景，通常用于对数据一致性要求极高的系统。</li>
+</ul>
+<h3 id="事务隔离级别的影响">事务隔离级别的影响</h3>
+<ol>
+<li>性能与一致性的平衡：</li>
+</ol>
+<ul>
+<li>隔离级别越高，事务之间的干扰越小，数据一致性越好，但性能开销越大。高隔离级别（如可串行化）会显著降低数据库的并发性能，因为事务之间需要等待。</li>
+</ul>
+<ol start="2">
+<li>隔离级别的选择：</li>
+</ol>
+<ul>
+<li>在实际应用中，常常根据具体需求来选择隔离级别。例如，在金融系统中，数据一致性要求较高，通常选择可重复读或可串行化；而在电商系统中，出于性能考虑，可能选择读已提交。</li>
+</ul>
+<ol start="3">
+<li>总结</li>
+</ol>
+<ul>
+<li>ACID 属性：原子性、一致性、隔离性和持久性是事务管理的核心，确保数据库操作的可靠性和一致性。</li>
+<li>隔离级别：不同的隔离级别提供了对事务间并发的不同控制，选择适当的隔离级别需要在数据一致性和性能之间进行权衡。</li>
+</ul>
+<h3 id="电商系统中使用rc隔离级别">电商系统中使用RC隔离级别</h3>
+<p>在电商系统中，使用**读已提交（Read Committed）隔离级别时，可能会遇到不可重复读（Non-repeatable Read）**的问题。不可重复读是指在同一个事务中，多次读取相同的数据时，数据内容可能发生变化，因为另一个事务可能已经修改并提交了该数据。<br>
+为了解决这个问题，在读已提交的隔离级别下，可以采用以下几种方法：</p>
+<h4 id="悲观锁pessimistic-locking">悲观锁（Pessimistic Locking）</h4>
+<p>悲观锁是一种假设冲突一定会发生的策略，所以会通过数据库的锁机制来防止其他事务对数据的修改。使用悲观锁可以确保数据在事务结束之前不会被其他事务修改，从而避免不可重复读问题。<br>
+在Java中，悲观锁通常通过数据库的 SELECT ... FOR UPDATE 语句实现。当一个事务读取数据时，会锁定该行记录，直到事务提交或回滚，其他事务无法修改被锁定的数据。</p>
+<ul>
+<li>优点：避免了数据修改带来的问题，保证了数据一致性。</li>
+<li>缺点：性能较差，特别是在高并发系统中，由于会对数据加锁，容易导致事务等待或死锁<br>
+-- 事务A<br>
+BEGIN;<br>
+SELECT * FROM products WHERE product_id = 1 FOR UPDATE;<br>
+-- 此时，事务B无法更新或读取 product_id = 1 的记录，直到事务A提交或回滚</li>
+</ul>
+<h4 id="乐观锁optimistic-locking">乐观锁（Optimistic Locking）</h4>
+<p>乐观锁是一种假设数据冲突不会经常发生的策略，只有在事务提交时才检查数据是否被其他事务修改。乐观锁通常通过版本号或时间戳机制来实现。<br>
+在电商系统中，可以为每个记录增加一个版本号（version 字段），每次事务提交时，检查数据的版本号是否与读取时一致。如果版本号发生变化，说明有其他事务修改了数据，当前事务应回滚或重新尝试。</p>
+<ul>
+<li>优点：不会加锁，适合高并发场景；只有在冲突发生时才会处理，性能较好。</li>
+<li>缺点：需要手动管理版本号，冲突发生时需要重试操作。</li>
+</ul>
+<pre><code>// 读取数据时获取版本号
+Product product = productRepository.findById(1);
+int currentVersion = product.getVersion();
+
+// 更新数据时检查版本号是否一致
+int rowsUpdated = productRepository.updateProduct(product.getId(), newPrice, currentVersion);
+
+if (rowsUpdated == 0) {
+    // 版本号不一致，说明有并发修改，回滚或重新处理
+    throw new OptimisticLockingFailureException(&quot;Product has been updated by another transaction.&quot;);
+}
+</code></pre>
+<ol>
+<li>在应用层缓存数据<br>
+在电商系统中，可以通过在应用层缓存数据来避免不可重复读问题。在同一个事务中，读取数据时将数据缓存起来，之后的操作都从缓存中获取数据，而不再重复从数据库读取。这种方式保证了在事务内的数据一致性。</li>
+</ol>
+<ul>
+<li>示例：将查询到的产品信息缓存到事务的上下文中，后续操作从缓存中获取数据，而不是直接查询数据库。</li>
+</ul>
+<pre><code>java复制代码// 缓存第一次读取的数据
+Map&lt;Integer, Product&gt; productCache = new HashMap&lt;&gt;();
+Product product = productRepository.findById(1);
+productCache.put(1, product);
+
+// 后续读取操作使用缓存中的数据
+Product cachedProduct = productCache.get(1);
+</code></pre>
+<ul>
+<li>优点：实现简单，能够在应用层解决不可重复读问题。</li>
+<li>缺点：适合只读场景或数据变化不频繁的情况，不能解决数据频繁变动时的一致性问题。</li>
+</ul>
+<ol start="2">
+<li>使用可重复读隔离级别<br>
+如果业务逻辑要求在同一事务中多次读取数据时保持一致，考虑升级到**可重复读（Repeatable Read）**隔离级别。可重复读隔离级别可以解决不可重复读问题，保证在同一事务中，每次读取的数据一致。<br>
+在MySQL等数据库中，可重复读隔离级别通过使用多版本并发控制（MVCC，Multi-Version Concurrency Control）来实现。MVCC允许事务读取数据的快照，即使其他事务修改并提交了数据，当前事务读取到的仍是开始时的数据版本。</li>
+</ol>
+<ul>
+<li>优点：天然解决不可重复读问题，能够保证数据一致性。</li>
+<li>缺点：可能会有**幻读（Phantom Read）**问题，且隔离级别提高会影响性能。</li>
+</ul>
+<ol start="3">
+<li>使用快照隔离（Snapshot Isolation）<br>
+部分数据库（如 PostgreSQL）提供了快照隔离，它类似于可重复读，通过每个事务访问数据的快照来避免并发读写问题。在快照隔离中，事务读取数据时会看到事务开始时的数据版本，其他事务的修改在当前事务中是不可见的。<br>
+快照隔离能够有效解决不可重复读问题，并且在处理幻读方面也有一定优势。</li>
+</ol>
+<ul>
+<li>优点：提供一致性视图，避免不可重复读问题，性能较好。</li>
+<li>缺点：并非所有数据库都支持，且需要额外的存储来保存多个版本的数据。</li>
+</ul>
+<h4 id="总结">总结</h4>
+<p>在电商系统中使用读已提交隔离级别时，可以通过以下几种方式解决不可重复读问题：</p>
+<ol>
+<li>悲观锁：通过数据库锁定，防止其他事务修改数据。</li>
+<li>乐观锁：通过版本号或时间戳机制，在提交时检查是否有并发修改。</li>
+<li>应用层缓存：在事务内缓存读取的数据，避免重复查询数据库。</li>
+<li>可重复读隔离级别：通过提高隔离级别，保证数据一致性。</li>
+<li>快照隔离：通过多版本并发控制（MVCC），为事务提供一致的快照数据。<br>
+根据具体业务需求和性能要求，可以选择合适的方式来解决不可重复读问题。</li>
+</ol>
+]]></content>
+    </entry>
+</feed>

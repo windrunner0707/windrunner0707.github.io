@@ -1,0 +1,430 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>（翻译）揭开数据库索引的神秘面纱：索引类型与用例 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.tech/favicon.ico?v=1766317230703">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.tech/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="（翻译）揭开数据库索引的神秘面纱：索引类型与用例 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.tech/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="当查询性能下降时，大多数工程师通常会首先检查应用代码，以识别问题。然而，问题的根源也可能出现在数据存储层，而索引则是决定能否精准查找与避免盲目全表扫描、从而提高性能的关键。只要建立了合适的索引，原本需要筛选数百万行的数据查询就能在毫秒级别返..." />
+    <meta name="keywords" content="索引,数据库" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.tech">
+  <img class="avatar" src="https://windrunner0707.tech/images/avatar.png?v=1766317230703" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              （翻译）揭开数据库索引的神秘面纱：索引类型与用例
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-07-01
+              </span>
+              <span>
+                18 min read
+              </span>
+              
+                <a href="https://windrunner0707.tech/tag/Fvo3TRNq5I/" class="post-tag">
+                  # 索引
+                </a>
+              
+                <a href="https://windrunner0707.tech/tag/drZeANo6Ob/" class="post-tag">
+                  # 数据库
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://windrunner0707.tech/post-images/fan-yi-jie-kai-shu-ju-ku-suo-yin-de-shen-mi-mian-sha-suo-yin-lei-xing-yu-yong-li.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>当查询性能下降时，大多数工程师通常会首先检查应用代码，以识别问题。然而，问题的根源也可能出现在数据存储层，而索引则是决定能否精准查找与避免盲目全表扫描、从而提高性能的关键。只要建立了合适的索引，原本需要筛选数百万行的数据查询就能在毫秒级别返回结果。</p>
+<p>随着数据集的增长，扫描的成本变得不可承受。数据库将数据存储在数据页、行和块中，这些结构并不适合任意读取。没有索引，每次进行筛选或排序的查询都必须扫描更多的行，超出了必要的范围。如果每秒有数千次查询，I/O 压力将加剧，系统会因此承受巨大负担。</p>
+<p>索引通过缩小搜索范围来解决这个问题，数据库引擎利用预计算结构，直接跳转到目标位置，就像翻书时直接查阅索引，而不是逐页翻阅。</p>
+<p>但并非所有索引类型的表现都相同。有些索引是为了加速键值查找而构建的，其他一些则优化了范围扫描，还有一些则通过提前计算优化特定查询的性能，同时可能在其他地方带来开销。</p>
+<p>在这篇文章中，我们将探索数据库索引的基本概念和不同的索引类型。我们还将了解每种索引的作用、何时适用以及其开销。</p>
+<figure data-type="image" tabindex="1"><img src="https://windrunner0707.tech/post-images/1751380728111.png" alt="" loading="lazy"></figure>
+<h2 id="什么是数据库索引">什么是数据库索引？</h2>
+<p>数据库索引是将列值映射到表中行物理位置的数据结构，其目的是加速数据访问。数据库引擎通过查询索引，直接跳转到相关行，而不需要扫描每一行来查找匹配的值。</p>
+<figure data-type="image" tabindex="2"><img src="https://windrunner0707.tech/post-images/1751380861720.png" alt="" loading="lazy"></figure>
+<p>假设有一个包含数百万条客户记录的表，以及以下查询：</p>
+<pre><code>SELECT * FROM customers WHERE email = alice@example.com';
+</code></pre>
+<p>没有索引时，像这样的查询需要引擎扫描 customers 表中的每一行。这就是全表扫描，在查找单条记录时，它既昂贵又缓慢，而且是多余的。</p>
+<p>如果在 email 列上有索引，数据库则会查询一个紧凑的查找结构。它找到该邮箱地址的条目，跟随指针直接定位到对应的行。</p>
+<figure data-type="image" tabindex="3"><img src="https://windrunner0707.tech/post-images/1751977368364.png" alt="" loading="lazy"></figure>
+<p>索引是建立在一个或多个列上的。它们可以定义在单个字段上（如 email），也可以是多个字段的组合（如 last_name 和 first_name），用于复合查询。当索引与查询的过滤、连接或排序模式相匹配时，性能提升最为明显。</p>
+<p>但索引并非没有代价。它们会占用存储空间，并且在插入、更新或删除数据时需要维护。每新增一个索引，都会增加写操作的成本。因此，索引的设计并不是“越多越好”，关键在于选择真正反映数据访问模式的合适索引。</p>
+<h2 id="索引是如何工作的">索引是如何工作的？</h2>
+<p>正如前文所述，索引的作用在于减少数据库在执行查询时所需读取的数据量。数据库引擎无需再逐行扫描以判断是否匹配筛选条件，而是通过索引直接跳转到可能的候选行，从而加快查询效率。</p>
+<p>下面我们逐步了解索引在查询执行过程中是如何被使用的：</p>
+<p>第一步：解析并规划查询<br>
+数据库引擎会解析 SQL 语句，并开始构建执行计划。它会检查查询中用于过滤、连接和排序的列上是否存在可用的索引。</p>
+<p>第二步：选择最优的可用索引<br>
+如果存在合适的索引（例如 customer_id 上的索引），查询优化器会评估是否使用它。这取决于预计的匹配行数，以及使用该索引与直接进行全表扫描之间的性能成本。如果判断使用索引能够减少 I/O 开销，则会优先选择索引。</p>
+<p>第三步：遍历索引结构<br>
+大多数通用索引采用 B 树结构实现。数据库引擎会从索引的根节点开始，沿着分支向下遍历，最终定位到包含目标值的叶子节点。每一层都在缩小搜索范围，就像查字典时利用字母分隔标签快速定位一样。</p>
+<p>第四步：获取行指针<br>
+一旦找到匹配项，索引将返回一个行指针：如果是聚簇索引，则直接指向实际数据行；如果是非聚簇索引，则提供主键或行 ID 的引用。</p>
+<p>第五步：获取实际数据<br>
+如果索引已经包含了查询所需的全部字段，数据库可以直接返回结果，无需访问表本身。否则，它会根据索引指针，从磁盘或内存中检索完整的数据行。</p>
+<p>第六步：返回查询结果<br>
+拿到目标数据后，数据库引擎会组装最终的结果集，并将其返回给应用程序。</p>
+<figure data-type="image" tabindex="4"><img src="https://windrunner0707.tech/post-images/1751978711661.png" alt="" loading="lazy"></figure>
+<p>这个过程使数据库能够在毫秒级的时间内，将数百万行数据缩小到少量候选记录。尽管开发者通常无法控制索引的底层结构（如 B 树或哈希表），但他们可以决定在哪些列上建立索引、如何组合这些列，以及为哪些访问模式优化索引设计——这正是索引设计真正发挥作用的地方。</p>
+<h2 id="核心索引类型基于结构的分类">核心索引类型：基于结构的分类</h2>
+<p>索引在数据库中可以扮演不同的角色，这取决于它与数据表结构和数据布局之间的关系。最基本的区分在于：索引是否决定了表中数据的物理存储方式（即聚簇索引），还是仅仅作为一种辅助的访问路径（即非聚簇索引）。</p>
+<p>接下来，我们来逐一解析三种核心索引类型。</p>
+<h3 id="1-主索引primary-index">1. 主索引（Primary Index）</h3>
+<p>当在表上定义主键时，数据库会自动创建主索引。主索引保证被索引的列（或列集合）中的每个值都是唯一且非空的。</p>
+<p>请参考下图来理解主索引的概念。</p>
+<figure data-type="image" tabindex="5"><img src="https://windrunner0707.tech/post-images/1751981068416.png" alt="" loading="lazy"></figure>
+<p>在许多数据库中，例如 MySQL 的 InnoDB 引擎，主索引也被用作聚簇索引。这意味着，表中的数据行在磁盘上的物理存储顺序是由主键决定的。</p>
+<p>例如，考虑以下客户信息表：</p>
+<pre><code>CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100)
+);
+</code></pre>
+<p>在这个表中，customer_id 列即作为主索引。再看下面这个查询：</p>
+<pre><code>SELECT * FROM customers WHERE customer_id = 501;
+</code></pre>
+<p>该查询可以利用主索引直接跳转到目标数据行，无需扫描其他行。由于 InnoDB 将主索引作为聚簇索引，数据行就实际存储在索引所指向的位置上。</p>
+<p>主索引的几个关键特性如下：</p>
+<ul>
+<li>强制唯一性</li>
+<li>在某些数据库引擎中具有物理排序功能</li>
+<li>通常作为其他索引的基础引用</li>
+</ul>
+<h3 id="2-聚簇索引clustered-index">2. 聚簇索引（Clustered Index）</h3>
+<p>聚簇索引决定了表中数据行的物理存储顺序。由于数据在磁盘上同一时间只能按照一种顺序存储，因此每个表只能有一个聚簇索引。</p>
+<p>这种存储方式对于范围查询、有序扫描以及提高 I/O 效率非常有利，因为相关的数据行在磁盘上的物理位置是连续的，能够减少磁盘寻址开销。</p>
+<figure data-type="image" tabindex="6"><img src="https://windrunner0707.tech/post-images/1751981519757.png" alt="" loading="lazy"></figure>
+<p>例如，考虑一个订单表，order_id 为自增主键：</p>
+<pre><code>CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE
+);
+</code></pre>
+<p>在这个表中，order_id 就是聚簇索引。再来看一个范围查询：</p>
+<pre><code>SELECT * FROM orders WHERE order_id BETWEEN 1000 AND 1100;
+</code></pre>
+<p>该查询的性能非常好，因为聚簇索引使得这些行在磁盘上的存储是连续的，从而提升了 I/O 效率。</p>
+<p>在某些数据库引擎（如 SQL Server）中，即使某列不是主键，开发者也可以显式指定其为聚簇索引。</p>
+<p>聚簇索引的几个关键特性包括：</p>
+<ul>
+<li>决定数据行的物理存储顺序</li>
+<li>优化范围查询与有序查询</li>
+<li>每个表只能有一个聚簇索引</li>
+<li>作为非聚簇索引查找的基础</li>
+</ul>
+<h3 id="3-非聚簇索引non-clustered-index-辅助索引">3. 非聚簇索引（Non-Clustered Index / 辅助索引）</h3>
+<p>非聚簇索引是一种独立的数据结构，它保存了一个或多个列的副本，并包含指向表中实际数据行的指针。与聚簇索引不同，非聚簇索引不会改变表中数据的物理存储顺序。</p>
+<p>非聚簇索引常用于优化主键以外列上的查询操作，例如过滤、连接和聚合等。</p>
+<p>请参考下图：</p>
+<figure data-type="image" tabindex="7"><img src="https://windrunner0707.tech/post-images/1751981858197.png" alt="" loading="lazy"></figure>
+<p>例如，假设我们经常需要通过客户的邮箱地址查询订单记录：</p>
+<pre><code>CREATE INDEX idx_email_id ON orders(email);
+</code></pre>
+<p>此时查询语句如下：</p>
+<pre><code>SELECT * FROM orders WHERE email = &quot;john@example.com&quot;;
+</code></pre>
+<p>通过 idx_email_id 索引，数据库引擎可以避免全表扫描，先根据索引定位所有匹配的行指针，再通过聚簇索引逐条“回表”获取完整的数据行。</p>
+<p>这种“两步查找”方式虽然能提升查询效率，但也会引入额外的 I/O 开销，尤其是在匹配结果较多，且该索引不是覆盖索引的情况下更为明显。</p>
+<p>辅助索引（非聚簇索引）的关键特性包括：</p>
+<ul>
+<li>不影响数据的物理存储顺序</li>
+<li>每张表可以创建多个辅助索引</li>
+<li>常用于优化过滤条件与连接操作</li>
+<li>若不是覆盖索引，查询需要额外读取完整数据行</li>
+</ul>
+<h2 id="索引类型按数据覆盖度分类">索引类型：按数据覆盖度分类</h2>
+<p>并非所有索引都需要覆盖表中的每一行数据。有些索引为每一个键值建立记录，也就是说每一行数据都可以通过索引直接访问。</p>
+<p>而另一些索引则采取更轻量的方式，仅对部分数据建立索引，其余部分则依赖数据的物理邻近性或块级布局进行定位。</p>
+<p>这些设计选择会影响索引的查找精度、存储空间占用，以及在高并发或高负载压力下的响应能力。</p>
+<h3 id="1-稠密索引dense-index">1. 稠密索引（Dense Index）</h3>
+<p>稠密索引为表中的每一行都建立一个对应的索引项。</p>
+<p>对于每一个唯一的键值，索引会保存一个指针，直接定位到该数据行在磁盘上的物理位置。这种结构提供了较高的查找精度和稳定的性能，尤其适合每条记录都需要通过索引访问的业务场景。</p>
+<p>请参考下图：<br>
+<img src="https://windrunner0707.tech/post-images/1752320917942.png" alt="" loading="lazy"></p>
+<p>稠密索引特别适用于读操作密集且需要细粒度查找的系统。</p>
+<p>例如，假设在 users 表的 email 字段上建立了一个稠密索引：</p>
+<pre><code>CREATE INDEX idx_email ON users(email);
+</code></pre>
+<p>在这个索引中，表中每一个邮箱地址都对应一条索引项。现在来看下面这个查询语句，用于查找特定用户：</p>
+<pre><code>SELECT * FROM users WHERE email = 'sam@demo.com';
+</code></pre>
+<p>这个查询可以直接通过索引定位到对应的数据行，无需执行全表扫描。由于每一行数据都在索引中有记录，数据库引擎可以以一种稳定、可预测、且高效的方式完成访问。</p>
+<p>稠密索引适用的场景包括：</p>
+<ul>
+<li>事务型系统中的等值查找</li>
+<li>每一行数据都可能被独立查询的表结构</li>
+<li>对查找响应时间一致性要求较高的系统</li>
+</ul>
+<p>稠密索引的权衡点：</p>
+<ul>
+<li>占用较多存储空间（索引体积较大）</li>
+<li>插入和更新操作较慢，需要额外的索引维护开销</li>
+</ul>
+<h3 id="2-稀疏索引sparse-index">2. 稀疏索引（Sparse Index）</h3>
+<p>稀疏索引仅为表中的部分行建立索引项。</p>
+<p>通常情况下，它会为每个数据块（block）或数据页（page）的第一行建立索引。当查询的目标值在索引中没有直接匹配项时，数据库引擎会定位到最近的索引键值，然后从该位置向后扫描，直到找到目标数据行为止。</p>
+<p>请参考下图：<br>
+<img src="https://windrunner0707.tech/post-images/1752321571440.png" alt="" loading="lazy"></p>
+<p>稀疏索引可以显著减少索引的存储体积和维护成本，但它依赖于数据在表中的物理组织方式，以尽可能缩短后续的扫描距离。</p>
+<p>例如，假设有一张按 order_date 排序、针对读取优化的 orders 表，稀疏索引可能只为每个日期块（如每一天）创建一个索引项。现在来看下面这个查询语句：</p>
+<pre><code>SELECT * FROM orders WHERE order_date = '2024-12-01';
+</code></pre>
+<p>数据库引擎可以使用稀疏索引直接跳转到该日期段的起始位置，然后在该数据块中继续扫描以找到目标数据行。</p>
+<p>这种方法在以下场景中表现良好：</p>
+<ul>
+<li>表中数据按字段顺序存储</li>
+<li>查询请求与索引粒度保持一致</li>
+<li>数据变更频率低、适合批量分析</li>
+</ul>
+<p>稀疏索引的典型使用场景：</p>
+<ul>
+<li>针对排序数据集的分析型查询</li>
+<li>数据仓库中的批量加载场景，更新较少</li>
+<li>查找精度要求不高的范围型查询</li>
+</ul>
+<p>稀疏索引的权衡点：</p>
+<ul>
+<li>占用更少的存储空间，写入成本更低</li>
+<li>查找精度依赖于数据的物理布局</li>
+<li>命中索引后，仍可能需要额外的块内扫描</li>
+</ul>
+<h2 id="逻辑索引类型logical-index-types">逻辑索引类型（Logical Index Types）</h2>
+<p>除了主索引和结构性索引外，现代数据库还引入了一些逻辑索引类型，它们专为适配特定的查询模式而设计。</p>
+<p>这类索引不影响数据在物理层的存储结构，而是用于优化那些无法通过传统主键查找高效执行的查询行为。</p>
+<h3 id="1-过滤索引filtered-index">1. 过滤索引（Filtered Index）</h3>
+<p>过滤索引只为满足特定条件的数据行创建索引项，因此相比在同一列上建立完整索引，它更轻量、更有针对性。</p>
+<p>这种索引非常适合大部分查询只涉及数据子集的场景。例如，假设一个 users 表中只有“活跃用户”经常被查询，在 SQL Server 中可以这样创建一个过滤索引：</p>
+<pre><code>CREATE INDEX idx_active_users ON users(last_login) WHERE status = 'ACTIVE';
+</code></pre>
+<p>如果我们执行如下查询：</p>
+<pre><code>SELECT last_login FROM users WHERE status = 'ACTIVE';
+</code></pre>
+<p>数据库引擎就可以直接利用这个过滤（或在 PostgreSQL 中的“部分”）索引返回结果，无需扫描非活跃用户的记录。这样不仅加快了查询速度，还有效节省了索引空间和维护成本。</p>
+<p>过滤索引的典型应用场景包括：</p>
+<ul>
+<li>包含归档数据或访问频率较低的表</li>
+<li>经常基于布尔或状态字段过滤的查询</li>
+<li>面向大型数据集、希望借助部分索引提升缓存效率的系统</li>
+</ul>
+<h3 id="2-覆盖索引covering-index">2. 覆盖索引（Covering Index）</h3>
+<p>覆盖索引是指一个索引中包含了查询所需的所有字段，包括出现在 WHERE 筛选条件、JOIN 关联字段以及 SELECT 查询结果中的列。</p>
+<p>由于所需数据已完全包含在索引中，数据库引擎在执行查询时无需访问原始表（即无需回表）。这大大减少了磁盘 I/O，显著提升了查询响应时间。</p>
+<p>请看下面这个示例：<br>
+<img src="https://windrunner0707.tech/post-images/1752322281457.png" alt="" loading="lazy"></p>
+<p>例如，假设我们需要查询一位名为 &quot;Bob Decker&quot; 的用户的邮箱地址：</p>
+<pre><code>SELECT Email FROM users WHERE Name = 'Bob Decker';
+</code></pre>
+<p>这个查询中，WHERE 子句根据 Name 进行筛选，而 SELECT 子句返回的是 Email 字段。如果我们为这两个字段建立索引：</p>
+<pre><code>CREATE INDEX idx_name_email ON users(Name, Email);
+</code></pre>
+<p>那么这个查询就可以完全通过该索引完成，而无需回表，从而显著提升查询性能。需要注意的是，不同数据库在语法上可能略有差异，但实现原理是一致的。</p>
+<p>覆盖索引的典型使用场景包括：</p>
+<ul>
+<li>读取密集型系统，且查询结构稳定</li>
+<li>高频访问的仪表盘、业务报表</li>
+<li>对响应时间要求严格的核心接口</li>
+</ul>
+<h3 id="3-函数索引function-based-index">3. 函数索引（Function-Based Index）</h3>
+<p>函数索引是指在索引列上应用某种函数或表达式后再进行索引的一种方式。它使得对计算值进行过滤的查询也能利用索引加速，从而避免全表扫描。</p>
+<p>例如，如果系统中经常需要对邮箱进行大小写不敏感的匹配：</p>
+<pre><code>SELECT * FROM users WHERE LOWER(email) = 'ana@example.com';
+</code></pre>
+<p>此时，普通的 email 索引无法命中。我们可以通过如下方式创建一个函数索引：</p>
+<pre><code>CREATE INDEX idx_lower_email ON users(LOWER(email));
+</code></pre>
+<p>这样，数据库就能识别该查询中的 LOWER(email) 表达式，并直接使用索引返回结果，避免不必要的行扫描。</p>
+<p>函数索引的典型应用场景包括：</p>
+<ul>
+<li>不区分大小写或去除空格的字符串比较</li>
+<li>从时间戳中提取日期、年份等字段（如：DATE(timestamp)）</li>
+<li>查询时涉及业务逻辑函数计算（如状态转换、数值映射等）</li>
+</ul>
+<h3 id="4-全文索引full-text-index">4. 全文索引（Full-Text Index）</h3>
+<p>全文索引支持对大文本字段（如产品描述、博客文章或评论）进行搜索。它通过将文本内容拆分成多个词项，并构建一个倒排索引，将词项映射到对应的数据行，从而实现快速的关键词搜索、短语匹配以及基于相关性的检索。</p>
+<p>见下图示意:<br>
+<img src="https://windrunner0707.tech/post-images/1752323070410.png" alt="" loading="lazy"></p>
+<p>全文索引的应用场景包括：</p>
+<ul>
+<li>电商平台或内容平台的搜索栏</li>
+<li>文档索引与检索系统</li>
+<li>需要模糊匹配或部分匹配的应用场景</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>我们已经详细了解了数据库索引的核心原理及多种索引类型。以下是本文的关键要点回顾：</p>
+<p>索引对于提升性能至关重要，因为它减少了查询需要扫描的行数。</p>
+<p>数据库索引是一种派生结构，将列值映射到数据行的位置，用存储和写入成本换取更快的读取速度。不同类型的索引满足不同的需求。</p>
+<p>主索引（Primary Index）保证唯一性，通常也作为聚集索引使用。</p>
+<p>聚集索引（Clustered Index）定义了数据行的物理排序，适合范围查询和有序扫描。</p>
+<p>非聚集索引（Non-Clustered Index）将指针与表数据分开存储，支持对非主键列的过滤、查找和连接。</p>
+<p>稠密索引（Dense Index）为每行记录包含一条索引项，访问精准，但存储和维护成本较高。</p>
+<p>稀疏索引（Sparse Index）索引条目较少，依赖数据的邻近关系来完成查询，开销较低但精度有限。</p>
+<p>过滤索引（Filtered Index）仅包含满足特定条件的行，减小索引大小并提升针对性查询的性能。</p>
+<p>覆盖索引（Covering Index）包含查询所需的全部列，允许数据库无需回表即可返回结果。</p>
+<p>函数索引（Function-Based Index）存储计算后的值，优化对表达式过滤或排序的查询。</p>
+<p>全文索引（Full-Text Index）支持对非结构化文本字段进行分词和短语搜索。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B4%A2%E5%BC%95">什么是数据库索引？</a></li>
+<li><a href="#%E7%B4%A2%E5%BC%95%E6%98%AF%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C%E7%9A%84">索引是如何工作的？</a></li>
+<li><a href="#%E6%A0%B8%E5%BF%83%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%9E%8B%E5%9F%BA%E4%BA%8E%E7%BB%93%E6%9E%84%E7%9A%84%E5%88%86%E7%B1%BB">核心索引类型：基于结构的分类</a>
+<ul>
+<li><a href="#1-%E4%B8%BB%E7%B4%A2%E5%BC%95primary-index">1. 主索引（Primary Index）</a></li>
+<li><a href="#2-%E8%81%9A%E7%B0%87%E7%B4%A2%E5%BC%95clustered-index">2. 聚簇索引（Clustered Index）</a></li>
+<li><a href="#3-%E9%9D%9E%E8%81%9A%E7%B0%87%E7%B4%A2%E5%BC%95non-clustered-index-%E8%BE%85%E5%8A%A9%E7%B4%A2%E5%BC%95">3. 非聚簇索引（Non-Clustered Index / 辅助索引）</a></li>
+</ul>
+</li>
+<li><a href="#%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%9E%8B%E6%8C%89%E6%95%B0%E6%8D%AE%E8%A6%86%E7%9B%96%E5%BA%A6%E5%88%86%E7%B1%BB">索引类型：按数据覆盖度分类</a>
+<ul>
+<li><a href="#1-%E7%A8%A0%E5%AF%86%E7%B4%A2%E5%BC%95dense-index">1. 稠密索引（Dense Index）</a></li>
+<li><a href="#2-%E7%A8%80%E7%96%8F%E7%B4%A2%E5%BC%95sparse-index">2. 稀疏索引（Sparse Index）</a></li>
+</ul>
+</li>
+<li><a href="#%E9%80%BB%E8%BE%91%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%9E%8Blogical-index-types">逻辑索引类型（Logical Index Types）</a>
+<ul>
+<li><a href="#1-%E8%BF%87%E6%BB%A4%E7%B4%A2%E5%BC%95filtered-index">1. 过滤索引（Filtered Index）</a></li>
+<li><a href="#2-%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95covering-index">2. 覆盖索引（Covering Index）</a></li>
+<li><a href="#3-%E5%87%BD%E6%95%B0%E7%B4%A2%E5%BC%95function-based-index">3. 函数索引（Function-Based Index）</a></li>
+<li><a href="#4-%E5%85%A8%E6%96%87%E7%B4%A2%E5%BC%95full-text-index">4. 全文索引（Full-Text Index）</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.tech/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/">
+              <h3 class="post-title">
+                 一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.tech/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

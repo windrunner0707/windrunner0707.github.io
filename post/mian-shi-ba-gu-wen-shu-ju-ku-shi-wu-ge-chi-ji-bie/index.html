@@ -1,0 +1,364 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>面试八股文-数据库事务，隔离级别 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.tech/favicon.ico?v=1766317230703">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.tech/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="面试八股文-数据库事务，隔离级别 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.tech/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="本文主要介绍数据库事务属性与隔离级别的使用
+
+ACID 属性
+ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括：
+
+原子性（Atomicity）
+
+
+原子性意味着事务中的所有操作要么全部成功，要么全部失败。事..." />
+    <meta name="keywords" content="数据库,面试八股文" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.tech">
+  <img class="avatar" src="https://windrunner0707.tech/images/avatar.png?v=1766317230703" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              面试八股文-数据库事务，隔离级别
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-10-24
+              </span>
+              <span>
+                10 min read
+              </span>
+              
+                <a href="https://windrunner0707.tech/tag/drZeANo6Ob/" class="post-tag">
+                  # 数据库
+                </a>
+              
+                <a href="https://windrunner0707.tech/tag/w3JPwieMOC/" class="post-tag">
+                  # 面试八股文
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://windrunner0707.tech/post-images/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>本文主要介绍数据库事务属性与隔离级别的使用</p>
+<!-- more -->
+<h3 id="acid-属性">ACID 属性</h3>
+<p>ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括：</p>
+<ol>
+<li>原子性（Atomicity）</li>
+</ol>
+<ul>
+<li>原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rollback）。这保证了在系统崩溃的情况下，数据不会处于部分更新的状态。</li>
+<li>例如：如果一个事务需要将某个账户的余额从100减少到50，并将另一账户的余额从50增加到100，这两个操作必须要么同时成功，要么同时失败。</li>
+</ul>
+<ol start="2">
+<li>一致性（Consistency）</li>
+</ol>
+<ul>
+<li>一致性保证事务的执行不会破坏数据库的规则或约束条件。事务开始之前和结束之后，数据库必须保持在一致的状态。任何事务都必须从一致状态转换为另一个一致状态。</li>
+<li>例如：在银行转账中，转账后的账户余额总和必须与转账前一致，不能因为转账导致总金额丢失或增加。</li>
+</ul>
+<ol start="3">
+<li>隔离性（Isolation）</li>
+</ol>
+<ul>
+<li>隔离性确保并发执行的事务互不干扰，每个事务的执行结果不会被其他事务所看到，直到事务完成。即便多个事务同时执行，也要让它们看起来像是串行执行的一样。</li>
+<li>例如：在多用户环境中，多个用户同时进行数据库操作，一个用户的操作不应影响到其他用户的事务结果。</li>
+</ul>
+<ol start="4">
+<li>持久性（Durability）</li>
+</ol>
+<ul>
+<li>持久性保证了事务一旦提交，其结果将永久保存在数据库中，即使系统崩溃或电源中断也不会丢失数据。持久性通常通过将数据写入磁盘来保证。</li>
+<li>例如：如果用户完成了银行转账操作，即便系统在操作后崩溃，数据仍应正确地反映转账的结果。<br>
+使用原子性，隔离性，持久性保证一致性。</li>
+</ul>
+<h3 id="事务的隔离级别">事务的隔离级别</h3>
+<p>隔离性是ACID中的一个重要属性，它控制事务之间的可见性。数据库通过定义不同的隔离级别来平衡并发性能和数据一致性。SQL标准定义了四种隔离级别，每种隔离级别允许不同程度的并发干扰。<br>
+隔离级别及其可能的问题：</p>
+<ol>
+<li>读未提交（Read Uncommitted）</li>
+</ol>
+<ul>
+<li>描述：最低的隔离级别，事务可以读取其他事务未提交的数据。</li>
+<li>可能问题：脏读（Dirty Read）——一个事务可以读取到另一个事务尚未提交的修改，如果后者回滚，则前者读取到无效数据。</li>
+<li>应用场景：很少使用，因为数据一致性无法保证。</li>
+</ul>
+<ol start="2">
+<li>读已提交（Read Committed）</li>
+</ol>
+<ul>
+<li>描述：一个事务只能读取到其他事务已提交的数据，防止脏读的发生。</li>
+<li>可能问题：不可重复读（Non-repeatable Read）——同一个事务中的两次相同查询可能会得到不同的结果，因为其他事务可能在它的中途修改并提交数据。</li>
+<li>应用场景：大多数数据库默认使用的隔离级别，如 Oracle。</li>
+</ul>
+<ol start="3">
+<li>可重复读（Repeatable Read）</li>
+</ol>
+<ul>
+<li>描述：一个事务在开始时对某个数据的读操作，在整个事务过程中保持一致。即使有其他事务修改并提交了该数据，本事务仍会看到它最初的值。</li>
+<li>可能问题：幻读（Phantom Read）——同一事务在不同时间段查询时，可能会发现数据集合不一致，例如第一次查询到的结果没有某条记录，但第二次查询时该记录出现了。</li>
+<li>应用场景：MySQL的默认隔离级别，解决了不可重复读，但可能存在幻读问题。</li>
+</ul>
+<ol start="4">
+<li>可串行化（Serializable）</li>
+</ol>
+<ul>
+<li>描述：最高的隔离级别，它通过强制事务串行化执行来防止所有并发问题。所有事务依次执行，确保没有并发访问冲突。</li>
+<li>可能问题：性能下降，因为并发能力几乎为零，事务必须等待其他事务执行完毕。</li>
+<li>应用场景：保证数据完全一致的场景，通常用于对数据一致性要求极高的系统。</li>
+</ul>
+<h3 id="事务隔离级别的影响">事务隔离级别的影响</h3>
+<ol>
+<li>性能与一致性的平衡：</li>
+</ol>
+<ul>
+<li>隔离级别越高，事务之间的干扰越小，数据一致性越好，但性能开销越大。高隔离级别（如可串行化）会显著降低数据库的并发性能，因为事务之间需要等待。</li>
+</ul>
+<ol start="2">
+<li>隔离级别的选择：</li>
+</ol>
+<ul>
+<li>在实际应用中，常常根据具体需求来选择隔离级别。例如，在金融系统中，数据一致性要求较高，通常选择可重复读或可串行化；而在电商系统中，出于性能考虑，可能选择读已提交。</li>
+</ul>
+<ol start="3">
+<li>总结</li>
+</ol>
+<ul>
+<li>ACID 属性：原子性、一致性、隔离性和持久性是事务管理的核心，确保数据库操作的可靠性和一致性。</li>
+<li>隔离级别：不同的隔离级别提供了对事务间并发的不同控制，选择适当的隔离级别需要在数据一致性和性能之间进行权衡。</li>
+</ul>
+<h3 id="电商系统中使用rc隔离级别">电商系统中使用RC隔离级别</h3>
+<p>在电商系统中，使用**读已提交（Read Committed）隔离级别时，可能会遇到不可重复读（Non-repeatable Read）**的问题。不可重复读是指在同一个事务中，多次读取相同的数据时，数据内容可能发生变化，因为另一个事务可能已经修改并提交了该数据。<br>
+为了解决这个问题，在读已提交的隔离级别下，可以采用以下几种方法：</p>
+<h4 id="悲观锁pessimistic-locking">悲观锁（Pessimistic Locking）</h4>
+<p>悲观锁是一种假设冲突一定会发生的策略，所以会通过数据库的锁机制来防止其他事务对数据的修改。使用悲观锁可以确保数据在事务结束之前不会被其他事务修改，从而避免不可重复读问题。<br>
+在Java中，悲观锁通常通过数据库的 SELECT ... FOR UPDATE 语句实现。当一个事务读取数据时，会锁定该行记录，直到事务提交或回滚，其他事务无法修改被锁定的数据。</p>
+<ul>
+<li>优点：避免了数据修改带来的问题，保证了数据一致性。</li>
+<li>缺点：性能较差，特别是在高并发系统中，由于会对数据加锁，容易导致事务等待或死锁<br>
+-- 事务A<br>
+BEGIN;<br>
+SELECT * FROM products WHERE product_id = 1 FOR UPDATE;<br>
+-- 此时，事务B无法更新或读取 product_id = 1 的记录，直到事务A提交或回滚</li>
+</ul>
+<h4 id="乐观锁optimistic-locking">乐观锁（Optimistic Locking）</h4>
+<p>乐观锁是一种假设数据冲突不会经常发生的策略，只有在事务提交时才检查数据是否被其他事务修改。乐观锁通常通过版本号或时间戳机制来实现。<br>
+在电商系统中，可以为每个记录增加一个版本号（version 字段），每次事务提交时，检查数据的版本号是否与读取时一致。如果版本号发生变化，说明有其他事务修改了数据，当前事务应回滚或重新尝试。</p>
+<ul>
+<li>优点：不会加锁，适合高并发场景；只有在冲突发生时才会处理，性能较好。</li>
+<li>缺点：需要手动管理版本号，冲突发生时需要重试操作。</li>
+</ul>
+<pre><code>// 读取数据时获取版本号
+Product product = productRepository.findById(1);
+int currentVersion = product.getVersion();
+
+// 更新数据时检查版本号是否一致
+int rowsUpdated = productRepository.updateProduct(product.getId(), newPrice, currentVersion);
+
+if (rowsUpdated == 0) {
+    // 版本号不一致，说明有并发修改，回滚或重新处理
+    throw new OptimisticLockingFailureException(&quot;Product has been updated by another transaction.&quot;);
+}
+</code></pre>
+<ol>
+<li>在应用层缓存数据<br>
+在电商系统中，可以通过在应用层缓存数据来避免不可重复读问题。在同一个事务中，读取数据时将数据缓存起来，之后的操作都从缓存中获取数据，而不再重复从数据库读取。这种方式保证了在事务内的数据一致性。</li>
+</ol>
+<ul>
+<li>示例：将查询到的产品信息缓存到事务的上下文中，后续操作从缓存中获取数据，而不是直接查询数据库。</li>
+</ul>
+<pre><code>java复制代码// 缓存第一次读取的数据
+Map&lt;Integer, Product&gt; productCache = new HashMap&lt;&gt;();
+Product product = productRepository.findById(1);
+productCache.put(1, product);
+
+// 后续读取操作使用缓存中的数据
+Product cachedProduct = productCache.get(1);
+</code></pre>
+<ul>
+<li>优点：实现简单，能够在应用层解决不可重复读问题。</li>
+<li>缺点：适合只读场景或数据变化不频繁的情况，不能解决数据频繁变动时的一致性问题。</li>
+</ul>
+<ol start="2">
+<li>使用可重复读隔离级别<br>
+如果业务逻辑要求在同一事务中多次读取数据时保持一致，考虑升级到**可重复读（Repeatable Read）**隔离级别。可重复读隔离级别可以解决不可重复读问题，保证在同一事务中，每次读取的数据一致。<br>
+在MySQL等数据库中，可重复读隔离级别通过使用多版本并发控制（MVCC，Multi-Version Concurrency Control）来实现。MVCC允许事务读取数据的快照，即使其他事务修改并提交了数据，当前事务读取到的仍是开始时的数据版本。</li>
+</ol>
+<ul>
+<li>优点：天然解决不可重复读问题，能够保证数据一致性。</li>
+<li>缺点：可能会有**幻读（Phantom Read）**问题，且隔离级别提高会影响性能。</li>
+</ul>
+<ol start="3">
+<li>使用快照隔离（Snapshot Isolation）<br>
+部分数据库（如 PostgreSQL）提供了快照隔离，它类似于可重复读，通过每个事务访问数据的快照来避免并发读写问题。在快照隔离中，事务读取数据时会看到事务开始时的数据版本，其他事务的修改在当前事务中是不可见的。<br>
+快照隔离能够有效解决不可重复读问题，并且在处理幻读方面也有一定优势。</li>
+</ol>
+<ul>
+<li>优点：提供一致性视图，避免不可重复读问题，性能较好。</li>
+<li>缺点：并非所有数据库都支持，且需要额外的存储来保存多个版本的数据。</li>
+</ul>
+<h4 id="总结">总结</h4>
+<p>在电商系统中使用读已提交隔离级别时，可以通过以下几种方式解决不可重复读问题：</p>
+<ol>
+<li>悲观锁：通过数据库锁定，防止其他事务修改数据。</li>
+<li>乐观锁：通过版本号或时间戳机制，在提交时检查是否有并发修改。</li>
+<li>应用层缓存：在事务内缓存读取的数据，避免重复查询数据库。</li>
+<li>可重复读隔离级别：通过提高隔离级别，保证数据一致性。</li>
+<li>快照隔离：通过多版本并发控制（MVCC），为事务提供一致的快照数据。<br>
+根据具体业务需求和性能要求，可以选择合适的方式来解决不可重复读问题。</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#acid-%E5%B1%9E%E6%80%A7">ACID 属性</a></li>
+<li><a href="#%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB">事务的隔离级别</a></li>
+<li><a href="#%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E7%9A%84%E5%BD%B1%E5%93%8D">事务隔离级别的影响</a></li>
+<li><a href="#%E7%94%B5%E5%95%86%E7%B3%BB%E7%BB%9F%E4%B8%AD%E4%BD%BF%E7%94%A8rc%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB">电商系统中使用RC隔离级别</a>
+<ul>
+<li><a href="#%E6%82%B2%E8%A7%82%E9%94%81pessimistic-locking">悲观锁（Pessimistic Locking）</a></li>
+<li><a href="#%E4%B9%90%E8%A7%82%E9%94%81optimistic-locking">乐观锁（Optimistic Locking）</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/">
+              <h3 class="post-title">
+                面试八股文-死锁
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.tech/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

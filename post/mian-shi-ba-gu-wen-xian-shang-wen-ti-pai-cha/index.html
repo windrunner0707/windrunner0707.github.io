@@ -1,0 +1,250 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>面试八股文-线上问题排查 | 0707‘s Blog</title>
+<link rel="shortcut icon" href="https://windrunner0707.tech/favicon.ico?v=1766317230703">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://windrunner0707.tech/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="面试八股文-线上问题排查 | 0707‘s Blog - Atom Feed" href="https://windrunner0707.tech/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="在面试中回答如何排查线上内存、CPU负载过高或死锁问题时，结构化的回答可以帮助你清晰地展示出排查思路和操作步骤。以下是可以参考的一套话术，分为现象识别、初步诊断、深入排查、解决措施和预防手段几个部分，结合你的实际经验可以进行调整和深入。
+
+..." />
+    <meta name="keywords" content="面试八股文" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://windrunner0707.tech">
+  <img class="avatar" src="https://windrunner0707.tech/images/avatar.png?v=1766317230703" alt="">
+  </a>
+  <h1 class="site-title">
+    0707‘s Blog
+  </h1>
+  <p class="site-description">
+    Software Developer
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              面试八股文-线上问题排查
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-10-25
+              </span>
+              <span>
+                7 min read
+              </span>
+              
+                <a href="https://windrunner0707.tech/tag/w3JPwieMOC/" class="post-tag">
+                  # 面试八股文
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://windrunner0707.tech/post-images/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>在面试中回答如何排查线上内存、CPU负载过高或死锁问题时，结构化的回答可以帮助你清晰地展示出排查思路和操作步骤。以下是可以参考的一套话术，分为现象识别、初步诊断、深入排查、解决措施和预防手段几个部分，结合你的实际经验可以进行调整和深入。</p>
+<ol>
+<li>现象识别<br>
+首先，描述一下线上系统出现内存、CPU负载过高或者死锁问题的典型表现，并且通过现象识别问题的类型。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象：<br>
+CPU负载高：请求响应时间增加，服务性能下降，甚至出现服务宕机。<br>
+内存负载高：可能会出现频繁的垃圾回收（GC）操作，尤其是 Full GC，或者出现内存溢出（OutOfMemoryError）。<br>
+死锁问题：程序无响应，线程一直等待，CPU使用率突然降低，系统几乎卡死。</p>
+<p>通过监控工具（如 Prometheus、Grafana、Kibana 等），我们可以实时监控系统的 CPU 和内存使用情况，还可以结合 APM 工具（如 New Relic、Pinpoint）监控请求性能。</p>
+</blockquote>
+<ol start="2">
+<li>初步诊断<br>
+接下来，我们可以根据不同的现象进行初步诊断，说明会优先查看哪些指标，并使用什么工具。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>对于CPU负载过高的问题，我通常首先会使用 top、htop 或者类似的监控工具查看系统中占用 CPU 最高的进程和线程，进而确定是系统负载问题还是应用本身的热点问题。同时会使用 Java 相关的监控工具如jstack 来查看线程的运行状态，判断是否存在CPU热点代码或死循环问题。</p>
+</blockquote>
+<blockquote>
+<p>对于内存负载过高，我会检查 GC 日志（通过设置 -XX:+PrintGCDetails），以判断是否是由于频繁的垃圾回收导致内存回收不及时。同时可以使用 jmap 命令生成堆内存快照（Heap Dump），并结合 MAT（Memory Analyzer Tool） 来分析哪些对象占用了大量内存。</p>
+</blockquote>
+<blockquote>
+<p>对于死锁问题，最常见的是通过 jstack 查看线程堆栈，检查是否有线程处于等待锁的状态。如果是多线程引发的死锁问题，线程堆栈中会显示哪些线程正在等待获得其他线程持有的锁资源。</p>
+</blockquote>
+<ol start="3">
+<li>深入排查<br>
+当初步定位了问题后，深入分析和排查的步骤就显得尤为关键。此时你可以展示一些具体的排查工具和操作步骤。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>CPU负载高：如果 top 或 htop 确定是某个 Java 进程占用 CPU 过高，我会通过 jstack 查看当前线程的 CPU 使用情况，确定是否有死循环或热点代码。通过查找 占用 CPU 高的线程（可以通过 top -H -p {pid} 命令找到线程 ID，然后将其转换为十六进制查看在 jstack 中对应的线程状态）来确定代码中的问题。</p>
+</blockquote>
+<blockquote>
+<p>内存问题：生成堆内存快照后，我会使用 MAT 等工具分析哪些类或对象占用了大量内存。例如，如果发现大量不可达对象占用了内存，可能是内存泄漏导致的。此外，也可以根据 jmap -histo 命令查看当前 JVM 内存中各类对象的数量分布，结合业务场景找出内存热点。</p>
+</blockquote>
+<blockquote>
+<p>死锁问题：通过 jstack 可以分析哪些线程进入了死锁状态。如果确认有死锁，通常会在堆栈中看到 Thread-1 等待 Thread-2 的锁，而 Thread-2 又在等待 Thread-1 的锁。此时可以使用线程转储信息（如 jstack 或 jconsole）找到具体的锁争用代码，并通过代码审查或调整锁的顺序来解决死锁问题。</p>
+</blockquote>
+<ol start="4">
+<li>解决措施<br>
+在定位了问题后，接下来是提出相应的解决方案。展示你如何在实际项目中应对这些问题，解决内存、CPU负载过高或死锁问题。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>CPU负载高的解决措施：</p>
+</blockquote>
+<blockquote>
+<p>对于热点代码问题，我会优化代码逻辑，避免不必要的复杂计算或耗时操作。对于 IO 密集型操作，可以考虑使用异步处理或批量处理的方式，降低 CPU 占用。<br>
+如果是由于垃圾回收频繁导致的 CPU 负载问题，可以调整 JVM 参数，如 -Xmx 和 -Xms，或者调整 GC 策略，比如从 CMS 切换到 G1 垃圾收集器，以减少 Full GC 的次数。</p>
+</blockquote>
+<blockquote>
+<p>内存负载高的解决措施：</p>
+</blockquote>
+<blockquote>
+<p>如果是内存泄漏问题，通常会通过分析堆内存快照找到未及时释放的对象，修复对象生命周期管理中的问题。<br>
+调整堆内存大小，例如通过调整 -Xmx 参数增加堆内存上限，或者通过优化代码减少大对象的创建频率，避免内存占用过高。</p>
+</blockquote>
+<blockquote>
+<p>死锁问题的解决措施：</p>
+</blockquote>
+<blockquote>
+<p>对于代码中的锁争用问题，我会检查代码中的锁的使用顺序，确保锁的获取顺序一致，避免产生环形等待。如果需要在高并发环境中使用锁，可以使用诸如 ReentrantLock 或使用无锁并发算法来降低锁的使用频率。<br>
+可以通过 tryLock() 方法替代传统的 synchronized 来实现非阻塞锁，并设置合理的超时机制，避免长时间等待锁。</p>
+</blockquote>
+<ol start="5">
+<li>预防手段<br>
+最后，可以介绍如何在日常开发和设计中预防这些问题，展现你对问题预防的关注和经验。</li>
+</ol>
+<p>示例话术：</p>
+<blockquote>
+<p>为了避免 CPU、内存负载过高和死锁问题，我们可以采取以下预防措施：</p>
+</blockquote>
+<blockquote>
+<p>代码层面优化：定期进行代码审查，关注性能瓶颈，避免无效循环和阻塞操作。在并发编程时，使用更高级别的并发控制工具如 ConcurrentHashMap 或者 ForkJoinPool 来提高并发处理的效率。<br>
+内存管理：通过设置合理的 JVM 参数和使用工具如 JVisualVM、Prometheus 等对应用的内存使用情况进行监控，提前发现潜在问题。还可以引入内存池等机制来管理大对象。<br>
+监控与报警：借助 APM 工具（如 Skywalking、Prometheus 等），实时监控 CPU 和内存的使用情况，设置预警阈值，确保在问题恶化之前就能处理。</p>
+</blockquote>
+<p>示例总结话术：</p>
+<blockquote>
+<p>排查线上 CPU 或内存负载过高以及死锁问题，我通常会遵循以下步骤：首先，使用 top 或者 jstack 确定是 CPU 还是内存引发的问题。对于 CPU 问题，我会查找热点线程并排查是否有死循环或复杂计算导致的性能瓶颈；对于内存问题，则会通过分析堆内存快照，找到内存泄漏或垃圾回收频繁的根本原因。最后，针对死锁问题，我会分析线程堆栈，找到锁的争用位置，并通过优化锁的顺序或使用无锁机制来解决。通过调整 JVM 参数、监控系统性能，以及对代码逻辑的持续优化，我们可以有效预防和应对这些问题。</p>
+</blockquote>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/">
+              <h3 class="post-title">
+                面试八股文-数据库事务，隔离级别
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://windrunner0707.tech/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
