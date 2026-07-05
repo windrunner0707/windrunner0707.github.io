@@ -32,24 +32,24 @@
 <meta property="og:title" content="面试八股文-死锁" />
 <meta property="og:type" content="article" />
 
-<meta property="og:image" content="/post-images/mian-shi-ba-gu-wen-si-suo.png" />
+<meta property="og:image" content="/post-images/mian-shi-ba-gu-wen-si-suo.webp" />
 
 
 <meta name="description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程&amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-死锁","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/","description":"死锁的四个必要条件（\u0026ldquo;Coffman条件\u0026rdquo;） 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程\u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-si-suo.png","datePublished":"2024-10-23T00:00:00+08:00","dateModified":"2026-07-05T15:29:53+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-死锁","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/","description":"死锁的四个必要条件（\u0026ldquo;Coffman条件\u0026rdquo;） 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程\u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-si-suo.webp","datePublished":"2024-10-23T00:00:00+08:00","dateModified":"2026-07-05T15:29:53+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/","name":"面试八股文-死锁","position":2}]}</script>
 <meta property="og:title" content="面试八股文-死锁">
 <meta property="og:description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程&amp;hellip;">
 <meta property="og:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707‘s Blog">
-<meta property="og:image" content="/post-images/mian-shi-ba-gu-wen-si-suo.png">
+<meta property="og:image" content="/post-images/mian-shi-ba-gu-wen-si-suo.webp">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/">
 <meta name="twitter:title" content="面试八股文-死锁">
 <meta name="twitter:description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程&amp;hellip;">
-<meta name="twitter:image" content="/post-images/mian-shi-ba-gu-wen-si-suo.png">
+<meta name="twitter:image" content="/post-images/mian-shi-ba-gu-wen-si-suo.webp">
 </head>
 <body class="flavor-theme">
 
@@ -202,7 +202,7 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/mian-shi-ba-gu-wen-si-suo.png" alt="面试八股文-死锁" />
+    <img src="/post-images/mian-shi-ba-gu-wen-si-suo.webp" alt="面试八股文-死锁" />
   </div>
   
 
@@ -273,7 +273,7 @@
     <a href="/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/" class="post-nav-card post-nav-card--prev">
       
       <div class="post-nav-card__img">
-        <img src="/post-images/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie.png" alt="面试八股文-数据库事务，隔离级别" loading="lazy" />
+        <img src="/post-images/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie.webp" alt="面试八股文-数据库事务，隔离级别" loading="lazy" />
       </div>
       
       <div class="post-nav-card__body">
@@ -291,7 +291,7 @@
       </div>
       
       <div class="post-nav-card__img">
-        <img src="/post-images/hua-wei-od-xiang-guan.jpg" alt="华为OD面试相关" loading="lazy" />
+        <img src="/post-images/hua-wei-od-xiang-guan.webp" alt="华为OD面试相关" loading="lazy" />
       </div>
       
       <span class="post-nav-card__arrow">&rarr;</span>
