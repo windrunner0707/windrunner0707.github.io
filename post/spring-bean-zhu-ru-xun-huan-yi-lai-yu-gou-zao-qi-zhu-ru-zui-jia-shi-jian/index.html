@@ -37,7 +37,7 @@
 
 <meta name="description" content="概述 在Spring框架中，Bean的注入是核心功能之一，它帮助开发者以声明式的方式管理对象之间的依赖，从而实现松耦合设计。然而，Bean注入也可能面临循环依赖的问题。@Lazy提供了一种通过延迟初始化解决循环依赖的方法，但这种方式可能隐藏设计上的缺陷。 本文将从循环依赖的角度切入，探讨@Autowired、@Inject以及构造器注入三种主要注入方式的原理，详细分析@Lazy解决循环依赖&amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Spring Bean注入：循环依赖与构造器注入最佳实践","url":"https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/","description":"概述 在Spring框架中，Bean的注入是核心功能之一，它帮助开发者以声明式的方式管理对象之间的依赖，从而实现松耦合设计。然而，Bean注入也可能面临循环依赖的问题。@Lazy提供了一种通过延迟初始化解决循环依赖的方法，但这种方式可能隐藏设计上的缺陷。 本文将从循环依赖的角度切入，探讨@Autowired、@Inject以及构造器注入三种主要注入方式的原理，详细分析@Lazy解决循环依赖\u0026hellip;","image":"/post-images/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian.jpg","datePublished":"2024-12-14T00:00:00+08:00","dateModified":"2026-07-05T15:00:08+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Spring Bean注入：循环依赖与构造器注入最佳实践","url":"https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/","description":"概述 在Spring框架中，Bean的注入是核心功能之一，它帮助开发者以声明式的方式管理对象之间的依赖，从而实现松耦合设计。然而，Bean注入也可能面临循环依赖的问题。@Lazy提供了一种通过延迟初始化解决循环依赖的方法，但这种方式可能隐藏设计上的缺陷。 本文将从循环依赖的角度切入，探讨@Autowired、@Inject以及构造器注入三种主要注入方式的原理，详细分析@Lazy解决循环依赖\u0026hellip;","image":"/post-images/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian.jpg","datePublished":"2024-12-14T00:00:00+08:00","dateModified":"2026-07-05T15:29:33+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/","name":"Spring Bean注入：循环依赖与构造器注入最佳实践","position":2}]}</script>
 <meta property="og:title" content="Spring Bean注入：循环依赖与构造器注入最佳实践">
 <meta property="og:description" content="概述 在Spring框架中，Bean的注入是核心功能之一，它帮助开发者以声明式的方式管理对象之间的依赖，从而实现松耦合设计。然而，Bean注入也可能面临循环依赖的问题。@Lazy提供了一种通过延迟初始化解决循环依赖的方法，但这种方式可能隐藏设计上的缺陷。 本文将从循环依赖的角度切入，探讨@Autowired、@Inject以及构造器注入三种主要注入方式的原理，详细分析@Lazy解决循环依赖&amp;hellip;">
@@ -178,7 +178,7 @@
     <div class="article-meta">
       
       
-      <a href="/category/default/" class="article-meta__category">默认分类</a>
+      <a href="/category/ji-shu/" class="article-meta__category">技术</a>
       
       
       <span class="article-meta__sep">·</span>
