@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://windrunner0707.tech/sitemap.xml
