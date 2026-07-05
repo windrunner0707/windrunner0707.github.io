@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://windrunner0707.tech/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -70,6 +70,15 @@
     </image:image>
   </url>
   <url>
+    <loc>https://windrunner0707.tech/post/clean-gitrang-dai-ma-ban-ben-kong-zhi-geng-qing-xi-geng-gao-xiao-de-shi-jian-zhi-nan/</loc>
+    <lastmod>2026-07-05T17:14:19+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://windrunner0707.tech/post-images/clean-gitrang-dai-ma-ban-ben-kong-zhi-geng-qing-xi-geng-gao-xiao-de-shi-jian-zhi-nan.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
     <loc>https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/</loc>
     <lastmod>2026-07-05T15:29:41+08:00</lastmod>
     <changefreq>monthly</changefreq>
@@ -98,91 +107,97 @@
   </url>
   <url>
     <loc>https://windrunner0707.tech/post/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/memos/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tags/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/archives/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://windrunner0707.tech/tag/git/</loc>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://windrunner0707.tech/tag/github/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tag/kubernetes/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tag/spring/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tag/hua-wei/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tag/shou-chong-ka-fei/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tag/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tag/si-suo/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tag/%E7%B4%A2%E5%BC%95/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tag/%E9%98%BF%E9%87%8C%E4%BA%91/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/tag/mian-shi-ba-gu-wen/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://windrunner0707.tech/links/</loc>
-    <lastmod>2026-07-05T17:13:48+08:00</lastmod>
+    <lastmod>2026-07-05T17:14:27+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
