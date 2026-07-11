@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="880" viewBox="0 0 1400 880">
+  <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L0 6L9 3Z" fill="#64748b"/></marker></defs>
+  <rect width="1400" height="880" fill="#f8fafc"/>
+  <g font-family="Arial,'PingFang SC'" fill="#0f172a">
+    <text x="700" y="62" text-anchor="middle" font-size="34" font-weight="700">四层库存：从销售承诺落到仓库批次</text>
+    <g stroke-width="3">
+      <rect x="100" y="150" width="260" height="150" rx="22" fill="#dbeafe" stroke="#2563eb"/>
+      <rect x="420" y="150" width="260" height="150" rx="22" fill="#e0f2fe" stroke="#0284c7"/>
+      <rect x="740" y="150" width="260" height="150" rx="22" fill="#dcfce7" stroke="#16a34a"/>
+      <rect x="1060" y="150" width="260" height="150" rx="22" fill="#fef3c7" stroke="#d97706"/>
+    </g>
+    <g text-anchor="middle"><text x="230" y="205" font-size="27" font-weight="700">店铺库存</text><text x="230" y="248" font-size="21">SKU 粒度</text><text x="230" y="278" font-size="18" fill="#475569">店铺还能承诺多少</text>
+      <text x="550" y="205" font-size="27" font-weight="700">平台库存</text><text x="550" y="248" font-size="21">平台商品粒度</text><text x="550" y="278" font-size="18" fill="#475569">渠道或平台可用额度</text>
+      <text x="870" y="205" font-size="27" font-weight="700">仓库汇总库存</text><text x="870" y="248" font-size="21">仓库商品粒度</text><text x="870" y="278" font-size="18" fill="#475569">某仓库的商品总账</text>
+      <text x="1190" y="205" font-size="27" font-weight="700">仓库批次库存</text><text x="1190" y="248" font-size="21">仓库商品批次粒度</text><text x="1190" y="278" font-size="18" fill="#475569">最终从哪一批履约</text></g>
+    <g stroke="#64748b" stroke-width="4" marker-end="url(#arr)"><line x1="360" y1="225" x2="412" y2="225"/><line x1="680" y1="225" x2="732" y2="225"/><line x1="1000" y1="225" x2="1052" y2="225"/></g>
+    <text x="700" y="380" text-anchor="middle" font-size="25" font-weight="700">每一层都不是单一数字，而是一组库存状态</text>
+    <g text-anchor="middle" font-size="23"><rect x="145" y="430" width="190" height="74" rx="15" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/><text x="240" y="477">总额</text><rect x="375" y="430" width="190" height="74" rx="15" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/><text x="470" y="477">可用</text><rect x="605" y="430" width="190" height="74" rx="15" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/><text x="700" y="477">占用 / 预留</text><rect x="835" y="430" width="190" height="74" rx="15" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/><text x="930" y="477">采购在途</text><rect x="1065" y="430" width="190" height="74" rx="15" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/><text x="1160" y="477">发货在途</text></g>
+    <rect x="170" y="610" width="1060" height="155" rx="22" fill="#fff7ed" stroke="#f97316" stroke-width="3"/>
+    <text x="700" y="660" text-anchor="middle" font-size="25" font-weight="700">一次业务命令可能同时修改多层库存</text>
+    <text x="700" y="708" text-anchor="middle" font-size="22">例如预留：各层可用减少、占用增加，并保存一次统一库存流水</text>
+    <text x="700" y="742" text-anchor="middle" font-size="19" fill="#475569">任何一层失败，整次库存交易都不能提交</text>
+  </g>
+</svg>

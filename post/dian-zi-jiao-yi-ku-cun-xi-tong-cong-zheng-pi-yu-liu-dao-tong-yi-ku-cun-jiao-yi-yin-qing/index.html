@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+
+
+<style>:root { --heatmap-color: #39d353; }</style>
+
+
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('flavor-theme');
+      var theme = saved || 'dark';
+      if (theme === 'light') {
+        document.documentElement.classList.add('theme-light');
+      }
+    } catch (e) { }
+  })();
+</script>
+  <meta name="generator" content="Gridea Pro 1.2.2">
+  <title>电子交易库存系统复盘：从整批预留到统一库存交易引擎 | 0707‘s Blog</title>
+  
+<meta property="og:title" content="电子交易库存系统复盘：从整批预留到统一库存交易引擎" />
+<meta property="og:type" content="article" />
+
+<meta property="og:image" content="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" />
+
+
+<meta name="description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。">
+<link rel="canonical" href="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"电子交易库存系统复盘：从整批预留到统一库存交易引擎","url":"https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/","description":"几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。","image":"/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg","datePublished":"2026-07-11T00:00:00+08:00","dateModified":"2026-07-11T18:16:00+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/","name":"电子交易库存系统复盘：从整批预留到统一库存交易引擎","position":2}]}</script>
+<meta property="og:title" content="电子交易库存系统复盘：从整批预留到统一库存交易引擎">
+<meta property="og:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。">
+<meta property="og:url" content="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="0707‘s Blog">
+<meta property="og:image" content="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
+<meta name="twitter:title" content="电子交易库存系统复盘：从整批预留到统一库存交易引擎">
+<meta name="twitter:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。">
+<meta name="twitter:image" content="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg">
+</head>
+<body class="flavor-theme">
+
+  <header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <div class="top-bar">
+
+      
+      <div class="top-bar__left">
+        
+        <a href="https://windrunner0707.tech" class="site-avatar-link" aria-label="返回首页">
+          <img class="site-avatar" src="/images/avatar.png" alt="0707‘s Blog" />
+        </a>
+        
+        <a href="https://windrunner0707.tech" class="site-name-link">0707‘s Blog</a>
+      </div>
+
+      
+      <nav class="top-bar__nav" id="sectionBar">
+        
+        
+        <a class="nav-item" href="/">首页</a>
+        
+        <a class="nav-item" href="/post">博客</a>
+        
+        <a class="nav-item" href="/memos">闪念</a>
+        
+        <a class="nav-item" href="/archives">归档</a>
+        
+        <a class="nav-item" href="/tags">标签</a>
+        
+        <a class="nav-item" href="/links">友链</a>
+        
+        <a class="nav-item" href="/post/about">关于</a>
+        
+        
+      </nav>
+
+      
+      <div class="top-bar__right">
+        <button class="btn-icon btn-search search-btn" id="btnSearch" type="button" aria-label="搜索">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-sun" id="themeToggleSun" type="button"
+          aria-label="切换到浅色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"></path>
+            <path d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"></path>
+            <path d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"></path>
+            <path d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"></path>
+            <path d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"></path>
+            <path d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"></path>
+            <path d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"></path>
+            <path d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-moon" id="themeToggleMoon" type="button"
+          aria-label="切换到深色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"></path>
+            <path d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon btn-nav-toggle mobile-only" id="btnNavToggle" type="button" aria-label="切换导航">
+          <div class="hamburger" id="hamburger">
+            <span class="hamburger__line hamburger__line--top"></span>
+            <span class="hamburger__line hamburger__line--bottom"></span>
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+<div class="header-spacer"></div>
+
+<script>
+(function(){
+  var btn = document.getElementById('btnNavToggle');
+  var nav = document.getElementById('sectionBar');
+  var hamburger = document.getElementById('hamburger');
+  if (btn && nav) {
+    btn.addEventListener('click', function(){
+      nav.classList.toggle('top-bar__nav--open');
+      if (hamburger) hamburger.classList.toggle('is-active');
+    });
+    nav.querySelectorAll('.nav-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        nav.classList.remove('top-bar__nav--open');
+        if (hamburger) hamburger.classList.remove('is-active');
+      });
+    });
+  }
+
+  var root = document.documentElement;
+  var applyTheme = function(theme, persist){
+    if (theme === 'light') {
+      root.classList.add('theme-light');
+    } else {
+      root.classList.remove('theme-light');
+    }
+    if (persist) {
+      try { localStorage.setItem('flavor-theme', theme); } catch (e) {}
+    }
+  };
+  document.querySelectorAll('.theme-toggle').forEach(function(el){
+    el.addEventListener('click', function(){
+      applyTheme(root.classList.contains('theme-light') ? 'dark' : 'light', true);
+    });
+  });
+})();
+</script>
+
+  <main class="site-main" role="main">
+    
+<article class="article-container">
+  <header class="article-header">
+    <h1 class="article-title">电子交易库存系统复盘：从整批预留到统一库存交易引擎</h1>
+    <div class="article-meta">
+      
+      
+      <a href="/category/ji-shu/" class="article-meta__category">技术</a>
+      
+      
+      <span class="article-meta__sep">·</span>
+      
+      <span class="article-meta__item">2026-07-11</span>
+      
+      <span class="article-meta__sep">·</span>
+      <span class="article-meta__item">14 分钟阅读</span>
+      
+    </div>
+    
+    <div class="article-header__tags">
+      
+      <a href="/tag/wei-fu-wu/" class="tag-pill tag-pill--sm">微服务</a>
+      
+      <a href="/tag/jia-gou-she-ji/" class="tag-pill tag-pill--sm">架构设计</a>
+      
+    </div>
+    
+  </header>
+
+  
+  <div class="article-feature">
+    <img src="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" alt="电子交易库存系统复盘：从整批预留到统一库存交易引擎" />
+  </div>
+  
+
+  <div class="article-content">
+    <p>几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。</p>
+<p>真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。</p>
+<p>这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。</p>
+<!-- more -->
+<h2 id="heading">一、旧库存模型为什么逐渐失效</h2>
+<p>最早让我们意识到模型需要重做的，是一类很普通的多商品订单。订单里三件商品，两件有货，一件暂时缺货。旧系统只有两个答案：全部预留成功，或者全部失败。即使业务愿意先锁定已经有货的两件商品，系统也表达不了这种状态。</p>
+<p>预留过程也不够及时。订单先写进一张待处理表，库存侧定时任务再分页捞取。低峰期感觉不到问题，订单量一上来，用户什么时候得到结果，就开始取决于任务多久执行一次、上一批积压了多少数据。分页期间记录还在持续变化，后来甚至出现过任务翻页时漏掉数据，只能依靠补偿任务重新扫描。</p>
+<p>更棘手的是，预留、发货、签收、取消和缺货重试都盯着同一批记录。不同任务各自认为自己有权推进状态，热点行不断被修改；一旦这些更新又被包进较大的业务事务，锁持有时间便会被拉长。线上看到的行锁超时，其实只是模型边界不清最终投射到数据库上的症状。</p>
+<p>那时的库存表还有不少“合法入口”：机器预留可以改，人工核对可以改，订单缺货逻辑也会间接影响库存。每个入口单独看都有业务理由，合在一起却意味着没有任何服务真正拥有库存变化。应用虽然已经被称作微服务，数据库仍然是隐藏的集成中心。</p>
+<p>继续往下追，我们发现问题还来自一个过于万能的订单模型。过去订单不仅保存下单商品，还记录预留仓库、发货批次、物流轨迹和签收信息。订单本身已经相对稳定，但分批预留、分批发货以及新物流渠道仍在不断变化。每增加一种履约方式，都要重新修改和发布订单模块。</p>
+<p>因此，拆分的判断不是“这张表太大了”，而是把变化速度不同的业务分开：订单保留下单事实，预留单描述库存承诺，发货单负责履约批次，物流单负责承运和轨迹。这样预留和物流继续演进时，不再反复扰动已经稳定的订单能力。</p>
+<p>但业务模型拆开以后，库存写入不能也跟着四处分散。库存准备、订单预留和发货履约都会改变多层库存，而且必须保持原子性。这次重构的核心目标因此不是“拆出更多微服务”，而是建立一条规则：所有库存变化都必须经过统一的库存交易引擎，并且每次变化都能够幂等、追踪、重试和对账。</p>
+<h2 id="heading-1">二、把业务决策和库存事实分开</h2>
+<p>我们没有直接从“怎样把表拆开”开始，而是先问了一个更基本的问题：一次预留里，哪些只是业务判断，哪些才是真正改变库存的事实？最后把主链路分成了两段：前一段负责快速选择，后一段负责最终确认。</p>
+<pre><code class="language-text">订单事件
+  -&gt; 业务编排服务
+       -&gt; 幂等校验
+       -&gt; 基于库存快照进行缺货初分
+       -&gt; 选择候选仓库
+       -&gt; 保存预留单头与明细
+       -&gt; 进入优先级队列
+  -&gt; 库存事务服务
+       -&gt; 批量取数与流量控制
+       -&gt; 基于真实库存重新预检
+       -&gt; 按仓库和商品聚类
+       -&gt; 执行统一原子操作
+       -&gt; 保存结果并发布事件
+</code></pre>
+<p><img src="/post-images/stock-architecture.svg" alt="库存预留主链路" /></p>
+<p><em>图 1：快照帮助业务层快速选出候选方案，真正的扣减仍由库存事务层根据实时库存完成。</em></p>
+<p>业务编排服务负责回答“订单希望怎样履约”：是否允许部分满足、哪个仓库更合适、订单优先级是多少。它读取的是库存快照，允许短暂延迟，换取低延迟和较高吞吐。</p>
+<p>库存事务服务负责回答“此刻库存事实是否允许这样做”。但它的职责不只是再检查一次余额。一次预留、取消或发货往往会同时影响店铺、平台、仓库汇总和仓库批次等多层库存。库存事务服务把这些变化看成一笔不可分割的库存交易，在一个短事务中按照固定顺序完成校验、余额迁移和流水记录。</p>
+<p>这也是后来回看项目时，我认为最容易被忽略的模型。业务人员看到的是库存准备、订单预留和发货三个流程；技术侧真正需要建立的，是藏在这些流程下面的统一库存交易能力。上层只需要表达“预留十件”“取消五件”或“确认发货八件”，至于要修改哪些库存层、数量从哪个状态转移到哪个状态，都由库存事务服务决定。</p>
+<p>这两个服务看起来都在“判断有没有库存”，但角色并不重复。业务编排层更像前台接待：它根据快照快速判断哪座仓库最有可能满足订单，尽快给出候选方案。库存事务层则像真正的出纳：它必须面对当下的真实余额，并对最终结果负责。</p>
+<p>这也解释了一个容易产生误会的现象：业务编排层刚刚看到有货，库存事务层仍可能返回失败。因为从读取快照到实际扣减之间，其他订单可能已经拿走了最后一件商品。这个差异不是系统错误，而是使用快照换取性能必须接受的现实。我们要做的不是消灭这个窗口，而是让失败能够自然进入重试、换仓或缺货流程。</p>
+<h2 id="heading-2">三、四层库存究竟在解决什么业务问题</h2>
+<p>项目里的“四层库存”并不是四个抽象概念，而是同一件商品从销售承诺到仓库履约的四种观察粒度。</p>
+<p>第一层是店铺库存，粒度通常落在店铺和 SKU。它最接近销售入口，回答的是“这个店铺还能向消费者承诺多少件”。同一个商品可能在多个店铺销售，如果所有店铺都直接看到仓库总量，就很容易重复承诺同一批货。</p>
+<p>第二层是平台库存。它把多个店铺或销售入口汇总到平台维度，用于控制某个平台可以使用的库存范围。店铺库存解决单个店铺的销售承诺，平台库存则负责更高一层的额度和共享关系。</p>
+<p>第三层是仓库汇总库存，粒度落在“仓库 + 商品”。它回答某个仓库里这种商品总体还有多少可用、多少已经被占用，以及有多少正在采购或发货途中。仓库匹配和真实库存预检主要依赖这一层。</p>
+<p>第四层是仓库批次库存。它进一步把仓库商品拆到具体批次，决定订单最后从哪一批货中发出。即使上层汇总库存足够，真正出库时仍然要按照先进先出、先到期先出、质量状态或指定批次等规则落到明细。</p>
+<p><img src="/post-images/four-layer-inventory.svg" alt="四层库存模型" /></p>
+<p><em>图 2：店铺和平台负责销售承诺，仓库汇总负责库存总账，仓库批次负责最终履约。</em></p>
+<p>这四层不是四套互不相干的库存。一次业务操作往往会同时穿过多层。例如某个店铺预留十件商品，系统不仅要减少店铺层的可用数量，还要同步修改平台库存、候选仓库的汇总库存，并最终占用具体仓库批次。</p>
+<p>如果店铺层扣减成功、仓库批次层却失败，系统对外已经承诺了库存，仓库里却没有对应的货；如果取消预留时只恢复了仓库库存，却没有恢复店铺和平台层，商品明明已经释放，前台仍然显示无货。因此，多层变更必须被当成同一笔库存交易处理，任何一层失败都不能提交。</p>
+<h3 id="heading-3">库存不是一个数字，而是在不同状态之间流动</h3>
+<p>每一层库存通常都不只保存“总数”，还需要区分可用、占用、采购在途和发货在途等状态。它们分别回答不同的问题：</p>
+<ul>
+<li><strong>总额</strong>：当前库存账面上的总体规模；</li>
+<li><strong>可用</strong>：还能继续被订单预留的数量；</li>
+<li><strong>占用或预留</strong>：已经承诺给订单、尚未出库的数量；</li>
+<li><strong>采购或调拨在途</strong>：正在进入仓库，但还不能销售的数量；</li>
+<li><strong>发货在途</strong>：已经离开仓库，尚未完成签收的数量。</li>
+</ul>
+<p>因此，库存业务并不只有预留和取消。完整生命周期至少包含库存准备、库存预留和发货履约三类操作。</p>
+<p><img src="/post-images/inventory-lifecycle.svg" alt="库存状态生命周期" /></p>
+<p><em>图 3：一件商品会在采购在途、可用、预留和发货在途之间迁移，签收后完成本次履约。</em></p>
+<p>库存准备负责把货物带进可销售状态。调入或采购发生时，在途数量增加；仓库接收后，在途减少、可用增加。如果发生调出，则来源仓库的可用减少，目标方向的在途增加。</p>
+<p>订单预留并没有让商品从仓库消失，只是改变了它的用途：可用减少，预留增加。取消预留执行相反的迁移，把已经承诺但尚未发出的商品重新变为可用。</p>
+<p>发货时，商品从预留转为发货在途；签收后，发货在途再减少。这样设计的好处是，即使物流尚未结束，系统也知道商品已经不在仓库，不能因为预留数量归零就再次销售。</p>
+<p>可以把几个核心动作概括为：</p>
+<pre><code class="language-text">接收：采购/调拨在途减少，可用增加
+预留：可用减少，预留增加
+取消：预留减少，可用增加
+发货：预留减少，发货在途增加
+签收：发货在途减少
+</code></pre>
+<p>这里最重要的不变量，不是简单套用一个通用公式，而是每次状态迁移前后数量守恒，并且所有受影响层级同时成功。例如预留不能让可用库存变成负数；取消不能释放超过原预留量的数量；发货不能超过已经预留的数量；各批次的汇总结果必须能够与仓库商品总账核对。</p>
+<h3 id="heading-4">库存流水是解释余额的依据</h3>
+<p>余额表适合快速回答“现在还有多少”，却无法单独解释“为什么变成这样”。所以每一次接收、预留、取消、发货和签收都需要写入不可变的库存流水。</p>
+<p>库存流水至少关联业务单号、库存命令号、操作类型、库存层级、变更前数量、变更数量和变更后数量。多层库存虽然会产生多条明细，但它们属于同一笔交易，应由同一个库存交易号串联起来。</p>
+<p>这样发生差异时，系统不需要直接修改余额来“把数字改对”，而是可以根据流水定位哪一次操作缺失或重复，再通过补偿命令修复。余额负责查询，流水负责审计和对账，两者共同构成完整的库存账。</p>
+<h2 id="heading-5">四、预留单需要一套明确的状态机</h2>
+<p>旧设计中最容易引发争议的问题是：“这张单现在到底能不能处理？”缺货重试看到它失败了，认为应该再试一次；取消任务已经收到用户指令，认为应该释放；发货任务又可能刚好拿到之前的预留结果。大家读取的是同一行数据，却按照各自的逻辑解释它。</p>
+<p>解决办法不是再增加一个 <code>if</code>，而是让所有任务围绕同一套状态机协作。</p>
+<pre><code class="language-text">CREATED
+  -&gt; QUEUED
+  -&gt; PROCESSING
+  -&gt; RESERVED          全量预留成功
+  -&gt; PART_RESERVED     部分预留成功
+  -&gt; OUT_OF_STOCK      当前无可用库存
+  -&gt; CANCELING
+  -&gt; CANCELED
+  -&gt; RELEASED          超时或业务结束后释放
+  -&gt; SHIPPED           已出库
+</code></pre>
+<p><img src="/post-images/reservation-state-machine.svg" alt="库存预留状态机" /></p>
+<p><em>图 4：状态机把正常预留、部分满足、缺货、取消、释放和发货放进同一条可检查的生命周期。</em></p>
+<p>只有状态机允许的转换才能执行。例如 <code>SHIPPED</code> 不能再取消预留，<code>CANCELED</code> 不能重新出库；缺货重试只能处理 <code>OUT_OF_STOCK</code> 或允许补货的 <code>PART_RESERVED</code>，不能捞取 <code>CANCELING</code> 状态。</p>
+<p>状态更新采用条件更新：</p>
+<pre><code class="language-sql">UPDATE reservation
+SET status = :target, version = version + 1
+WHERE id = :id
+  AND status = :expected
+  AND version = :version;
+</code></pre>
+<p>受影响行数为零表示状态已经被其他流程修改。此时应重新读取并按最新状态决定，而不是无条件覆盖。</p>
+<h2 id="heading-6">五、整批预留与累积预留</h2>
+<p>系统支持两种模式：</p>
+<ul>
+<li>整批预留：同一订单的所有明细必须一次满足，否则本次不产生预留；</li>
+<li>累积预留：允许先预留部分数量，补货后继续处理剩余需求。</li>
+</ul>
+<p>仓库匹配可以采用可解释的加权评分算法。对订单中的每个商品，计算候选仓库的满足率：</p>
+<pre><code class="language-text">lineScore = min(available / required, 1)
+</code></pre>
+<p>整批预留要求所有 <code>lineScore</code> 都等于 1，然后按照仓库优先级、预计送达时间和履约成本选择。累积预留则计算：</p>
+<pre><code class="language-text">warehouseScore =
+    商品满足率加权和
+    - 拆单惩罚
+    - 跨区运输成本
+    - 库存老化成本
+    + 仓库优先级加成
+</code></pre>
+<p>业务编排层只产生候选结果，库存事务层必须用真实库存重新计算。为了避免一次订单从多个仓库零散出货，部分预留成功后可以锁定履约仓库；如果业务允许换仓，则需要把换仓定义成“释放旧仓预留，再创建新仓预留”的补偿流程，不能直接修改仓库字段。</p>
+<h2 id="heading-7">六、为什么要短暂排队再批量处理</h2>
+<p>“蓄水”这个词第一次听起来有些反直觉：用户正在等库存结果，为什么还要故意让订单停一下？实际原因是，立即逐单访问数据库虽然单笔路径最短，却会把每一个流量尖峰原样传递给数据库。</p>
+<p>我们给请求设置了一个很短的等待窗口。高优先级订单可以排到前面，同优先级仍按照进入时间处理；批处理程序每次取出有限数量的请求，再按“仓库 + 商品”聚类，让相同库存单元尽量在同一批处理中完成。</p>
+<p>这段等待换来了三个好处：高优先级订单有机会优先处理，相同商品可以合并操作，数据库面对的也不再是毫无规律的零散请求。但等待窗口和批次大小都必须有上限。批次过大会延长事务和持锁时间，低流量时也不能为了凑批让订单一直等待。</p>
+<p>队列只是调度手段，不是库存事实来源。请求是否已经预留、处理到哪个状态，仍然要以数据库中的预留单和库存流水为准。这样即使调度数据丢失，也可以根据持久化状态重新投递。</p>
+<h2 id="mq-">七、MQ 和数据库如何保持最终一致</h2>
+<p>把定时抓取换成消息队列之后，我们很快遇到了另一个问题：数据库已经保存了预留单，但消息还没来得及发，进程就退出了，怎么办？如果把顺序调过来，先发消息再保存数据，消费者又可能比本地事务更早看到一张尚不存在的单。</p>
+<p>这类问题没有办法靠调整两行代码的先后顺序彻底解决。最终采用的是业内常见的 Transactional Outbox：业务数据和“待发送事件”在同一个本地事务里落库，再由后台发布器负责把事件送进消息队列。</p>
+<p>通用做法是事务型 Outbox：</p>
+<ol>
+<li>在同一个本地事务中保存预留单和 Outbox 事件；</li>
+<li>独立发布器扫描未发送事件并投递到消息队列；</li>
+<li>消息发送成功后把 Outbox 标记为已发送；</li>
+<li>消费者用 <code>eventId</code> 或“业务单号 + 操作类型”做幂等；</li>
+<li>消费失败采用指数退避，超过阈值进入死信队列和人工处理台。</li>
+</ol>
+<p><img src="/post-images/outbox-consistency.svg" alt="Transactional Outbox 一致性流程" /></p>
+<p><em>图 5：即使服务在提交数据库后立刻退出，Outbox 事件仍留在库中，发布器恢复后可以继续发送。</em></p>
+<p>发布器可能在“消息已经发出、发送状态还没来得及更新”时崩溃，所以恢复后仍可能重复发送。我们不再追求很难证明的“绝不重复”，而是接受至少一次投递，并要求消费者无论收到几次都只产生一次业务效果。这种思路反而更容易验证，也更符合故障真实发生的方式。</p>
+<p>库存事务成功后同样在本地事务中写结果事件。业务编排服务消费结果并推进预留状态。若消息长时间未到，可通过预留单与库存流水对账修复，而不是直接猜测库存结果。</p>
+<h2 id="heading-8">八、所有库存命令都必须幂等</h2>
+<p>每个库存命令携带全局唯一的 <code>requestId</code>，库存事务服务建立唯一索引：</p>
+<pre><code class="language-text">UNIQUE(request_id, operation_type)
+</code></pre>
+<p>第一次处理时执行业务事务并保存结果；重复请求直接返回第一次的结果。幂等记录不能只保存“处理过”，还要保存成功、业务失败或处理中状态，否则调用方无法判断上一次到底发生了什么。</p>
+<p>对于预留扣减，可以采用带条件的原子更新：</p>
+<pre><code class="language-sql">UPDATE stock_balance
+SET available = available - :quantity,
+    reserved = reserved + :quantity,
+    version = version + 1
+WHERE stock_key = :stockKey
+  AND available &gt;= :quantity
+  AND version = :version;
+</code></pre>
+<p>库存余额更新、库存流水和命令结果在同一个短事务中提交。真正让这件事变复杂的，是一次命令可能同时修改四层库存、多张表和多个商品。如果不同请求采用不同的访问顺序，一个请求先锁店铺库存再锁仓库批次，另一个请求反过来执行，就可能形成循环等待。</p>
+<p>我们后来把“顺序”当成了库存交易协议的一部分：批量商品先按照稳定库存键排序，多层库存按照统一表顺序更新，所有调用方使用相同的锁粒度。这样无论请求来自预留、退货还是库存指令，进入库存事务服务以后都遵守同一种资源访问顺序。</p>
+<p>如果需要，也可以在数据库之前增加竞争收敛手段，减少同一库存键同时进入事务的请求数量。但它不是死锁治理和防止超卖的根本。真正的基础仍然是固定访问顺序、短事务和数据库条件更新。</p>
+<h2 id="heading-9">九、取消、释放与补偿</h2>
+<p>取消预留不是删除几条记录，而是一条与预留相反、同样需要审计的库存命令。</p>
+<pre><code class="language-text">业务侧申请取消
+  -&gt; 条件更新为 CANCELING
+  -&gt; 发送 ReleaseReservation 命令
+  -&gt; 库存事务服务幂等释放 reserved
+  -&gt; 写释放流水与结果事件
+  -&gt; 业务侧更新为 CANCELED 或 RELEASED
+</code></pre>
+<p>如果释放失败，状态停留在 <code>CANCELING</code> 并继续重试；不能先删除缺货和失败记录，否则故障后会失去恢复依据。<code>REQUIRES_NEW</code> 可以用于隔离某些本地事务，但它不能替代跨服务一致性。跨服务流程仍需通过状态机、Outbox、幂等和补偿完成。</p>
+<p>长时间卡在 <code>PROCESSING</code>、<code>CANCELING</code> 等中间状态的记录由巡检任务扫描。巡检任务必须按稳定游标分页，例如使用递增主键或“更新时间 + 主键”，不能使用不断变化的数据集配合 <code>OFFSET</code> 翻页。</p>
+<h2 id="heading-10">十、上线后最值得监控什么</h2>
+<p>技术指标至少包括：</p>
+<ul>
+<li>消息积压量、最老消息等待时间和死信数量；</li>
+<li>预留成功率、部分满足率、缺货率和取消释放成功率；</li>
+<li>库存事务耗时、批次大小、乐观锁冲突率和数据库锁等待；</li>
+<li>各状态停留时长以及中间状态超时数量；</li>
+<li>快照与真实库存判断结果的偏差率；</li>
+<li>库存余额与流水重放结果的差异。</li>
+</ul>
+<p>每次请求需要贯穿订单号、预留单号、库存命令号、消息事件号和库存流水号。运营人员应能从任意一个编号还原完整时间线，而不是只能在多个服务日志中手工拼接。</p>
+<p>同时建立周期性库存对账：余额表与流水汇总对账、业务预留与库存预留对账、已出库数量与履约结果对账。发现差异后生成修复任务，修复本身也必须通过库存命令和流水完成，禁止直接改余额。</p>
+<h2 id="heading-11">十一、这次重构留下的几个认识</h2>
+<p>第一，库存系统最重要的不是把表画成几层，而是任何时刻都能说清楚一个数量代表什么，并用不变量阻止非法状态。</p>
+<p>第二，快照可以提高决策速度，但不能替代真实库存；队列可以平滑流量，但不能成为事实来源；任何前置并发控制都不能替代数据库的原子约束。</p>
+<p>第三，所谓最终一致性不是“失败以后多重试几次”。它至少需要状态机、事务型 Outbox、幂等消费、补偿流程、超时巡检和对账闭环。</p>
+<p>第四，库存服务的边界不是某几张表，而是库存变化的所有权。只有所有扣减、释放、冻结和调整都经过统一交易入口，微服务拆分才真正成立。</p>
+<p>回头看，这次改造最有价值的结果，并不是技术栈里多了哪些中间件。真正的变化是：以前库存规则散落在订单、商品、定时任务和人工脚本里，出现异常时大家只能沿着日志猜；改造后，每一次预留、释放和出库都有明确入口、合法状态和可追溯流水。</p>
+<p>库存系统无法保证永远不出故障，但它应该保证，故障发生以后我们仍然知道事情停在了哪里，下一步应该重试、补偿还是交给人工处理。对交易类系统来说，这种“能够把事情说清楚并收回来”的能力，往往比单次请求快几毫秒更重要。</p>
+
+  </div>
+
+  
+  <nav class="post-nav">
+    
+    <a href="/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/" class="post-nav-card post-nav-card--prev">
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun.jpg" alt="一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂" loading="lazy" />
+      </div>
+      
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">上一篇</span>
+        <span class="post-nav-card__title">一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂</span>
+      </div>
+      <span class="post-nav-card__arrow">&larr;</span>
+    </a>
+    
+    
+    <a href="/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/" class="post-nav-card post-nav-card--next">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">下一篇</span>
+        <span class="post-nav-card__title">面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦</span>
+      </div>
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg" alt="面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦" loading="lazy" />
+      </div>
+      
+      <span class="post-nav-card__arrow">&rarr;</span>
+    </a>
+    
+  </nav>
+
+  
+  
+
+
+</article>
+
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-inner">
+
+    
+    
+    <nav class="footer-nav" aria-label="页脚导航">
+      
+      <a class="footer-nav__link" href="/">首页</a>
+      
+      <a class="footer-nav__link" href="/post">博客</a>
+      
+      <a class="footer-nav__link" href="/memos">闪念</a>
+      
+      <a class="footer-nav__link" href="/archives">归档</a>
+      
+      <a class="footer-nav__link" href="/tags">标签</a>
+      
+      <a class="footer-nav__link" href="/links">友链</a>
+      
+      <a class="footer-nav__link" href="/post/about">关于</a>
+      
+    </nav>
+    
+
+    
+    <div class="footer-social">
+      
+      
+      
+      <a class="footer-social__link" href="/feed.xml" aria-label="RSS">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.18 15.64a2.18 2.18 0 110 4.36 2.18 2.18 0 010-4.36zM4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44zm0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+        </svg>
+      </a>
+    </div>
+
+    
+    <div class="footer-copyright">
+      <p>&copy; 2026 0707‘s Blog. All rights reserved.</p>
+    </div>
+
+    
+    
+    <div class="footer-custom">
+      Powered by Gridea Pro
+    </div>
+    
+
+    
+    <div class="footer-powered">
+      <span>Powered by <a href="https://gridea.pro" target="_blank" rel="noopener noreferrer">Gridea Pro</a></span>
+    </div>
+
+  </div>
+</footer>
+
+  
+  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-modal">
+    <div class="search-header">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <span class="search-kbd">&#8984;K</span>
+      <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<script src="/scripts/search.js"></script>
+  
+
+  
+
+  
+
+  
+
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: flavor-theme v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+</html>
