@@ -204,14 +204,11 @@
       <h3 class="post-card__title clamp-3">面试八股文-数据库事务，隔离级别</h3>
     </a>
     <a href="/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/" class="post-card__excerpt clamp-2">
-      本文主要介绍数据库事务属性与隔离级别的使用
+      事务题容易停留在定义背诵。面试时更重要的是讲清楚：不同隔离级别允许看到什么数据，以及业务如何处理并发冲突。
 ACID 属性
 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括：
 
-原子性（Atomicity）
-
-
-原子性意味着事务中的所有操作要么全部成功，要么全部失败...
+原子性（Atomicit...
     </a>
     <div class="post-card__meta meta-text">
       2024-10-24
@@ -233,9 +230,8 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
     </a>
     <a href="/post/mian-shi-ba-gu-wen-si-suo/" class="post-card__excerpt clamp-2">
       死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;）
-1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。
-2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。
-3...
+死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。
+1.互斥条件：至少有一个资源是非共享的，必须由一个线...
     </a>
     <div class="post-card__meta meta-text">
       2024-10-23

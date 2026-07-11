@@ -35,12 +35,12 @@
 <meta property="og:image" content="/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp" />
 
 
-<meta name="description" content="概述 Kubernetes（简称 K8S）是目前最流行的容器编排平台，能够自动化地完成容器化应用的部署、伸缩、负载均衡和运维管理。它的强大之处在于一整套架构设计，这套架构由控制平面（Control Plane）和工作节点（Worker Node）共同组成。每个部分承担着特定的职责，相互协作保证集群的稳定运行。本文将基于&amp;hellip;">
+<meta name="description" content="概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： ##&amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Kubernetes基础组件详解","url":"https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/","description":"概述 Kubernetes（简称 K8S）是目前最流行的容器编排平台，能够自动化地完成容器化应用的部署、伸缩、负载均衡和运维管理。它的强大之处在于一整套架构设计，这套架构由控制平面（Control Plane）和工作节点（Worker Node）共同组成。每个部分承担着特定的职责，相互协作保证集群的稳定运行。本文将基于\u0026hellip;","image":"/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp","datePublished":"2025-09-30T00:00:00+08:00","dateModified":"2026-07-11T17:35:46+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Kubernetes基础组件详解","url":"https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/","description":"概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： ##\u0026hellip;","image":"/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp","datePublished":"2025-09-30T00:00:00+08:00","dateModified":"2026-07-11T17:35:46+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/","name":"Kubernetes基础组件详解","position":2}]}</script>
 <meta property="og:title" content="Kubernetes基础组件详解">
-<meta property="og:description" content="概述 Kubernetes（简称 K8S）是目前最流行的容器编排平台，能够自动化地完成容器化应用的部署、伸缩、负载均衡和运维管理。它的强大之处在于一整套架构设计，这套架构由控制平面（Control Plane）和工作节点（Worker Node）共同组成。每个部分承担着特定的职责，相互协作保证集群的稳定运行。本文将基于&amp;hellip;">
+<meta property="og:description" content="概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： ##&amp;hellip;">
 <meta property="og:url" content="https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707‘s Blog">
@@ -48,7 +48,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/">
 <meta name="twitter:title" content="Kubernetes基础组件详解">
-<meta name="twitter:description" content="概述 Kubernetes（简称 K8S）是目前最流行的容器编排平台，能够自动化地完成容器化应用的部署、伸缩、负载均衡和运维管理。它的强大之处在于一整套架构设计，这套架构由控制平面（Control Plane）和工作节点（Worker Node）共同组成。每个部分承担着特定的职责，相互协作保证集群的稳定运行。本文将基于&amp;hellip;">
+<meta name="twitter:description" content="概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： ##&amp;hellip;">
 <meta name="twitter:image" content="/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp">
 </head>
 <body class="flavor-theme">
@@ -209,30 +209,30 @@
   <div class="article-content">
     <p><img src="/post-images/1759237881724.png" alt="" /></p>
 <h1 id="heading">概述</h1>
-<p>Kubernetes（简称 K8S）是目前最流行的容器编排平台，能够自动化地完成容器化应用的部署、伸缩、负载均衡和运维管理。它的强大之处在于一整套架构设计，这套架构由控制平面（Control Plane）和工作节点（Worker Node）共同组成。每个部分承担着特定的职责，相互协作保证集群的稳定运行。本文将基于一张经典架构图，带你了解 Kubernetes 的基础组件及其作用。</p>
+<p>Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。</p>
 <h1 id="heading-1">介绍</h1>
 <h2 id="control-plane">控制平面（Control Plane）</h2>
-<p>控制平面是整个集群的大脑，负责对集群进行全局调度和管理，主要组件包括：</p>
+<p>控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括：</p>
 <h3 id="api-server">API Server</h3>
-<p>API Server 是 Kubernetes 的“门面”，是所有请求的统一入口。无论是通过命令行（kubectl）、UI 管理界面还是自动化控制器，所有操作都会通过 API Server 进行交互。</p>
+<p>API Server 暴露 Kubernetes API。<code>kubectl</code>、控制器和其他集群组件都通过它读取或修改资源；它还负责认证、鉴权、准入控制和请求校验。</p>
 <h3 id="etcd">etcd</h3>
-<p>etcd 是一个分布式的键值数据库，用来保存整个集群的状态信息。比如有哪些节点、有哪些 Pod、服务的配置等，都存储在 etcd 中。可以理解为 Kubernetes 的“账本”。</p>
+<p>etcd 是一致性的分布式键值数据库，用于保存 Kubernetes API 对象。它是控制平面的关键数据存储，因此备份、访问控制和磁盘延迟都很重要。</p>
 <h3 id="scheduler">Scheduler</h3>
 <p>Scheduler 负责把新建的 Pod 分配到合适的节点上。它会综合考虑节点的 CPU、内存、亲和性、反亲和性等条件，尽量做到资源合理分配。</p>
 <h3 id="controller-manager">Controller Manager</h3>
-<p>Controller Manager 保证集群的状态与用户的期望一致。比如用户声明需要三个副本，如果其中一个 Pod 挂掉，Controller Manager 会自动启动新的 Pod 来补齐。</p>
+<p>Controller Manager 运行多种控制器，持续比较期望状态与实际状态。例如 Deployment 需要三个副本而当前只有两个时，相关控制器会创建新的 Pod 对象，随后再由调度器和 kubelet 接手。</p>
 <h2 id="worker-node">工作节点（Worker Node）</h2>
 <p>工作节点是真正运行应用的地方，每个节点上都包含以下组件：</p>
 <h3 id="kubelet">kubelet</h3>
-<p>kubelet 负责与 API Server 通信，确保节点上运行的容器与期望状态保持一致。比如 Pod 定义了 2 个副本，kubelet 会负责监控并保持容器的存活。</p>
+<p>kubelet 监视分配到本节点的 Pod，并通过容器运行时启动容器、执行健康检查和上报状态。副本数量由控制器维护，不是 kubelet 的职责。</p>
 <h3 id="kube-proxy">kube-proxy</h3>
-<p>kube-proxy 处理 Pod 与 Pod 之间的网络通信和负载均衡。它确保服务能通过虚拟 IP 正确转发到后端的 Pod。</p>
+<p>kube-proxy 在节点上实现 Service 的转发规则，通常使用 iptables 或 IPVS 将虚拟 IP 的流量转到后端 Pod。Pod 网络本身通常由 CNI 插件提供。</p>
 <h3 id="container-runtime">Container Runtime</h3>
-<p>Container Runtime 是运行容器的引擎，常见的有 Docker、containerd 等。Pod 内的容器最终都是通过它来启动的。</p>
+<p>容器运行时负责镜像拉取和容器生命周期管理，并通过 CRI 与 kubelet 交互，常见实现有 containerd 和 CRI-O。Kubernetes 自 1.24 起移除了内置的 dockershim，不能再把 Docker Engine 直接当作 CRI 运行时使用。</p>
 <h3 id="pods">Pods</h3>
 <p>Pod 是 Kubernetes 中最小的调度单元，每个 Pod 包含一个或多个紧密相关的容器。Pod 会共享网络和存储卷，方便容器之间的通信。</p>
-<h1 id="heading-2">总结</h1>
-<p>Kubernetes 的强大在于它通过一套精心设计的组件，完成了从集群调度到应用运行的全链路管理。控制平面（Control Plane）负责“全局大脑”的调度与状态维护，而工作节点（Worker Node）则是具体运行应用的“执行者”。理解这些核心组件的作用，是进一步学习 Kubernetes 网络、存储、安全和扩展性的基础。</p>
+<h1 id="heading-2">把一次部署串起来</h1>
+<p>提交 Deployment 后，API Server 校验并保存对象；控制器创建所需的 Pod；Scheduler 为未调度的 Pod 选择节点；目标节点上的 kubelet 再调用容器运行时启动容器。Service 流量则由 kube-proxy 维护的转发规则送到可用 Pod。沿着这条链路排查问题，通常比孤立地背组件名称更实用。</p>
 <!-- more -->
   </div>
 

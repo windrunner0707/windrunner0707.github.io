@@ -35,12 +35,12 @@
 <meta property="og:image" content="/post-images/mian-shi-ba-gu-wen-si-suo.webp" />
 
 
-<meta name="description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程&amp;hellip;">
+<meta name="description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 &amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-死锁","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/","description":"死锁的四个必要条件（\u0026ldquo;Coffman条件\u0026rdquo;） 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程\u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-si-suo.webp","datePublished":"2024-10-23T00:00:00+08:00","dateModified":"2026-07-05T15:29:53+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-死锁","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/","description":"死锁的四个必要条件（\u0026ldquo;Coffman条件\u0026rdquo;） 死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 \u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-si-suo.webp","datePublished":"2024-10-23T00:00:00+08:00","dateModified":"2026-07-05T15:29:53+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/","name":"面试八股文-死锁","position":2}]}</script>
 <meta property="og:title" content="面试八股文-死锁">
-<meta property="og:description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程&amp;hellip;">
+<meta property="og:description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 &amp;hellip;">
 <meta property="og:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707‘s Blog">
@@ -48,7 +48,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/">
 <meta name="twitter:title" content="面试八股文-死锁">
-<meta name="twitter:description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程&amp;hellip;">
+<meta name="twitter:description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 &amp;hellip;">
 <meta name="twitter:image" content="/post-images/mian-shi-ba-gu-wen-si-suo.webp">
 </head>
 <body class="flavor-theme">
@@ -208,12 +208,13 @@
 
   <div class="article-content">
     <h3 id="coffman">死锁的四个必要条件（&ldquo;Coffman条件&rdquo;）</h3>
+<p>死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。</p>
 <p>1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。</p>
 <p>2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。</p>
 <p>3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。</p>
 <p>4.环形等待：存在一个环形链，即线程A等待线程B持有的资源，线程B又等待线程C持有的资源，依此类推，最后一个线程又等待线程A的资源，形成环路。</p>
 <h3 id="heading">避免死锁的方案</h3>
-<p>为了避免死锁，可以从打破上述四个必要条件入手，主要有以下几种常用的方案：</p>
+<p>避免死锁的思路是让上述至少一个条件不成立：</p>
 <ol>
 <li>破坏互斥条件</li>
 </ol>
@@ -247,21 +248,21 @@
 <ul>
 <li>死锁预防就是通过编程或者系统设计确保某些死锁条件不成立。</li>
 <li>避免同时持有多个资源：尽可能将任务分解，使得每个线程只需要持有一个资源。</li>
-<li>提高并发粒度：将锁的粒度调细，避免多个线程频繁竞争同一个资源。</li>
+<li>调整锁粒度：缩小锁范围可能减少竞争，但同时持有更多细粒度锁也可能增加死锁机会，需要结合访问模式评估。</li>
 <li>避免循环等待：通过资源分配顺序确保不会发生循环等待。</li>
 </ul>
 <ol start="2">
 <li>死锁检测与恢复</li>
 </ol>
 <ul>
-<li>死锁检测算法：通过系统检测当前的资源占用状态，判断是否存在死锁。如果检测到死锁，可以选择强制终止某个线程以释放资源。例如，银行家算法（Banker’s Algorithm）是一种经典的死锁检测与避免的算法。</li>
+<li>死锁检测：系统可以分析等待图是否存在环。检测到死锁后，数据库通常选择一个事务作为牺牲者并回滚。银行家算法属于死锁避免算法，需要预先知道最大资源需求，不是常规的死锁检测算法。</li>
 <li>资源回收：一旦检测到死锁，系统可以选择回收某些线程占有的资源，强制它们放弃操作，以恢复系统的正常运行。</li>
 </ul>
 <ol start="3">
 <li>避免死锁的工具和库</li>
 </ol>
 <ul>
-<li>并发工具库：许多高级编程语言提供了处理并发和锁机制的库。例如，Java 的 java.util.concurrent.locks 包提供了 ReentrantLock、ReadWriteLock 等工具，有效帮助开发者避免死锁。</li>
+<li>并发工具库：Java 的 <code>java.util.concurrent</code> 提供 <code>ReentrantLock</code>、<code>ReadWriteLock</code> 等工具，但工具本身不会自动避免死锁。固定加锁顺序、缩短持锁时间和使用带超时的 <code>tryLock</code> 仍需在代码中落实。</li>
 <li>死锁检测工具：可以使用工具对系统进行分析和监控，检测可能发生的死锁。比如 Java 的 JConsole 或 JVisualVM 可以用于检测 JVM 中的线程死锁情况。</li>
 </ul>
 

@@ -184,7 +184,7 @@
     </a>
     <a href="/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/" class="post-card__excerpt clamp-2">
       概述
-在Spring框架中，Bean的注入是核心功能之一，它帮助开发者以声明式的方式管理对象之间的依赖，从而实现松耦合设计。然而，Bean注入也可能面临循环依赖的问题。@Lazy提供了一种通过延迟初始化解决循环依赖的方法，但这种方式可...
+字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决...
     </a>
     <div class="post-card__meta meta-text">
       2024-12-14

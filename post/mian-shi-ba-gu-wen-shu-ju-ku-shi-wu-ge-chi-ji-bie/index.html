@@ -35,12 +35,12 @@
 <meta property="og:image" content="/post-images/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie.webp" />
 
 
-<meta name="description" content="本文主要介绍数据库事务属性与隔离级别的使用 ACID 属性 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括： 原子性（Atomicity） 原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rollback）。这保证了在系统崩溃的情况下，数据不会处于部分更新的&amp;hellip;">
+<meta name="description" content="事务题容易停留在定义背诵。面试时更重要的是讲清楚：不同隔离级别允许看到什么数据，以及业务如何处理并发冲突。 ACID 属性 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括： 原子性（Atomicity） 原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rol&amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-数据库事务，隔离级别","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/","description":"本文主要介绍数据库事务属性与隔离级别的使用 ACID 属性 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括： 原子性（Atomicity） 原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rollback）。这保证了在系统崩溃的情况下，数据不会处于部分更新的\u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie.webp","datePublished":"2024-10-24T00:00:00+08:00","dateModified":"2026-07-05T15:29:47+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-数据库事务，隔离级别","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/","description":"事务题容易停留在定义背诵。面试时更重要的是讲清楚：不同隔离级别允许看到什么数据，以及业务如何处理并发冲突。 ACID 属性 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括： 原子性（Atomicity） 原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rol\u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie.webp","datePublished":"2024-10-24T00:00:00+08:00","dateModified":"2026-07-05T15:29:47+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/","name":"面试八股文-数据库事务，隔离级别","position":2}]}</script>
 <meta property="og:title" content="面试八股文-数据库事务，隔离级别">
-<meta property="og:description" content="本文主要介绍数据库事务属性与隔离级别的使用 ACID 属性 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括： 原子性（Atomicity） 原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rollback）。这保证了在系统崩溃的情况下，数据不会处于部分更新的&amp;hellip;">
+<meta property="og:description" content="事务题容易停留在定义背诵。面试时更重要的是讲清楚：不同隔离级别允许看到什么数据，以及业务如何处理并发冲突。 ACID 属性 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括： 原子性（Atomicity） 原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rol&amp;hellip;">
 <meta property="og:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707‘s Blog">
@@ -48,7 +48,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/">
 <meta name="twitter:title" content="面试八股文-数据库事务，隔离级别">
-<meta name="twitter:description" content="本文主要介绍数据库事务属性与隔离级别的使用 ACID 属性 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括： 原子性（Atomicity） 原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rollback）。这保证了在系统崩溃的情况下，数据不会处于部分更新的&amp;hellip;">
+<meta name="twitter:description" content="事务题容易停留在定义背诵。面试时更重要的是讲清楚：不同隔离级别允许看到什么数据，以及业务如何处理并发冲突。 ACID 属性 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括： 原子性（Atomicity） 原子性意味着事务中的所有操作要么全部成功，要么全部失败。事务不可能部分执行，事务的操作要么全部提交（commit），要么全部回滚（rol&amp;hellip;">
 <meta name="twitter:image" content="/post-images/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie.webp">
 </head>
 <body class="flavor-theme">
@@ -207,7 +207,7 @@
   
 
   <div class="article-content">
-    <p>本文主要介绍数据库事务属性与隔离级别的使用</p>
+    <p>事务题容易停留在定义背诵。面试时更重要的是讲清楚：不同隔离级别允许看到什么数据，以及业务如何处理并发冲突。</p>
 <h3 id="acid-">ACID 属性</h3>
 <p>ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括：</p>
 <ol>
@@ -235,14 +235,10 @@
 <li>持久性（Durability）</li>
 </ol>
 <ul>
-<li>
-<p>持久性保证了事务一旦提交，其结果将永久保存在数据库中，即使系统崩溃或电源中断也不会丢失数据。持久性通常通过将数据写入磁盘来保证。</p>
-</li>
-<li>
-<p>例如：如果用户完成了银行转账操作，即便系统在操作后崩溃，数据仍应正确地反映转账的结果。</p>
-<p>使用原子性，隔离性，持久性保证一致性。</p>
-</li>
+<li>持久性保证了事务一旦提交，其结果将永久保存在数据库中，即使系统崩溃或电源中断也不会丢失数据。持久性通常通过将数据写入磁盘来保证。</li>
+<li>例如：如果用户完成了银行转账操作，即便系统在操作后崩溃，数据仍应正确地反映转账的结果。</li>
 </ul>
+<p>一致性是业务约束和数据库约束共同达到的结果，不能简单理解为由另外三个属性自动保证。</p>
 <h3 id="heading">事务的隔离级别</h3>
 <p>隔离性是ACID中的一个重要属性，它控制事务之间的可见性。数据库通过定义不同的隔离级别来平衡并发性能和数据一致性。SQL标准定义了四种隔离级别，每种隔离级别允许不同程度的并发干扰。</p>
 <p>隔离级别及其可能的问题：</p>
@@ -260,7 +256,7 @@
 <ul>
 <li>描述：一个事务只能读取到其他事务已提交的数据，防止脏读的发生。</li>
 <li>可能问题：不可重复读（Non-repeatable Read）——同一个事务中的两次相同查询可能会得到不同的结果，因为其他事务可能在它的中途修改并提交数据。</li>
-<li>应用场景：大多数数据库默认使用的隔离级别，如 Oracle。</li>
+<li>应用场景：Oracle、PostgreSQL 等数据库默认使用该级别；具体默认值应以数据库产品为准。</li>
 </ul>
 <ol start="3">
 <li>可重复读（Repeatable Read）</li>
@@ -268,7 +264,7 @@
 <ul>
 <li>描述：一个事务在开始时对某个数据的读操作，在整个事务过程中保持一致。即使有其他事务修改并提交了该数据，本事务仍会看到它最初的值。</li>
 <li>可能问题：幻读（Phantom Read）——同一事务在不同时间段查询时，可能会发现数据集合不一致，例如第一次查询到的结果没有某条记录，但第二次查询时该记录出现了。</li>
-<li>应用场景：MySQL的默认隔离级别，解决了不可重复读，但可能存在幻读问题。</li>
+<li>应用场景：InnoDB 默认使用该级别。SQL 标准下仍可能出现幻读，但 InnoDB 会通过 MVCC 和锁机制处理许多常见的幻读场景。</li>
 </ul>
 <ol start="4">
 <li>可串行化（Serializable）</li>
@@ -292,11 +288,10 @@
 <li>在实际应用中，常常根据具体需求来选择隔离级别。例如，在金融系统中，数据一致性要求较高，通常选择可重复读或可串行化；而在电商系统中，出于性能考虑，可能选择读已提交。</li>
 </ul>
 <ol start="3">
-<li>总结</li>
+<li>选择时看什么</li>
 </ol>
 <ul>
-<li>ACID 属性：原子性、一致性、隔离性和持久性是事务管理的核心，确保数据库操作的可靠性和一致性。</li>
-<li>隔离级别：不同的隔离级别提供了对事务间并发的不同控制，选择适当的隔离级别需要在数据一致性和性能之间进行权衡。</li>
+<li>先明确业务不能接受哪种并发现象，再结合数据库实现、事务长度和冲突概率选择隔离级别。仅凭“金融用高隔离、电商用低隔离”无法做出可靠判断。</li>
 </ul>
 <h3 id="rc">电商系统中使用RC隔离级别</h3>
 <p>在电商系统中，使用**读已提交（Read Committed）隔离级别时，可能会遇到不可重复读（Non-repeatable Read）**的问题。不可重复读是指在同一个事务中，多次读取相同的数据时，数据内容可能发生变化，因为另一个事务可能已经修改并提交了该数据。</p>
@@ -336,9 +331,9 @@ if (rowsUpdated == 0) {
 }
 </code></pre>
 <ol>
-<li>在应用层缓存数据</li>
+<li>复用事务内已经读取的数据</li>
 </ol>
-<p>在电商系统中，可以通过在应用层缓存数据来避免不可重复读问题。在同一个事务中，读取数据时将数据缓存起来，之后的操作都从缓存中获取数据，而不再重复从数据库读取。这种方式保证了在事务内的数据一致性。</p>
+<p>如果业务只需要第一次读取的值，可以在当前调用内复用该对象，避免重复查询。但这不是数据库层的一致性保证，也无法发现其他事务已经提交的修改。</p>
 <ul>
 <li>示例：将查询到的产品信息缓存到事务的上下文中，后续操作从缓存中获取数据，而不是直接查询数据库。</li>
 </ul>
@@ -372,7 +367,7 @@ Product cachedProduct = productCache.get(1);
 <li>优点：提供一致性视图，避免不可重复读问题，性能较好。</li>
 <li>缺点：并非所有数据库都支持，且需要额外的存储来保存多个版本的数据。</li>
 </ul>
-<h4 id="heading-2">总结</h4>
+<h4 id="heading-2">怎么选择</h4>
 <p>在电商系统中使用读已提交隔离级别时，可以通过以下几种方式解决不可重复读问题：</p>
 <ol>
 <li>悲观锁：通过数据库锁定，防止其他事务修改数据。</li>
@@ -381,7 +376,7 @@ Product cachedProduct = productCache.get(1);
 <li>可重复读隔离级别：通过提高隔离级别，保证数据一致性。</li>
 <li>快照隔离：通过多版本并发控制（MVCC），为事务提供一致的快照数据。</li>
 </ol>
-<p>根据具体业务需求和性能要求，可以选择合适的方式来解决不可重复读问题。</p>
+<p>选择方案前先问清楚业务需要“重复读取结果不变”，还是需要“更新时不覆盖他人修改”。前者可考虑可重复读或显式锁，后者通常更适合版本号条件更新。把事务做短、为查询建立合适索引，同样能减少锁等待和冲突。</p>
 
   </div>
 

@@ -271,7 +271,7 @@
     </a>
     <a href="/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/" class="post-card__excerpt clamp-2">
       概述
-在Spring框架中，Bean的注入是核心功能之一，它帮助开发者以声明式的方式管理对象之间的依赖，从而实现松耦合设计。然而，Bean注入也可能面临循环依赖的问题。@Lazy提供了一种通过延迟初始化解决循环依赖的方法，但这种方式可...
+字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决...
     </a>
     <div class="post-card__meta meta-text">
       2024-12-14
@@ -293,7 +293,7 @@
     </a>
     <a href="/post/clean-gitrang-dai-ma-ban-ben-kong-zhi-geng-qing-xi-geng-gao-xiao-de-shi-jian-zhi-nan/" class="post-card__excerpt clamp-2">
       概述
-在现代软件开发中，Git 已成为不可或缺的版本控制工具。然而，随着项目规模的增长和团队协作的深入，开发者常常面临提交记录混乱、分支管理无序以及冲突处理低效等问题。本篇文章将从提交历史优化、分支管理、冲突解决、git hooks在...
+Git 历史一旦混入大量 fix、临时提交和无意义的合并记录，代码审查与问题回溯都会变慢。本文整理提交、分支、冲突、补丁和 Git Hooks 的常用做法，并补充对应的 IDEA 操作。涉及重写历史的命令，使用前要先确认提交是否...
     </a>
     <div class="post-card__meta meta-text">
       2024-12-04
@@ -314,7 +314,11 @@
       <h3 class="post-card__title clamp-3">面试八股文-线上问题排查</h3>
     </a>
     <a href="/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/" class="post-card__excerpt clamp-2">
-      在面试中回答如何排查线上内存、CPU负载过高或死锁问题时，结构化的回答可以帮助你清晰地展示出排查思路和操作步骤。以下是可以参考的一套话术，分为现象识别、初步诊断、深入排查、解决措施和预防手段几个部分，结合你的实际经验可以进行调整和深入...
+      线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例。
+
+现象识别
+
+首先，描述一下线上系统出现内存、CPU负载过高或者...
     </a>
     <div class="post-card__meta meta-text">
       2024-10-25
@@ -335,14 +339,11 @@
       <h3 class="post-card__title clamp-3">面试八股文-数据库事务，隔离级别</h3>
     </a>
     <a href="/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/" class="post-card__excerpt clamp-2">
-      本文主要介绍数据库事务属性与隔离级别的使用
+      事务题容易停留在定义背诵。面试时更重要的是讲清楚：不同隔离级别允许看到什么数据，以及业务如何处理并发冲突。
 ACID 属性
 ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括：
 
-原子性（Atomicity）
-
-
-原子性意味着事务中的所有操作要么全部成功，要么全部失败...
+原子性（Atomicit...
     </a>
     <div class="post-card__meta meta-text">
       2024-10-24
@@ -364,9 +365,8 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
     </a>
     <a href="/post/mian-shi-ba-gu-wen-si-suo/" class="post-card__excerpt clamp-2">
       死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;）
-1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。
-2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。
-3...
+死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。
+1.互斥条件：至少有一个资源是非共享的，必须由一个线...
     </a>
     <div class="post-card__meta meta-text">
       2024-10-23

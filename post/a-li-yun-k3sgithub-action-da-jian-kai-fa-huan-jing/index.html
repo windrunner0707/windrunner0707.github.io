@@ -27,28 +27,28 @@
   })();
 </script>
   <meta name="generator" content="Gridea Pro 1.2.2">
-  <title>使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站 | 0707‘s Blog</title>
+  <title>使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站 | 0707‘s Blog</title>
   
-<meta property="og:title" content="使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站" />
+<meta property="og:title" content="使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站" />
 <meta property="og:type" content="article" />
 
 <meta property="og:image" content="/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp" />
 
 
-<meta name="description" content="效果展示：https://www.windrunner0707.tech/ 技术栈说明 ChatGPT 辅助生成样例代码与K8S配置文件 阿里云 提供ECS实例和容器镜像仓库 ECS：活动价99元购入，配置为2vCPU，2G内存，3Mbps带宽 容器镜像仓库：阿里云ACR，个人版免费，用于保存前&amp;hellip;">
+<meta name="description" content="本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/">
 <link rel="canonical" href="https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站","url":"https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/","description":"效果展示：https://www.windrunner0707.tech/ 技术栈说明 ChatGPT 辅助生成样例代码与K8S配置文件 阿里云 提供ECS实例和容器镜像仓库 ECS：活动价99元购入，配置为2vCPU，2G内存，3Mbps带宽 容器镜像仓库：阿里云ACR，个人版免费，用于保存前\u0026hellip;","image":"/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp","datePublished":"2025-06-19T00:00:00+08:00","dateModified":"2026-07-05T15:29:24+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/","name":"使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站","position":2}]}</script>
-<meta property="og:title" content="使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站">
-<meta property="og:description" content="效果展示：https://www.windrunner0707.tech/ 技术栈说明 ChatGPT 辅助生成样例代码与K8S配置文件 阿里云 提供ECS实例和容器镜像仓库 ECS：活动价99元购入，配置为2vCPU，2G内存，3Mbps带宽 容器镜像仓库：阿里云ACR，个人版免费，用于保存前&amp;hellip;">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站","url":"https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/","description":"本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/","image":"/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp","datePublished":"2025-06-19T00:00:00+08:00","dateModified":"2026-07-12T00:00:00+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/","name":"使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站","position":2}]}</script>
+<meta property="og:title" content="使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站">
+<meta property="og:description" content="本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/">
 <meta property="og:url" content="https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707‘s Blog">
 <meta property="og:image" content="/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/">
-<meta name="twitter:title" content="使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站">
-<meta name="twitter:description" content="效果展示：https://www.windrunner0707.tech/ 技术栈说明 ChatGPT 辅助生成样例代码与K8S配置文件 阿里云 提供ECS实例和容器镜像仓库 ECS：活动价99元购入，配置为2vCPU，2G内存，3Mbps带宽 容器镜像仓库：阿里云ACR，个人版免费，用于保存前&amp;hellip;">
+<meta name="twitter:title" content="使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站">
+<meta name="twitter:description" content="本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/">
 <meta name="twitter:image" content="/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp">
 </head>
 <body class="flavor-theme">
@@ -174,7 +174,7 @@
     
 <article class="article-container">
   <header class="article-header">
-    <h1 class="article-title">使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站</h1>
+    <h1 class="article-title">使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站</h1>
     <div class="article-meta">
       
       
@@ -186,7 +186,7 @@
       <span class="article-meta__item">2025-06-19</span>
       
       <span class="article-meta__sep">·</span>
-      <span class="article-meta__item">8 分钟阅读</span>
+      <span class="article-meta__item">11 分钟阅读</span>
       
     </div>
     
@@ -208,86 +208,114 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp" alt="使用ChatGPT，阿里云，K8S，GitHub Action搭建小型网站" />
+    <img src="/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp" alt="使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站" />
   </div>
   
 
   <div class="article-content">
-    <p>效果展示：https://www.windrunner0707.tech/</p>
-<h1 id="heading">技术栈说明</h1>
-<h2 id="chatgpt">ChatGPT</h2>
-<p>辅助生成样例代码与K8S配置文件</p>
-<h2 id="heading-1">阿里云</h2>
-<p>提供ECS实例和容器镜像仓库</p>
-<p>ECS：活动价99元购入，配置为2vCPU，2G内存，3Mbps带宽</p>
-<p><img src="/post-images/1750337198199.png" alt="" /></p>
-<p>容器镜像仓库：阿里云ACR，个人版免费，用于保存前后端代码打包的镜像，在阿里云使用Docker Hub可能会发生超时问题。</p>
-<p><img src="/post-images/1750337576420.png" alt="" /></p>
-<h2 id="k3s">K3S</h2>
-<p>由于Kubernetes占用资源较多，所以无法在我的阿里云ECS部署，这里采用K3S。官网对它的描述是”Lightweight Kubernetes“即轻量化Kubernetes，是为物联网和边缘计算打造的经认证的Kubernetes发行版。</p>
-<h2 id="github-action">GitHub Action</h2>
-<p>GitHub Actions 是 GitHub 提供的持续集成和持续部署（CI/CD）服务，它允许你在代码仓库中定义自动化流程，从而在特定事件发生时自动执行一系列任务，比如：</p>
-<ul>
-<li>push 或 PR 时自动运行测试</li>
-<li>构建和发布 Docker 镜像</li>
-<li>部署代码到服务器或 Kubernetes 集群</li>
-<li>静态分析、格式检查、打包发布等</li>
-</ul>
-<h1 id="heading-2">准备阶段</h1>
-<h2 id="ecsk3s">阿里云ECS安装K3S</h2>
-<p>由于网络原因，阿里云服务器访问GitHub服务会超时，所以参考官方文档会发生超时的错误。然后我使用了以下方法安装K3S</p>
-<pre><code>wget https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh
-INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=&quot;--system-default-registry registry.cn-hangzhou.aliyuncs.com --tls-san 8.130.108.60&quot; ./k3s-install.sh
+    <p>本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。</p>
+<p>演示地址：<a href="https://www.windrunner0707.tech/">https://www.windrunner0707.tech/</a></p>
+<!-- more -->
+<h1 id="heading">整体架构</h1>
+<p>一次代码提交会经过下面这条链路：</p>
+<pre><code class="language-text">GitHub push
+    ↓
+GitHub Actions：编译、构建镜像
+    ↓
+阿里云 ACR：保存容器镜像
+    ↓
+SSH 登录 ECS，执行 kubectl
+    ↓
+K3s：Deployment → Service → Traefik Ingress → HTTPS 域名
 </code></pre>
-<p>首先，安装 K3s 使用的是存储在阿里云对象存储上的 K3s 安装脚本，并且使用存储在国内 channel 去解析对应的 K3s 版本。</p>
-<p>其次，通过 INSTALL_K3S_MIRROR=cn 环境变量来指定 K3s 的二进制文件从国内的阿里云对象存储上去拉取。</p>
-<p>最后，通过&ndash;system-default-registry参数来指定 K3s 的系统镜像从国内的阿里云镜像仓库去拉取。</p>
-<h2 id="heading-3">准备代码仓库</h2>
-<p>这里我准备了后端常用的Spring Boot代码仓库和React + Vite代码仓库，具体代码仓库如下：</p>
-<p>前端：https://github.com/windrunner0707/transaction-system-frontend</p>
-<p>后端：https://github.com/windrunner0707/transaction-system</p>
-<p>工程的搭建主要依赖于ChatGPT，并且保证本地能打包成功</p>
-<h1 id="heading-4">部署阶段</h1>
-<h2 id="dockerfile">配置Dockerfile</h2>
-<p>Dockerfile主要用来打包前后端镜像，并push到阿里云ACR镜像仓库。</p>
-<p>前端Dockerfile如下：</p>
-<pre><code>## 构建阶段
+<p>本项目使用的主要组件如下：</p>
+<ul>
+<li><strong>ChatGPT</strong>：辅助搭建 Spring Boot、React + Vite 项目并生成配置文件。</li>
+<li><strong>阿里云 ECS</strong>：2 vCPU、2 GB 内存、3 Mbps 带宽，用于运行 K3s。</li>
+<li><strong>阿里云 ACR</strong>：保存前后端容器镜像，减少服务器从 Docker Hub 拉取镜像时的不确定性。</li>
+<li><strong>K3s</strong>：轻量级 Kubernetes 发行版，更适合资源有限的单机环境。</li>
+<li><strong>GitHub Actions</strong>：在推送代码后自动编译、构建镜像并部署。</li>
+</ul>
+<blockquote>
+<p>本文适合学习和个人项目。生产环境还需要补充高可用、监控、备份、权限隔离与回滚策略。</p>
+</blockquote>
+<h1 id="heading-1">一、准备云端资源</h1>
+<h2 id="1--ecs--acr">1. 创建 ECS 与 ACR</h2>
+<p>我的 ECS 配置如下：</p>
+<p><img src="/post-images/1750337198199.png" alt="阿里云 ECS 实例" /></p>
+<p>在阿里云容器镜像服务中创建个人版实例、命名空间和镜像仓库。后续 GitHub Actions 会将构建好的镜像推送到这里。</p>
+<p><img src="/post-images/1750337576420.png" alt="阿里云 ACR 镜像仓库" /></p>
+<p>同时在 ECS 安全组中按需放行 SSH、HTTP 和 HTTPS 端口。数据库端口不应直接暴露到公网。</p>
+<h2 id="2--k3s">2. 安装 K3s</h2>
+<p>服务器访问 GitHub 不稳定时，可以使用 K3s 的国内镜像安装脚本：</p>
+<pre><code class="language-bash">wget https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh
+chmod +x k3s-install.sh
+
+INSTALL_K3S_MIRROR=cn \
+INSTALL_K3S_EXEC=&quot;--system-default-registry registry.cn-hangzhou.aliyuncs.com&quot; \
+./k3s-install.sh
+</code></pre>
+<p>这里的两个关键配置分别是：</p>
+<ul>
+<li><code>INSTALL_K3S_MIRROR=cn</code>：通过国内镜像获取 K3s 二进制文件。</li>
+<li><code>--system-default-registry</code>：为 K3s 系统镜像指定国内镜像仓库。</li>
+</ul>
+<p>安装后检查节点状态：</p>
+<pre><code class="language-bash">sudo kubectl get nodes
+sudo systemctl status k3s --no-pager
+</code></pre>
+<p>节点状态为 <code>Ready</code> 后再继续部署。</p>
+<h1 id="heading-2">二、准备项目</h1>
+<p>本文使用两个代码仓库：</p>
+<ul>
+<li>前端：<a href="https://github.com/windrunner0707/transaction-system-frontend">transaction-system-frontend</a>，技术栈为 React + Vite。</li>
+<li>后端：<a href="https://github.com/windrunner0707/transaction-system">transaction-system</a>，技术栈为 Spring Boot。</li>
+</ul>
+<p>在接入 CI/CD 前，应先确保两个项目都能在本地完成编译和打包。不要把“能否构建”的问题留到部署阶段排查。</p>
+<h2 id="1--dockerfile">1. 前端 Dockerfile</h2>
+<p>前端使用多阶段构建：Node.js 负责生成静态文件，Nginx 负责提供 Web 服务。</p>
+<pre><code class="language-dockerfile"># 构建阶段
 FROM node:20-alpine AS builder
 WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
 COPY . .
-RUN npm install &amp;&amp; npm run build
+RUN npm run build
 
 # 运行阶段
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-</code></pre>
-<p>后端Dockerfile如下：</p>
-<pre><code># Start with a base image containing Java runtime
-FROM openjdk:21-jdk-slim
 
-# Set the working directory
+EXPOSE 80
+</code></pre>
+<p>相比先复制全部文件再执行 <code>npm install</code>，先复制依赖清单并使用 <code>npm ci</code> 更容易利用 Docker 构建缓存，也能保证依赖版本与锁文件一致。</p>
+<h2 id="2--dockerfile">2. 后端 Dockerfile</h2>
+<p>后端先由 Maven 生成 JAR，再制作只包含运行环境的镜像：</p>
+<pre><code class="language-dockerfile">FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Copy the built jar file into the container
-COPY target/transaction-system-0.0.1-SNAPSHOT.jar /app/transaction-system.jar
+COPY target/transaction-system-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose the port the application runs on
 EXPOSE 8080
-
-# Set the command to run the application
-CMD [&quot;java&quot;, &quot;-jar&quot;, &quot;transaction-system.jar&quot;]
+ENTRYPOINT [&quot;java&quot;, &quot;-jar&quot;, &quot;/app/app.jar&quot;]
 </code></pre>
-<h2 id="github-action-1">配置GitHub Action</h2>
-<p>GitHub Action功能主要在代码仓库中创建这样一个yaml配置文件来使用</p>
-<p><img src="/post-images/1750338735496.png" alt="" /></p>
-<p>其yaml配置文件内容如下：</p>
-<pre><code>name: Build and Deploy to K3s
+<p>实际项目可以进一步使用固定版本的基础镜像，并配置非 root 用户、JVM 内存上限和健康检查。</p>
+<h1 id="-github-actions">三、配置 GitHub Actions</h1>
+<p>在仓库中创建 <code>.github/workflows/deploy.yml</code>：</p>
+<p><img src="/post-images/1750338735496.png" alt="GitHub Actions 工作流目录" /></p>
+<p>下面以后端为例。工作流使用 Git 提交 SHA 作为镜像标签，避免 <code>latest</code> 带来的版本不可追踪问题。</p>
+<pre><code class="language-yaml">name: Build and deploy to K3s
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
 
 env:
   IMAGE_NAME: transaction-system
@@ -299,31 +327,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          distribution: temurin
+          java-version: &quot;21&quot;
+          cache: maven
 
-      - name: Build with Maven
-        run: mvn clean package -DskipTests
+      - name: Build and test
+        run: ./mvnw --batch-mode clean verify
 
       - name: Log in to ACR
-        run: echo &quot;${{ secrets.ACR_PASSWORD }}&quot; | docker login ${{ env.ACR_REGISTRY }} -u &quot;${{ secrets.ACR_USERNAME }}&quot; --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build Docker Image
-        run: |
-          docker build -t $ACR_REGISTRY/$ACR_NAMESPACE/$IMAGE_NAME:latest .
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-      - name: Push Docker Image to ACR
-        run: |
-          docker push $ACR_REGISTRY/$ACR_NAMESPACE/$IMAGE_NAME:latest
-
-      - name: Upload deployment.yaml to server
-        uses: appleboy/scp-action@v0.1.4
+      - name: Upload Kubernetes manifest
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -331,44 +363,68 @@ jobs:
           source: deployment.yaml
           target: /home/${{ secrets.SERVER_USER }}/deploy
 
-      - name: Deploy to K3s via SSH
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Deploy to K3s
+        uses: appleboy/ssh-action@v1
+        env:
+          IMAGE: ${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: IMAGE
           script: |
             export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-            kubectl delete deployment transaction-system --ignore-not-found
             kubectl apply -f /home/${{ secrets.SERVER_USER }}/deploy/deployment.yaml
+            kubectl set image deployment/transaction-system transaction-system=&quot;$IMAGE&quot;
+            kubectl rollout status deployment/transaction-system --timeout=120s
 </code></pre>
-<p>主要步骤为：设置环境 -&gt; Maven打包 -&gt; 登陆阿里云ACR -&gt; 打包Docker镜像 -&gt; push Docker镜像 -&gt; 上传K8S配置文件至阿里云ECS -&gt; 登陆ECS服务器使用kubectl完成部署。</p>
-<p>将配置文件push至GitHub仓库后，可以在Actions下看到该pipeline的所有流程，如图所示：</p>
-<p><img src="/post-images/1750339084011.png" alt="" /></p>
-<h2 id="heading-5">检查服务部署情况</h2>
-<p>登陆至ECS服务器，使用kubectl get pods命令可以查看前后端部署的Pods情况</p>
-<p><img src="/post-images/1750339210712.png" alt="" /></p>
-<h2 id="heading-6">域名解析</h2>
-<p>在阿里云购买域名后，使用云解析DNS，将域名解析到我们的ECS服务器，并填写个人资料，完成备案流程</p>
-<p><img src="/post-images/1750339466100.png" alt="" /></p>
-<h2 id="https">配置HTTPS</h2>
-<p>在阿里云数字证书管理服务购买个人测试用的免费证书，一般有效期为3个月</p>
-<p><img src="/post-images/1750339585045.png" alt="" /></p>
-<p>然后下载公钥与私钥，上传到ECS服务器</p>
-<p><img src="/post-images/1750339731140.png" alt="" /></p>
-<p>将密钥加入K8S的Secret</p>
-<pre><code>kubectl create secret tls windrunner-tls   --cert=www.windrunner0707.tech.pem   --key=www.windrunner0707.tech.key   --namespace=default
+<p>需要在 GitHub 仓库的 <code>Settings → Secrets and variables → Actions</code> 中配置：</p>
+<ul>
+<li><code>ACR_USERNAME</code>、<code>ACR_PASSWORD</code>：ACR 登录凭据。</li>
+<li><code>SERVER_HOST</code>、<code>SERVER_USER</code>：ECS 地址和 SSH 用户。</li>
+<li><code>SERVER_SSH_KEY</code>：用于部署的 SSH 私钥。</li>
+</ul>
+<p>不要把密码、私钥或证书直接写入仓库。为部署账户授予完成任务所需的最小权限，并为 ACR 凭据和 SSH 密钥设置轮换策略。</p>
+<p>这条流水线依次完成代码检出、Maven 构建与测试、ACR 登录、镜像构建与推送、配置文件上传，以及 K3s 滚动更新。提交代码后，可以在仓库的 Actions 页面查看每一步日志：</p>
+<p><img src="/post-images/1750339084011.png" alt="GitHub Actions 执行结果" /></p>
+<h1 id="heading-3">四、验证部署</h1>
+<p>登录 ECS 后检查资源和滚动发布状态：</p>
+<pre><code class="language-bash">export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+kubectl get nodes
+kubectl get deployments,pods,services,ingress
+kubectl rollout status deployment/transaction-system
 </code></pre>
-<p><img src="/post-images/1750339865254.png" alt="" /></p>
-<p>配置Ingress并开启HTTPS</p>
-<pre><code>apiVersion: networking.k8s.io/v1
+<p>如果 Pod 启动失败，可以继续查看事件和容器日志：</p>
+<pre><code class="language-bash">kubectl describe pod &lt;pod-name&gt;
+kubectl logs &lt;pod-name&gt; --tail=200
+</code></pre>
+<p><img src="/post-images/1750339210712.png" alt="K3s 中的 Pod 运行状态" /></p>
+<h1 id="-https">五、配置域名与 HTTPS</h1>
+<h2 id="1-">1. 域名解析</h2>
+<p>在阿里云云解析 DNS 中添加记录，将域名指向 ECS 公网 IP。中国内地服务器对外提供网站服务时，还需要按要求完成备案。</p>
+<p><img src="/post-images/1750339466100.png" alt="阿里云 DNS 解析记录" /></p>
+<h2 id="2--tls-">2. 导入 TLS 证书</h2>
+<p>可以在阿里云数字证书管理服务中申请证书：</p>
+<p><img src="/post-images/1750339585045.png" alt="申请 HTTPS 证书" /></p>
+<p>下载证书后，将公钥和私钥安全地传到服务器。不要将私钥提交到 Git 仓库，也不要通过聊天工具明文传递。</p>
+<p><img src="/post-images/1750339731140.png" alt="下载证书文件" /></p>
+<p>在 K3s 中创建 TLS Secret：</p>
+<pre><code class="language-bash">kubectl create secret tls windrunner-tls \
+  --cert=www.windrunner0707.tech.pem \
+  --key=www.windrunner0707.tech.key \
+  --namespace=default
+</code></pre>
+<p><img src="/post-images/1750339865254.png" alt="创建 TLS Secret" /></p>
+<h2 id="3--ingress">3. 配置 Ingress</h2>
+<p>K3s 默认集成 Traefik，可以通过 Ingress 将域名流量转发到前端 Service：</p>
+<pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frontend-ingress
   namespace: default
-  annotations:
-    kubernetes.io/ingress.class: traefik
 spec:
+  ingressClassName: traefik
   tls:
     - hosts:
         - www.windrunner0707.tech
@@ -385,8 +441,21 @@ spec:
                 port:
                   number: 80
 </code></pre>
-<h1 id="todo">后续开发（TODO）</h1>
-<p>至此已完成了一个Demo的部署，后续还有前后端的连通，开发更多feature</p>
+<p>应用配置并验证：</p>
+<pre><code class="language-bash">kubectl apply -f ingress.yaml
+kubectl get ingress frontend-ingress
+curl -I https://www.windrunner0707.tech/
+</code></pre>
+<h1 id="heading-4">六、后续优化方向</h1>
+<p>至此，一个从代码提交到 HTTPS 访问的最小部署链路已经完成。接下来可以继续补齐：</p>
+<ul>
+<li>使用 <code>readinessProbe</code> 和 <code>livenessProbe</code> 改善发布可靠性。</li>
+<li>为前后端配置 CPU、内存请求和上限，避免单个 Pod 占满服务器。</li>
+<li>使用 cert-manager 自动签发和续期证书。</li>
+<li>增加日志、指标监控、数据库备份和告警。</li>
+<li>为 GitHub Actions 固定第三方 Action 的提交摘要，并增加环境审批与回滚流程。</li>
+<li>完成前后端联调，将敏感配置统一放入 Kubernetes Secret。</li>
+</ul>
 
   </div>
 
