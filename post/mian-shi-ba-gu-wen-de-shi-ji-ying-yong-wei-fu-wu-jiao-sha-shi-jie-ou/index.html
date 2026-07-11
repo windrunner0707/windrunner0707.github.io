@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+
+
+<style>:root { --heatmap-color: #39d353; }</style>
+
+
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('flavor-theme');
+      var theme = saved || 'dark';
+      if (theme === 'light') {
+        document.documentElement.classList.add('theme-light');
+      }
+    } catch (e) { }
+  })();
+</script>
+  <meta name="generator" content="Gridea Pro 1.2.2">
+  <title>面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦 | 0707‘s Blog</title>
+  
+<meta property="og:title" content="面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦" />
+<meta property="og:type" content="article" />
+
+<meta property="og:image" content="/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg" />
+
+
+<meta name="description" content="很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。">
+<link rel="canonical" href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/","description":"很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。","image":"/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg","datePublished":"2025-12-25T00:00:00+08:00","dateModified":"2026-07-11T16:50:35+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/","name":"面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦","position":2}]}</script>
+<meta property="og:title" content="面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦">
+<meta property="og:description" content="很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。">
+<meta property="og:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="0707‘s Blog">
+<meta property="og:image" content="/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/">
+<meta name="twitter:title" content="面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦">
+<meta name="twitter:description" content="很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。">
+<meta name="twitter:image" content="/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg">
+</head>
+<body class="flavor-theme">
+
+  <header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <div class="top-bar">
+
+      
+      <div class="top-bar__left">
+        
+        <a href="https://windrunner0707.tech" class="site-avatar-link" aria-label="返回首页">
+          <img class="site-avatar" src="/images/avatar.png" alt="0707‘s Blog" />
+        </a>
+        
+        <a href="https://windrunner0707.tech" class="site-name-link">0707‘s Blog</a>
+      </div>
+
+      
+      <nav class="top-bar__nav" id="sectionBar">
+        
+        
+        <a class="nav-item" href="/">首页</a>
+        
+        <a class="nav-item" href="/post">博客</a>
+        
+        <a class="nav-item" href="/memos">闪念</a>
+        
+        <a class="nav-item" href="/archives">归档</a>
+        
+        <a class="nav-item" href="/tags">标签</a>
+        
+        <a class="nav-item" href="/links">友链</a>
+        
+        <a class="nav-item" href="/post/about">关于</a>
+        
+        
+      </nav>
+
+      
+      <div class="top-bar__right">
+        <button class="btn-icon btn-search search-btn" id="btnSearch" type="button" aria-label="搜索">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-sun" id="themeToggleSun" type="button"
+          aria-label="切换到浅色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"></path>
+            <path d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"></path>
+            <path d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"></path>
+            <path d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"></path>
+            <path d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"></path>
+            <path d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"></path>
+            <path d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"></path>
+            <path d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-moon" id="themeToggleMoon" type="button"
+          aria-label="切换到深色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"></path>
+            <path d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon btn-nav-toggle mobile-only" id="btnNavToggle" type="button" aria-label="切换导航">
+          <div class="hamburger" id="hamburger">
+            <span class="hamburger__line hamburger__line--top"></span>
+            <span class="hamburger__line hamburger__line--bottom"></span>
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+<div class="header-spacer"></div>
+
+<script>
+(function(){
+  var btn = document.getElementById('btnNavToggle');
+  var nav = document.getElementById('sectionBar');
+  var hamburger = document.getElementById('hamburger');
+  if (btn && nav) {
+    btn.addEventListener('click', function(){
+      nav.classList.toggle('top-bar__nav--open');
+      if (hamburger) hamburger.classList.toggle('is-active');
+    });
+    nav.querySelectorAll('.nav-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        nav.classList.remove('top-bar__nav--open');
+        if (hamburger) hamburger.classList.remove('is-active');
+      });
+    });
+  }
+
+  var root = document.documentElement;
+  var applyTheme = function(theme, persist){
+    if (theme === 'light') {
+      root.classList.add('theme-light');
+    } else {
+      root.classList.remove('theme-light');
+    }
+    if (persist) {
+      try { localStorage.setItem('flavor-theme', theme); } catch (e) {}
+    }
+  };
+  document.querySelectorAll('.theme-toggle').forEach(function(el){
+    el.addEventListener('click', function(){
+      applyTheme(root.classList.contains('theme-light') ? 'dark' : 'light', true);
+    });
+  });
+})();
+</script>
+
+  <main class="site-main" role="main">
+    
+<article class="article-container">
+  <header class="article-header">
+    <h1 class="article-title">面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦</h1>
+    <div class="article-meta">
+      
+      
+      <a href="/category/ji-shu/" class="article-meta__category">技术</a>
+      
+      
+      <span class="article-meta__sep">·</span>
+      
+      <span class="article-meta__item">2025-12-25</span>
+      
+      <span class="article-meta__sep">·</span>
+      <span class="article-meta__item">10 分钟阅读</span>
+      
+    </div>
+    
+    <div class="article-header__tags">
+      
+      <a href="/tag/mian-shi-ba-gu-wen/" class="tag-pill tag-pill--sm">面试八股文</a>
+      
+      <a href="/tag/wei-fu-wu/" class="tag-pill tag-pill--sm">微服务</a>
+      
+      <a href="/tag/jia-gou-she-ji/" class="tag-pill tag-pill--sm">架构设计</a>
+      
+    </div>
+    
+  </header>
+
+  
+  <div class="article-feature">
+    <img src="/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg" alt="面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦" />
+  </div>
+  
+
+  <div class="article-content">
+    <p>很多面试题看起来像是在背概念：微服务为什么要独立数据库？<code>ThreadLocal</code> 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？</p>
+<p>但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。</p>
+<p>本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、<code>ThreadLocal</code> 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。</p>
+<!-- more -->
+<h2 id="heading">一、项目背景：服务拆开了，数据库却没有拆开</h2>
+<p>系统中已经存在商品服务和库存服务。从部署形态上看，它们是两个微服务；但从数据层看，两个服务仍然访问同一个数据库，而且数据库中混杂了商品、库存等多个业务领域的数据表。</p>
+<p>这种架构属于“应用层拆分、数据层未拆分”。它在微服务改造初期很常见，但会留下几个问题：</p>
+<ul>
+<li>商品服务可以绕过库存服务，直接查询甚至修改库存表；</li>
+<li>库存服务也可能依赖商品领域的表结构；</li>
+<li>一方修改表结构，另一方可能被动受到影响；</li>
+<li>两个服务无法真正独立发布、扩容和演进；</li>
+<li>数据库成为隐藏的集成层，服务边界只停留在代码和部署层面。</li>
+</ul>
+<p>“微服务独享数据库”这道面试题，在这里不再是一句原则。它真正想解决的是数据所有权：一个领域的数据只能由拥有该领域的服务管理，其他服务必须通过稳定的契约访问它。</p>
+<p>因此，本次改造的目标不是简单地把表复制到另一个库，而是让商品服务不再直接读取库存领域的数据。最终，库存数据由库存服务负责，商品服务只能通过 HTTP 接口获取。</p>
+<h2 id="heading-1">二、为什么不能一次性切换</h2>
+<p>最直接的方案是修改商品服务的代码，把原有数据库查询全部替换成库存服务 HTTP 调用，然后一次发布上线。</p>
+<p>但真实生产环境很少允许这样做。新接口可能存在字段映射错误、超时、容量不足或边界场景遗漏。一旦全量切换出现问题，影响的是所有流量；如果回滚还需要重新发版，故障恢复时间会被拉长。</p>
+<p>这正是绞杀者模式（Strangler Fig Pattern）的典型使用场景：保留旧能力，在外围逐步建立新能力，让流量分批迁移，确认稳定后再删除旧实现。</p>
+<p>在本项目中，两条链路并存：</p>
+<pre><code class="language-text">Toggle 关闭：业务接口 -&gt; 原有 DAO -&gt; 共享数据库
+Toggle 开启：业务接口 -&gt; HTTP Client -&gt; 库存服务 -&gt; 库存数据库
+</code></pre>
+<p>旧链路提供稳定基线和快速回退能力，新链路承载未来架构。Toggle 决定当前请求走哪条链路。</p>
+<p>这也是灰度发布相关八股文的实际含义：灰度不只是“先发一台机器”，还可以是在同一版本中保留两套实现，通过配置动态选择执行路径。</p>
+<h2 id="toggle-">三、Toggle 设计：把切换能力放在请求上下文中</h2>
+<p>项目使用 Apollo 管理动态配置。运维或研发人员可以在不重新发版的情况下修改开关，使指定接口在新旧链路之间切换。</p>
+<p>核心实现是一个枚举单例：</p>
+<pre><code class="language-java">public enum ToggleUtils {
+    INSTANCE;
+
+    private final ThreadLocal&lt;Boolean&gt; toggle = new ThreadLocal&lt;&gt;();
+
+    public void set(Boolean toggle) {
+        this.toggle.set(toggle);
+    }
+
+    public boolean isOn() {
+        return Boolean.TRUE.equals(toggle.get());
+    }
+
+    public void remove() {
+        toggle.remove();
+    }
+}
+</code></pre>
+<p>这里同时对应三个常见知识点。</p>
+<h3 id="1-">1. 为什么使用枚举单例</h3>
+<p>Toggle 工具类本身不需要保存多份实例。枚举单例写法简洁，并且由 JVM 保证实例唯一，天然避免反射和反序列化创建额外实例的问题。</p>
+<p>不过需要注意：单例只保证 <code>ToggleUtils</code> 实例唯一，并不代表所有请求共享同一个 Toggle 值。真正实现请求隔离的是内部的 <code>ThreadLocal</code>。</p>
+<h3 id="2--threadlocal">2. 为什么使用 ThreadLocal</h3>
+<p>一次请求会经过 Controller、Service、DAO 或 HTTP Client 等多层调用。如果在每一层方法参数中都增加 <code>boolean toggle</code>，会污染大量接口，而且很多中间方法只负责透传这个参数。</p>
+<p><code>ThreadLocal</code> 把 Toggle 值绑定到当前线程。入口处设置一次，同一线程中的下游代码便可随时读取，不需要逐层修改方法签名。</p>
+<p>它适合保存这类与单次请求相关、需要跨层传递的上下文信息，例如 traceId、租户 ID、用户信息和灰度标记。</p>
+<h3 id="3--remove">3. 为什么必须 remove</h3>
+<p>Web 容器通常使用线程池处理请求。请求结束后，工作线程不会销毁，而是回到线程池等待下一次复用。如果只调用 <code>set()</code> 而不调用 <code>remove()</code>，下一个请求可能读到上一个请求遗留的开关值，产生流量串线。</p>
+<p>对于 <code>ThreadLocal</code>，内存泄漏只是风险之一；在这个场景中，更危险的是业务上下文污染。因此必须在 <code>finally</code> 语义下清理。</p>
+<h2 id="aop">四、AOP：统一完成开关的读取与清理</h2>
+<p>如果每个接口都手工读取 Apollo 配置、写入 <code>ThreadLocal</code>，再在结束时清理，代码会重复且容易漏掉。项目使用注解和 AOP 统一处理这类横切逻辑。</p>
+<p>整体过程如下：</p>
+<pre><code class="language-text">请求进入
+  -&gt; AOP 根据注解取得当前接口的 URI
+  -&gt; 读取 Apollo 中该 URI 对应的 Toggle
+  -&gt; 写入 ThreadLocal
+  -&gt; 执行业务代码
+  -&gt; 根据 Toggle 选择 HTTP 或原数据库查询
+  -&gt; 请求结束后清理 ThreadLocal
+</code></pre>
+<p>示意代码如下：</p>
+<pre><code class="language-java">@Around(&quot;@annotation(toggleRoute)&quot;)
+public Object route(ProceedingJoinPoint point, ToggleRoute toggleRoute) throws Throwable {
+    boolean enabled = toggleService.isEnabled(toggleRoute.uri());
+    ToggleUtils.INSTANCE.set(enabled);
+    try {
+        return point.proceed();
+    } finally {
+        ToggleUtils.INSTANCE.remove();
+    }
+}
+</code></pre>
+<p>原设计使用 <code>@Before</code> 获取注解中的 URI，并在 <code>@After</code> 清理。实际编码时更推荐 <code>@Around + try/finally</code>，因为它能更直观地保证：无论业务正常返回还是抛出异常，清理逻辑都会执行。</p>
+<p>AOP 在这里没有承载业务规则。它只负责所有接口都需要的通用动作：读取配置、建立上下文和释放上下文。这就是 AOP 适合解决的问题——关注点横跨多个业务模块，但又不属于任何一个具体领域。</p>
+<h2 id="threadlocal-">五、同步与异步：ThreadLocal 为什么会失效</h2>
+<p>同步调用中，请求的入口和下游逻辑通常在同一个线程执行，因此可以直接从 <code>ThreadLocal</code> 读取 Toggle：</p>
+<pre><code class="language-java">public StockInfo queryStock(String skuId) {
+    if (ToggleUtils.INSTANCE.isOn()) {
+        return inventoryClient.queryStock(skuId);
+    }
+    return legacyStockRepository.queryStock(skuId);
+}
+</code></pre>
+<p>但异步任务提交到线程池后，会切换到另一个线程。普通 <code>ThreadLocal</code> 的数据不会自动传播到新线程，所以异步线程中读取到的可能是 <code>null</code>，也可能在错误实现下读到线程池残留的旧值。</p>
+<p>PDF 中给出的处理思路是：在进入异步线程之前，从当前线程取出 Toggle，然后显式作为参数向下传递。</p>
+<pre><code class="language-java">boolean toggle = ToggleUtils.INSTANCE.isOn();
+
+executor.execute(() -&gt; {
+    if (toggle) {
+        inventoryClient.refreshStock();
+    } else {
+        legacyStockRepository.refreshStock();
+    }
+});
+</code></pre>
+<p>显式传参虽然朴素，却最容易理解和验证。若系统中有大量上下文需要在线程池间传播，也可以使用任务装饰器统一复制和清理上下文，但仍要避免直接依赖 <code>InheritableThreadLocal</code>：线程池中的线程通常早已创建，它并不能可靠解决线程复用下的上下文传递问题。</p>
+<h2 id="-http-">六、从本地查询变成 HTTP 调用，代价不只是多了一次网络请求</h2>
+<p>Toggle 开启后，原来的进程内数据库查询变成跨服务 HTTP 调用。数据库解耦带来了更清晰的领域边界，也引入了分布式系统的新问题。</p>
+<h3 id="1--1">1. 超时</h3>
+<p>HTTP Client 必须设置连接超时和读取超时。没有超时的远程调用可能长期占用业务线程，最终拖垮商品服务的线程池。</p>
+<p>超时时间不能简单设置得越长越好。它需要小于上游请求的剩余时间预算，并为重试、降级和响应返回预留空间。</p>
+<h3 id="2-">2. 重试与幂等</h3>
+<p>查询接口通常可以在有限次数内重试，但应只对超时、连接失败等瞬时故障重试，不能对所有异常无差别重试。否则库存服务故障时，重试会放大流量，形成重试风暴。</p>
+<p>如果未来迁移写接口，还必须考虑幂等键、重复请求和“请求已成功但响应丢失”等问题。读接口的切换只是解耦的第一步。</p>
+<h3 id="3-">3. 熔断、隔离与降级</h3>
+<p>库存服务异常时，商品服务不能无限等待。应通过线程池或信号量隔离、熔断和限流控制故障范围。</p>
+<p>是否允许 Toggle 自动回退到旧数据库，需要谨慎决定。自动回退可以提高可用性，但也可能掩盖新旧数据不一致，并让已经计划下线的数据库依赖长期存在。更稳妥的做法是明确降级策略，并记录每一次回退。</p>
+<h3 id="4-">4. 接口契约</h3>
+<p>共享数据库时，调用方依赖的是表结构；改成 HTTP 后，依赖变成 API 契约。库存服务应返回稳定的领域模型，而不是把数据库字段原样暴露出去。</p>
+<p>接口需要明确字段语义、空值规则、错误码、版本兼容策略和分页方式。否则只是把“表耦合”替换成“接口耦合”。</p>
+<h2 id="heading-2">七、如何安全地完成灰度切换</h2>
+<p>有了 Toggle，并不等于迁移就安全了。完整的切换过程还需要可观测、可验证和可回滚。</p>
+<h3 id="heading-3">阶段一：建立新链路，但默认关闭</h3>
+<p>先完成库存服务接口和商品服务 HTTP Client，上线时保持 Toggle 关闭。此时线上仍走旧数据库，主要验证代码发布没有副作用。</p>
+<h3 id="heading-4">阶段二：影子读与结果比对</h3>
+<p>在条件允许时，可以仍以旧链路结果为准，同时异步调用新链路，把两边的结果进行比对，但不影响用户响应。</p>
+<p>比对时不能只比较整个 JSON 是否完全相同，还要区分：</p>
+<ul>
+<li>真正的数据不一致；</li>
+<li>字段默认值或排序差异；</li>
+<li>新旧链路读取时间不同造成的短暂差异；</li>
+<li>接口转换逻辑造成的精度、单位或空值差异。</li>
+</ul>
+<h3 id="heading-5">阶段三：小流量开启</h3>
+<p>按接口、租户、门店、用户哈希或机器维度逐步放量。Apollo 负责动态配置，Toggle 负责请求级路由。</p>
+<p>重点观察新旧链路的请求量、成功率、P95/P99 延迟、超时率、错误码分布、线程池队列、连接池使用率以及结果差异率。</p>
+<h3 id="heading-6">阶段四：全量切换并保留观察期</h3>
+<p>新链路全量运行后，旧链路暂时保留，但不再承接正常流量。观察期内如果出现严重问题，可以快速关闭 Toggle 回退。</p>
+<h3 id="heading-7">阶段五：删除旧链路</h3>
+<p>绞杀式重构的终点不是 Toggle 永久存在。确认新链路稳定后，应删除旧 DAO、共享库账号、相关配置和双路判断代码。</p>
+<p>只有撤销商品服务对库存表的数据库权限，数据所有权才算真正收回。否则旧路径虽然不再使用，架构耦合依然存在。</p>
+<h2 id="heading-8">八、这个项目把哪些“八股文”串了起来</h2>
+<p>回看整个项目，会发现多个面试知识点都对应着真实的工程决策：</p>
+<table>
+<thead>
+<tr>
+<th>八股知识点</th>
+<th>项目中的实际作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>微服务独立数据库</td>
+<td>明确商品与库存的数据所有权，避免跨领域直接操作表</td>
+</tr>
+<tr>
+<td>DDD / 限界上下文</td>
+<td>判断哪些表、模型和能力属于商品领域，哪些属于库存领域</td>
+</tr>
+<tr>
+<td>绞杀者模式</td>
+<td>保留旧链路并逐步迁移流量，降低一次性重构风险</td>
+</tr>
+<tr>
+<td>配置中心 Apollo</td>
+<td>动态管理开关，无需发版即可放量或回滚</td>
+</tr>
+<tr>
+<td>AOP</td>
+<td>统一读取接口配置、建立和清理请求上下文</td>
+</tr>
+<tr>
+<td>单例模式</td>
+<td>提供全局唯一的 Toggle 上下文管理入口</td>
+</tr>
+<tr>
+<td>ThreadLocal</td>
+<td>在同步调用链中传递请求级灰度标记</td>
+</tr>
+<tr>
+<td>线程池与异步编程</td>
+<td>解释上下文为何丢失，并决定显式传参或统一包装任务</td>
+</tr>
+<tr>
+<td>HTTP / RPC 治理</td>
+<td>处理超时、重试、熔断、隔离、限流和接口契约</td>
+</tr>
+<tr>
+<td>灰度发布</td>
+<td>小流量验证新链路，用指标决定是否继续放量</td>
+</tr>
+<tr>
+<td>可观测性</td>
+<td>用日志、指标和链路追踪证明新链路是否可靠</td>
+</tr>
+</tbody>
+</table>
+<p>所以，“八股文”真正有价值的学习方式，不是记住一个标准答案，而是继续追问三个问题：它解决什么工程问题？它有什么适用边界？使用后又会引入什么新问题？</p>
+<h2 id="heading-9">九、容易踩的坑</h2>
+<p>最后总结几个在类似改造中尤其需要注意的点：</p>
+<ol>
+<li><strong>把 Toggle 当成永久架构。</strong> Toggle 是迁移脚手架，不是最终业务模型。长期保留会让测试组合成倍增加。</li>
+<li><strong>只切代码，不收数据库权限。</strong> 调用方仍有权限直连领域表，就无法阻止未来再次产生耦合。</li>
+<li><strong>ThreadLocal 未清理。</strong> 在线程池环境中会造成请求上下文串线，必须在 <code>finally</code> 中 <code>remove()</code>。</li>
+<li><strong>异步任务直接读取 ThreadLocal。</strong> 切换线程后上下文不会可靠继承，应在提交任务前捕获并显式传递。</li>
+<li><strong>无条件自动回退。</strong> 回退可能提高可用性，也可能隐藏数据问题；必须监控并限制。</li>
+<li><strong>只看成功率，不看数据正确性。</strong> HTTP 200 不代表库存结果正确，新旧结果比对是迁移期间的重要证据。</li>
+<li><strong>全量后立即删除旧链路。</strong> 应先经过稳定观察期，但也要为最终删除设定明确日期和验收条件。</li>
+</ol>
+<h2 id="heading-10">总结</h2>
+<p>商品与库存解耦表面上是一次数据库拆分，实质上是数据所有权、服务边界和调用关系的重新建立。</p>
+<p>绞杀者模式解决迁移节奏问题，Apollo 和 Toggle 提供动态放量与回滚能力，AOP 负责统一建立请求上下文，<code>ThreadLocal</code> 负责同步链路中的上下文传递，显式参数解决异步线程切换，而超时、重试、熔断和可观测性则为新的 HTTP 链路兜底。</p>
+<p>这些知识点单独出现时像是面试题，组合起来时就是一套能够落地的重构方案。真正理解八股文，不是能够背出定义，而是能在复杂约束下知道为什么选它、怎样用它，以及什么时候应该把它删掉。</p>
+
+  </div>
+
+  
+  <nav class="post-nav">
+    
+    <a href="/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/" class="post-nav-card post-nav-card--prev">
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun.jpg" alt="一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂" loading="lazy" />
+      </div>
+      
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">上一篇</span>
+        <span class="post-nav-card__title">一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂</span>
+      </div>
+      <span class="post-nav-card__arrow">&larr;</span>
+    </a>
+    
+    
+    <a href="/post/kubernetes-ji-chu-zu-jian-xiang-jie/" class="post-nav-card post-nav-card--next">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">下一篇</span>
+        <span class="post-nav-card__title">Kubernetes基础组件详解</span>
+      </div>
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp" alt="Kubernetes基础组件详解" loading="lazy" />
+      </div>
+      
+      <span class="post-nav-card__arrow">&rarr;</span>
+    </a>
+    
+  </nav>
+
+  
+  
+
+
+</article>
+
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-inner">
+
+    
+    
+    <nav class="footer-nav" aria-label="页脚导航">
+      
+      <a class="footer-nav__link" href="/">首页</a>
+      
+      <a class="footer-nav__link" href="/post">博客</a>
+      
+      <a class="footer-nav__link" href="/memos">闪念</a>
+      
+      <a class="footer-nav__link" href="/archives">归档</a>
+      
+      <a class="footer-nav__link" href="/tags">标签</a>
+      
+      <a class="footer-nav__link" href="/links">友链</a>
+      
+      <a class="footer-nav__link" href="/post/about">关于</a>
+      
+    </nav>
+    
+
+    
+    <div class="footer-social">
+      
+      
+      
+      <a class="footer-social__link" href="/feed.xml" aria-label="RSS">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.18 15.64a2.18 2.18 0 110 4.36 2.18 2.18 0 010-4.36zM4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44zm0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+        </svg>
+      </a>
+    </div>
+
+    
+    <div class="footer-copyright">
+      <p>&copy; 2026 0707‘s Blog. All rights reserved.</p>
+    </div>
+
+    
+    
+    <div class="footer-custom">
+      Powered by Gridea Pro
+    </div>
+    
+
+    
+    <div class="footer-powered">
+      <span>Powered by <a href="https://gridea.pro" target="_blank" rel="noopener noreferrer">Gridea Pro</a></span>
+    </div>
+
+  </div>
+</footer>
+
+  
+  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-modal">
+    <div class="search-header">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <span class="search-kbd">&#8984;K</span>
+      <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<script src="/scripts/search.js"></script>
+  
+
+  
+
+  
+
+  
+
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: flavor-theme v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+</html>
