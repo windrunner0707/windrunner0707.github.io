@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+
+
+<style>:root { --heatmap-color: #39d353; }</style>
+
+
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('flavor-theme');
+      var theme = saved || 'dark';
+      if (theme === 'light') {
+        document.documentElement.classList.add('theme-light');
+      }
+    } catch (e) { }
+  })();
+</script>
+  <meta name="generator" content="Gridea Pro 1.2.2">
+  <title>TypeScript 学习路线：从基础类型到泛型、模块与类型声明 | 0707‘s Blog</title>
+  
+<meta property="og:title" content="TypeScript 学习路线：从基础类型到泛型、模块与类型声明" />
+<meta property="og:type" content="article" />
+
+<meta property="og:image" content="/post-images/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai.png" />
+
+
+<meta name="description" content="TypeScript 是 JavaScript 的超集。它不会取代 JavaScript，而是在 JavaScript 之上增加静态类型检查、编辑器提示和更可靠的重构能力，最终仍会被编译成 JavaScript 运行。 面对 TypeScript 庞大的类型系统，初学者很容易陷入“知识点都看过，项目里却不会用”的困境。本文以学习路线图为线索，从环境搭建、基础类型一路讲到接口、泛型、模块和声明文件，帮助你建立一套可以落地到项目中的知识框架。">
+<link rel="canonical" href="https://windrunner0707.tech/post/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"TypeScript 学习路线：从基础类型到泛型、模块与类型声明","url":"https://windrunner0707.tech/post/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai/","description":"TypeScript 是 JavaScript 的超集。它不会取代 JavaScript，而是在 JavaScript 之上增加静态类型检查、编辑器提示和更可靠的重构能力，最终仍会被编译成 JavaScript 运行。 面对 TypeScript 庞大的类型系统，初学者很容易陷入“知识点都看过，项目里却不会用”的困境。本文以学习路线图为线索，从环境搭建、基础类型一路讲到接口、泛型、模块和声明文件，帮助你建立一套可以落地到项目中的知识框架。","image":"/post-images/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai.png","datePublished":"2023-07-31T00:00:00+08:00","dateModified":"2026-07-12T00:22:54+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai/","name":"TypeScript 学习路线：从基础类型到泛型、模块与类型声明","position":2}]}</script>
+<meta property="og:title" content="TypeScript 学习路线：从基础类型到泛型、模块与类型声明">
+<meta property="og:description" content="TypeScript 是 JavaScript 的超集。它不会取代 JavaScript，而是在 JavaScript 之上增加静态类型检查、编辑器提示和更可靠的重构能力，最终仍会被编译成 JavaScript 运行。 面对 TypeScript 庞大的类型系统，初学者很容易陷入“知识点都看过，项目里却不会用”的困境。本文以学习路线图为线索，从环境搭建、基础类型一路讲到接口、泛型、模块和声明文件，帮助你建立一套可以落地到项目中的知识框架。">
+<meta property="og:url" content="https://windrunner0707.tech/post/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="0707‘s Blog">
+<meta property="og:image" content="/post-images/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://windrunner0707.tech/post/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai/">
+<meta name="twitter:title" content="TypeScript 学习路线：从基础类型到泛型、模块与类型声明">
+<meta name="twitter:description" content="TypeScript 是 JavaScript 的超集。它不会取代 JavaScript，而是在 JavaScript 之上增加静态类型检查、编辑器提示和更可靠的重构能力，最终仍会被编译成 JavaScript 运行。 面对 TypeScript 庞大的类型系统，初学者很容易陷入“知识点都看过，项目里却不会用”的困境。本文以学习路线图为线索，从环境搭建、基础类型一路讲到接口、泛型、模块和声明文件，帮助你建立一套可以落地到项目中的知识框架。">
+<meta name="twitter:image" content="/post-images/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai.png">
+</head>
+<body class="flavor-theme">
+
+  <header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <div class="top-bar">
+
+      
+      <div class="top-bar__left">
+        
+        <a href="https://windrunner0707.tech" class="site-avatar-link" aria-label="返回首页">
+          <img class="site-avatar" src="/images/avatar.png" alt="0707‘s Blog" />
+        </a>
+        
+        <a href="https://windrunner0707.tech" class="site-name-link">0707‘s Blog</a>
+      </div>
+
+      
+      <nav class="top-bar__nav" id="sectionBar">
+        
+        
+        <a class="nav-item" href="/">首页</a>
+        
+        <a class="nav-item" href="/post">博客</a>
+        
+        <a class="nav-item" href="/memos">闪念</a>
+        
+        <a class="nav-item" href="/archives">归档</a>
+        
+        <a class="nav-item" href="/tags">标签</a>
+        
+        <a class="nav-item" href="/links">友链</a>
+        
+        <a class="nav-item" href="/post/about">关于</a>
+        
+        
+      </nav>
+
+      
+      <div class="top-bar__right">
+        <button class="btn-icon btn-search search-btn" id="btnSearch" type="button" aria-label="搜索">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-sun" id="themeToggleSun" type="button"
+          aria-label="切换到浅色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"></path>
+            <path d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"></path>
+            <path d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"></path>
+            <path d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"></path>
+            <path d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"></path>
+            <path d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"></path>
+            <path d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"></path>
+            <path d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-moon" id="themeToggleMoon" type="button"
+          aria-label="切换到深色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"></path>
+            <path d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon btn-nav-toggle mobile-only" id="btnNavToggle" type="button" aria-label="切换导航">
+          <div class="hamburger" id="hamburger">
+            <span class="hamburger__line hamburger__line--top"></span>
+            <span class="hamburger__line hamburger__line--bottom"></span>
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+<div class="header-spacer"></div>
+
+<script>
+(function(){
+  var btn = document.getElementById('btnNavToggle');
+  var nav = document.getElementById('sectionBar');
+  var hamburger = document.getElementById('hamburger');
+  if (btn && nav) {
+    btn.addEventListener('click', function(){
+      nav.classList.toggle('top-bar__nav--open');
+      if (hamburger) hamburger.classList.toggle('is-active');
+    });
+    nav.querySelectorAll('.nav-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        nav.classList.remove('top-bar__nav--open');
+        if (hamburger) hamburger.classList.remove('is-active');
+      });
+    });
+  }
+
+  var root = document.documentElement;
+  var applyTheme = function(theme, persist){
+    if (theme === 'light') {
+      root.classList.add('theme-light');
+    } else {
+      root.classList.remove('theme-light');
+    }
+    if (persist) {
+      try { localStorage.setItem('flavor-theme', theme); } catch (e) {}
+    }
+  };
+  document.querySelectorAll('.theme-toggle').forEach(function(el){
+    el.addEventListener('click', function(){
+      applyTheme(root.classList.contains('theme-light') ? 'dark' : 'light', true);
+    });
+  });
+})();
+</script>
+
+  <main class="site-main" role="main">
+    
+<article class="article-container">
+  <header class="article-header">
+    <h1 class="article-title">TypeScript 学习路线：从基础类型到泛型、模块与类型声明</h1>
+    <div class="article-meta">
+      
+      
+      <a href="/category/ji-shu/" class="article-meta__category">技术</a>
+      
+      
+      <span class="article-meta__sep">·</span>
+      
+      <span class="article-meta__item">2023-07-31</span>
+      
+      <span class="article-meta__sep">·</span>
+      <span class="article-meta__item">10 分钟阅读</span>
+      
+    </div>
+    
+    <div class="article-header__tags">
+      
+      <a href="/tag/typescript/" class="tag-pill tag-pill--sm">TypeScript</a>
+      
+    </div>
+    
+  </header>
+
+  
+  <div class="article-feature">
+    <img src="/post-images/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai.png" alt="TypeScript 学习路线：从基础类型到泛型、模块与类型声明" />
+  </div>
+  
+
+  <div class="article-content">
+    <figure class="mindmap-figure">
+  <button class="zoomable-image-trigger" type="button" data-zoom-src="/post-images/typescript-xue-xi-lu-xian.png" aria-label="放大查看 TypeScript 学习路线思维导图">
+    <img src="/post-images/typescript-xue-xi-lu-xian.png" alt="TypeScript 学习路线思维导图" loading="lazy">
+    <span>点击图片放大查看</span>
+  </button>
+  <figcaption>TypeScript 学习路线总览（支持放大、缩小和拖动）</figcaption>
+</figure>
+<p>TypeScript 是 JavaScript 的超集。它不会取代 JavaScript，而是在 JavaScript 之上增加静态类型检查、编辑器提示和更可靠的重构能力，最终仍会被编译成 JavaScript 运行。</p>
+<p>面对 TypeScript 庞大的类型系统，初学者很容易陷入“知识点都看过，项目里却不会用”的困境。本文以学习路线图为线索，从环境搭建、基础类型一路讲到接口、泛型、模块和声明文件，帮助你建立一套可以落地到项目中的知识框架。</p>
+<!-- more -->
+<h1 id="-typescript">一、为什么学习 TypeScript</h1>
+<p>JavaScript 的灵活性提高了开发效率，也让一些错误只能在运行时暴露：</p>
+<pre><code class="language-js">function formatUser(user) {
+  return user.name.toUpperCase()
+}
+
+formatUser({ name: null }) // 运行到这里才报错
+</code></pre>
+<p>TypeScript 可以提前描述参数的形状，让错误在编码或编译阶段被发现：</p>
+<pre><code class="language-ts">interface User {
+  name: string
+}
+
+function formatUser(user: User): string {
+  return user.name.toUpperCase()
+}
+</code></pre>
+<p>它带来的主要收益包括：更早发现错误、更准确的代码补全、更安全的重构，以及更清晰的函数和数据结构文档。</p>
+<h1 id="heading">二、安装与运行原理</h1>
+<p>先准备 Node.js 环境，再在项目中安装 TypeScript：</p>
+<pre><code class="language-bash">npm install --save-dev typescript
+npx tsc --init
+npx tsc --version
+</code></pre>
+<p>假设有 <code>hello.ts</code>：</p>
+<pre><code class="language-ts">const message: string = &quot;Hello TypeScript&quot;
+console.log(message)
+</code></pre>
+<p>执行 <code>npx tsc hello.ts</code> 后会生成 JavaScript 文件。其核心流程可以概括为：</p>
+<pre><code class="language-text">TypeScript 源码 → 类型检查 → JavaScript 源码 → 浏览器或 Node.js 执行
+</code></pre>
+<p>类型信息主要服务于开发和编译阶段，通常不会保留到最终的 JavaScript 中。</p>
+<h1 id="heading-1">三、基础类型与类型推断</h1>
+<h2 id="1-">1. 常见基础类型</h2>
+<pre><code class="language-ts">const count: number = 10
+const title: string = &quot;TypeScript&quot;
+const enabled: boolean = true
+const bigValue: bigint = 100n
+const uniqueKey: symbol = Symbol(&quot;key&quot;)
+
+let empty: null = null
+let missing: undefined = undefined
+</code></pre>
+<p>数组有两种常见写法：</p>
+<pre><code class="language-ts">const scores: number[] = [90, 95, 100]
+const names: Array&lt;string&gt; = [&quot;Alice&quot;, &quot;Bob&quot;]
+</code></pre>
+<h2 id="2-">2. 类型推断</h2>
+<p>能让 TypeScript 推断时，不必为每个变量重复标注类型：</p>
+<pre><code class="language-ts">const language = &quot;TypeScript&quot; // 推断为 string
+const version = 5              // 推断为 number
+</code></pre>
+<p>类型标注更适合用在函数边界、公共 API 和结构复杂的数据上。</p>
+<h2 id="3-anyunknown--never">3. any、unknown 与 never</h2>
+<p><code>any</code> 会绕过类型检查，应谨慎使用。面对类型暂时未知的数据，优先选择 <code>unknown</code>：</p>
+<pre><code class="language-ts">function printValue(value: unknown): void {
+  if (typeof value === &quot;string&quot;) {
+    console.log(value.toUpperCase())
+  }
+}
+</code></pre>
+<p><code>never</code> 表示不可能出现的值，常用于永远不会正常结束的函数或穷尽检查：</p>
+<pre><code class="language-ts">function fail(message: string): never {
+  throw new Error(message)
+}
+</code></pre>
+<h1 id="heading-2">四、变量、条件与循环</h1>
+<p>现代 TypeScript 代码优先使用 <code>const</code>，确实需要重新赋值时再使用 <code>let</code>：</p>
+<pre><code class="language-ts">const siteName = &quot;My Blog&quot;
+let visits = 0
+visits += 1
+</code></pre>
+<p>条件和循环语法与 JavaScript 一致：</p>
+<pre><code class="language-ts">if (visits &gt; 0) {
+  console.log(&quot;Welcome back&quot;)
+}
+
+for (const name of [&quot;Alice&quot;, &quot;Bob&quot;]) {
+  console.log(name)
+}
+</code></pre>
+<h1 id="heading-3">五、函数</h1>
+<p>函数可以标注参数类型和返回值类型：</p>
+<pre><code class="language-ts">function add(left: number, right: number): number {
+  return left + right
+}
+</code></pre>
+<p>可选参数使用 <code>?</code>，默认参数直接提供默认值：</p>
+<pre><code class="language-ts">function greet(name: string, prefix = &quot;Hello&quot;, suffix?: string): string {
+  return `${prefix}, ${name}${suffix ?? &quot;&quot;}`
+}
+</code></pre>
+<p>剩余参数必须使用数组类型：</p>
+<pre><code class="language-ts">function join(separator: string, ...items: string[]): string {
+  return items.join(separator)
+}
+</code></pre>
+<p>箭头函数适合简短的回调：</p>
+<pre><code class="language-ts">const doubled = [1, 2, 3].map(value =&gt; value * 2)
+</code></pre>
+<p>同一个函数需要支持多组调用方式时，可以使用函数重载；实现签名则负责处理所有情况：</p>
+<pre><code class="language-ts">function format(value: string): string
+function format(value: number): string
+function format(value: string | number): string {
+  return String(value)
+}
+</code></pre>
+<h1 id="-map">六、数组、元组、对象与 Map</h1>
+<p>元组用于描述数量和位置确定的元素：</p>
+<pre><code class="language-ts">type UserRecord = [id: number, name: string]
+const user: UserRecord = [1, &quot;Alice&quot;]
+
+const id = user[0]
+const name = user[1]
+</code></pre>
+<p>普通业务对象可以通过类型别名描述：</p>
+<pre><code class="language-ts">type Article = {
+  id: number
+  title: string
+  published: boolean
+}
+</code></pre>
+<p><code>Map</code> 适合维护键值映射：</p>
+<pre><code class="language-ts">const roles = new Map&lt;number, string&gt;()
+roles.set(1, &quot;admin&quot;)
+roles.set(2, &quot;editor&quot;)
+
+roles.get(1)    // string | undefined
+roles.has(2)    // true
+roles.delete(2)
+</code></pre>
+<h1 id="heading-4">七、联合类型与类型收窄</h1>
+<p>联合类型表示一个值可能属于多个类型：</p>
+<pre><code class="language-ts">function normalizeId(id: string | number): string {
+  return typeof id === &quot;number&quot; ? String(id) : id.trim()
+}
+</code></pre>
+<p>这里的 <code>typeof</code> 不只是运行时判断，也会帮助 TypeScript 缩小类型范围。实际项目还可以使用 <code>in</code>、<code>instanceof</code>、自定义类型守卫和判别联合。</p>
+<pre><code class="language-ts">type Result =
+  | { status: &quot;success&quot;; data: string }
+  | { status: &quot;error&quot;; message: string }
+
+function printResult(result: Result): void {
+  if (result.status === &quot;success&quot;) {
+    console.log(result.data)
+  } else {
+    console.error(result.message)
+  }
+}
+</code></pre>
+<h1 id="heading-5">八、接口、类与泛型</h1>
+<h2 id="1--1">1. 接口</h2>
+<p>接口用于描述对象需要具备的结构：</p>
+<pre><code class="language-ts">interface Person {
+  readonly id: number
+  name: string
+  age?: number
+}
+</code></pre>
+<p><code>readonly</code> 表示属性只读，<code>?</code> 表示属性可选。接口还可以继承：</p>
+<pre><code class="language-ts">interface Employee extends Person {
+  department: string
+}
+</code></pre>
+<h2 id="2--1">2. 类</h2>
+<pre><code class="language-ts">class UserService {
+  constructor(private readonly prefix: string) {}
+
+  getDisplayName(name: string): string {
+    return `${this.prefix}${name}`
+  }
+}
+</code></pre>
+<p>类适合封装状态与行为。<code>public</code>、<code>protected</code> 和 <code>private</code> 可以控制成员的访问范围。</p>
+<h2 id="3-">3. 泛型</h2>
+<p>泛型让类型关系可以被复用，同时保留调用时的具体类型：</p>
+<pre><code class="language-ts">function first&lt;T&gt;(items: T[]): T | undefined {
+  return items[0]
+}
+
+const firstNumber = first([1, 2, 3])     // number | undefined
+const firstName = first([&quot;A&quot;, &quot;B&quot;])    // string | undefined
+</code></pre>
+<p>通过约束可以规定泛型至少具备哪些能力：</p>
+<pre><code class="language-ts">function getId&lt;T extends { id: number }&gt;(value: T): number {
+  return value.id
+}
+</code></pre>
+<h1 id="heading-6">九、模块、命名空间与声明文件</h1>
+<p>现代 TypeScript 项目主要使用 ES Modules。通过 <code>export</code> 暴露成员，通过 <code>import</code> 引入：</p>
+<pre><code class="language-ts">// math.ts
+export function add(a: number, b: number): number {
+  return a + b
+}
+
+// app.ts
+import { add } from &quot;./math&quot;
+console.log(add(1, 2))
+</code></pre>
+<p>命名空间主要出现在旧项目或不使用模块加载器的特殊场景，新项目通常优先使用 ES Modules。</p>
+<p>声明文件以 <code>.d.ts</code> 结尾，用来描述已有 JavaScript 代码的类型。例如为全局变量补充声明：</p>
+<pre><code class="language-ts">declare const jQuery: (selector: string) =&gt; unknown
+</code></pre>
+<p>许多第三方库已经自带类型；没有内置类型时，也可以查看对应的 <code>@types/*</code> 包。</p>
+<h1 id="tsconfigjson-">十、tsconfig.json 与工程化</h1>
+<p><code>tsconfig.json</code> 决定 TypeScript 如何检查和生成代码。入门阶段尤其值得关注：</p>
+<pre><code class="language-json">{
+  &quot;compilerOptions&quot;: {
+    &quot;target&quot;: &quot;ES2022&quot;,
+    &quot;module&quot;: &quot;ESNext&quot;,
+    &quot;strict&quot;: true,
+    &quot;noUncheckedIndexedAccess&quot;: true,
+    &quot;skipLibCheck&quot;: true
+  }
+}
+</code></pre>
+<p>建议尽早启用 <code>strict</code>，让类型系统真正发挥作用。ESLint 负责代码质量与常见错误检查，Prettier 负责统一格式；二者职责不同，可以配合使用。</p>
+<h1 id="heading-7">十一、推荐学习顺序</h1>
+<p>可以按下面的顺序推进：</p>
+<ol>
+<li>熟悉 JavaScript 基础与 ES Modules。</li>
+<li>掌握基础类型、数组、对象和函数标注。</li>
+<li>理解类型推断、联合类型与类型收窄。</li>
+<li>学习接口、类型别名、类和泛型。</li>
+<li>掌握 <code>keyof</code>、<code>typeof</code> 和常用工具类型。</li>
+<li>熟悉 <code>tsconfig.json</code>，在真实项目中开启严格模式。</li>
+<li>再进入条件类型、映射类型和类型体操等进阶内容。</li>
+</ol>
+<h1 id="heading-8">总结</h1>
+<p>学习 TypeScript 的重点不是为所有变量补上类型，而是理解数据之间的约束关系。先用基础类型描述输入和输出，再通过类型收窄、接口和泛型表达更复杂的关系，最后结合严格模式和工程化工具把类型检查融入日常开发。</p>
+<p>思维导图适合帮助我们建立全局视角，真正掌握 TypeScript 仍需要把每个知识点放进可运行的小项目中反复练习。</p>
+<p>参考资料：<a href="https://www.typescriptlang.org/docs/">TypeScript 官方文档</a><img src="/post-images/1783786944387232000_0.png" alt="" /></p>
+
+  </div>
+
+  
+  <nav class="post-nav">
+    
+    <a href="/post/mian-shi-ba-gu-wen-si-suo/" class="post-nav-card post-nav-card--prev">
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/mian-shi-ba-gu-wen-si-suo.webp" alt="面试八股文-死锁" loading="lazy" />
+      </div>
+      
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">上一篇</span>
+        <span class="post-nav-card__title">面试八股文-死锁</span>
+      </div>
+      <span class="post-nav-card__arrow">&larr;</span>
+    </a>
+    
+    
+    <div class="post-nav-card post-nav-card--empty post-nav-card--next">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">下一篇</span>
+        <span class="post-nav-card__empty-text">没有下一篇了~</span>
+      </div>
+    </div>
+    
+  </nav>
+
+  
+  
+
+
+</article>
+
+<div class="image-zoom-modal" id="imageZoomModal" role="dialog" aria-modal="true" aria-label="图片查看器" hidden>
+  <div class="image-zoom-toolbar">
+    <button type="button" data-zoom-action="out" aria-label="缩小图片">−</button>
+    <output id="imageZoomLevel" aria-live="polite">100%</output>
+    <button type="button" data-zoom-action="in" aria-label="放大图片">＋</button>
+    <button type="button" data-zoom-action="reset">重置</button>
+    <button type="button" data-zoom-action="close" aria-label="关闭图片查看器">关闭</button>
+  </div>
+  <div class="image-zoom-stage">
+    <img class="image-zoom-target" alt="" draggable="false" />
+  </div>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-inner">
+
+    
+    
+    <nav class="footer-nav" aria-label="页脚导航">
+      
+      <a class="footer-nav__link" href="/">首页</a>
+      
+      <a class="footer-nav__link" href="/post">博客</a>
+      
+      <a class="footer-nav__link" href="/memos">闪念</a>
+      
+      <a class="footer-nav__link" href="/archives">归档</a>
+      
+      <a class="footer-nav__link" href="/tags">标签</a>
+      
+      <a class="footer-nav__link" href="/links">友链</a>
+      
+      <a class="footer-nav__link" href="/post/about">关于</a>
+      
+    </nav>
+    
+
+    
+    <div class="footer-social">
+      
+      
+      
+      <a class="footer-social__link" href="/feed.xml" aria-label="RSS">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.18 15.64a2.18 2.18 0 110 4.36 2.18 2.18 0 010-4.36zM4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44zm0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+        </svg>
+      </a>
+    </div>
+
+    
+    <div class="footer-copyright">
+      <p>&copy; 2026 0707‘s Blog. All rights reserved.</p>
+    </div>
+
+    
+    
+    <div class="footer-custom">
+      Powered by Gridea Pro
+    </div>
+    
+
+    
+    <div class="footer-powered">
+      <span>Powered by <a href="https://gridea.pro" target="_blank" rel="noopener noreferrer">Gridea Pro</a></span>
+    </div>
+
+  </div>
+</footer>
+
+  
+  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-modal">
+    <div class="search-header">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <span class="search-kbd">&#8984;K</span>
+      <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<script src="/scripts/search.js"></script>
+  
+
+  
+<script src="/scripts/image-zoom.js"></script>
+
+
+  
+
+  
+
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: flavor-theme v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+</html>

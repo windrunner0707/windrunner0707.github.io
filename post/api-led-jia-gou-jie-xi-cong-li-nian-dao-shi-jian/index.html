@@ -312,6 +312,19 @@
 
 </article>
 
+<div class="image-zoom-modal" id="imageZoomModal" role="dialog" aria-modal="true" aria-label="图片查看器" hidden>
+  <div class="image-zoom-toolbar">
+    <button type="button" data-zoom-action="out" aria-label="缩小图片">−</button>
+    <output id="imageZoomLevel" aria-live="polite">100%</output>
+    <button type="button" data-zoom-action="in" aria-label="放大图片">＋</button>
+    <button type="button" data-zoom-action="reset">重置</button>
+    <button type="button" data-zoom-action="close" aria-label="关闭图片查看器">关闭</button>
+  </div>
+  <div class="image-zoom-stage">
+    <img class="image-zoom-target" alt="" draggable="false" />
+  </div>
+</div>
+
   </main>
 
   <footer class="site-footer">
@@ -397,6 +410,8 @@
   
 
   
+<script src="/scripts/image-zoom.js"></script>
+
 
   
 

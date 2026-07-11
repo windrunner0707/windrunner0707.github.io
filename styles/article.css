@@ -505,6 +505,120 @@
   margin: 1.5em 0;
 }
 
+/* Zoomable diagrams */
+.mindmap-figure {
+  margin: 1.5em 0 2em;
+  text-align: center;
+}
+
+.zoomable-image-trigger {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  cursor: zoom-in;
+}
+
+.zoomable-image-trigger img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+}
+
+.zoomable-image-trigger span {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 6px 10px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 999px;
+}
+
+.mindmap-figure figcaption {
+  margin-top: 10px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.image-zoom-modal {
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.94);
+}
+
+.image-zoom-modal[hidden] {
+  display: none;
+}
+
+.image-zoom-toolbar {
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(20, 20, 20, 0.95);
+  border-bottom: 1px solid #333;
+}
+
+.image-zoom-toolbar button,
+.image-zoom-toolbar output {
+  min-width: 44px;
+  min-height: 40px;
+  padding: 8px 12px;
+  color: #fff;
+  font: inherit;
+  line-height: 1;
+  background: #292929;
+  border: 1px solid #444;
+  border-radius: 7px;
+}
+
+.image-zoom-toolbar button {
+  cursor: pointer;
+}
+
+.image-zoom-stage {
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.image-zoom-stage:active {
+  cursor: grabbing;
+}
+
+.image-zoom-target {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  user-select: none;
+  transform-origin: center;
+  will-change: transform;
+}
+
+body.image-zoom-open {
+  overflow: hidden;
+}
+
 .post-content ul,
 .post-content ol {
   padding-left: 1.5em;
@@ -599,5 +713,4 @@
 .toc__link--active {
   color: var(--color-text-primary);
 }
-
 
