@@ -35,12 +35,12 @@
 <meta property="og:image" content="/post-images/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan.jpg" />
 
 
-<meta name="description" content="几年前，我参与过一套收单银行业务系统的建设。项目刚开始时，我以为它的核心就是接收交易报文、调用支付网络，再把成功或失败返回给商户。真正做进去才发现，终端上短短几秒钟的一次“支付成功”，只是整条链路的开头。 授权之后还有请款、清算、结算和对账。任何一步都可能超时、重复或者出现差异，而系统必须回答三个问题：这笔交易现在是什么状态？钱走到哪里了？如果两边记录对不上，应该怎样处理？ 这篇文章是我对那次项目的复盘。出于保密要求，机构名称、合作方、内部系统、业务规模、金额和项目时间都经过了匿名化或泛化。文中涉及的品牌只来自公开行业示意图，与原项目无关。">
+<meta name="description" content="几年前，我参与过一套收单银行业务系统的建设。项目刚开始时，我以为它的核心就是接收交易报文、调用支付网络，再把成功或失败返回给商户。真正做进去才发现，终端上短短几秒钟的一次“支付成功”，只是整条链路的开头。 授权之后还有请款、清算、结算和对账。任何一步都可能超时、重复或者出现差异，而系统必须回答三个问题：这笔交易现在是什么状态？钱走到哪里了？如果两边记录对不上，应该怎样处理？ 这篇文章是我对那次项目的复盘，部分细节已作泛化处理。">
 <link rel="canonical" href="https://windrunner0707.tech/post/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从一笔刷卡交易出发：收单银行业务系统项目复盘","url":"https://windrunner0707.tech/post/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan/","description":"几年前，我参与过一套收单银行业务系统的建设。项目刚开始时，我以为它的核心就是接收交易报文、调用支付网络，再把成功或失败返回给商户。真正做进去才发现，终端上短短几秒钟的一次“支付成功”，只是整条链路的开头。 授权之后还有请款、清算、结算和对账。任何一步都可能超时、重复或者出现差异，而系统必须回答三个问题：这笔交易现在是什么状态？钱走到哪里了？如果两边记录对不上，应该怎样处理？ 这篇文章是我对那次项目的复盘。出于保密要求，机构名称、合作方、内部系统、业务规模、金额和项目时间都经过了匿名化或泛化。文中涉及的品牌只来自公开行业示意图，与原项目无关。","image":"/post-images/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan.jpg","datePublished":"2024-12-25T00:00:00+08:00","dateModified":"2026-07-11T17:15:06+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从一笔刷卡交易出发：收单银行业务系统项目复盘","url":"https://windrunner0707.tech/post/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan/","description":"几年前，我参与过一套收单银行业务系统的建设。项目刚开始时，我以为它的核心就是接收交易报文、调用支付网络，再把成功或失败返回给商户。真正做进去才发现，终端上短短几秒钟的一次“支付成功”，只是整条链路的开头。 授权之后还有请款、清算、结算和对账。任何一步都可能超时、重复或者出现差异，而系统必须回答三个问题：这笔交易现在是什么状态？钱走到哪里了？如果两边记录对不上，应该怎样处理？ 这篇文章是我对那次项目的复盘，部分细节已作泛化处理。","image":"/post-images/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan.jpg","datePublished":"2024-12-25T00:00:00+08:00","dateModified":"2026-07-11T17:15:06+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan/","name":"从一笔刷卡交易出发：收单银行业务系统项目复盘","position":2}]}</script>
 <meta property="og:title" content="从一笔刷卡交易出发：收单银行业务系统项目复盘">
-<meta property="og:description" content="几年前，我参与过一套收单银行业务系统的建设。项目刚开始时，我以为它的核心就是接收交易报文、调用支付网络，再把成功或失败返回给商户。真正做进去才发现，终端上短短几秒钟的一次“支付成功”，只是整条链路的开头。 授权之后还有请款、清算、结算和对账。任何一步都可能超时、重复或者出现差异，而系统必须回答三个问题：这笔交易现在是什么状态？钱走到哪里了？如果两边记录对不上，应该怎样处理？ 这篇文章是我对那次项目的复盘。出于保密要求，机构名称、合作方、内部系统、业务规模、金额和项目时间都经过了匿名化或泛化。文中涉及的品牌只来自公开行业示意图，与原项目无关。">
+<meta property="og:description" content="几年前，我参与过一套收单银行业务系统的建设。项目刚开始时，我以为它的核心就是接收交易报文、调用支付网络，再把成功或失败返回给商户。真正做进去才发现，终端上短短几秒钟的一次“支付成功”，只是整条链路的开头。 授权之后还有请款、清算、结算和对账。任何一步都可能超时、重复或者出现差异，而系统必须回答三个问题：这笔交易现在是什么状态？钱走到哪里了？如果两边记录对不上，应该怎样处理？ 这篇文章是我对那次项目的复盘，部分细节已作泛化处理。">
 <meta property="og:url" content="https://windrunner0707.tech/post/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707‘s Blog">
@@ -48,7 +48,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan/">
 <meta name="twitter:title" content="从一笔刷卡交易出发：收单银行业务系统项目复盘">
-<meta name="twitter:description" content="几年前，我参与过一套收单银行业务系统的建设。项目刚开始时，我以为它的核心就是接收交易报文、调用支付网络，再把成功或失败返回给商户。真正做进去才发现，终端上短短几秒钟的一次“支付成功”，只是整条链路的开头。 授权之后还有请款、清算、结算和对账。任何一步都可能超时、重复或者出现差异，而系统必须回答三个问题：这笔交易现在是什么状态？钱走到哪里了？如果两边记录对不上，应该怎样处理？ 这篇文章是我对那次项目的复盘。出于保密要求，机构名称、合作方、内部系统、业务规模、金额和项目时间都经过了匿名化或泛化。文中涉及的品牌只来自公开行业示意图，与原项目无关。">
+<meta name="twitter:description" content="几年前，我参与过一套收单银行业务系统的建设。项目刚开始时，我以为它的核心就是接收交易报文、调用支付网络，再把成功或失败返回给商户。真正做进去才发现，终端上短短几秒钟的一次“支付成功”，只是整条链路的开头。 授权之后还有请款、清算、结算和对账。任何一步都可能超时、重复或者出现差异，而系统必须回答三个问题：这笔交易现在是什么状态？钱走到哪里了？如果两边记录对不上，应该怎样处理？ 这篇文章是我对那次项目的复盘，部分细节已作泛化处理。">
 <meta name="twitter:image" content="/post-images/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan.jpg">
 </head>
 <body class="flavor-theme">
@@ -211,7 +211,7 @@
   <div class="article-content">
     <p>几年前，我参与过一套收单银行业务系统的建设。项目刚开始时，我以为它的核心就是接收交易报文、调用支付网络，再把成功或失败返回给商户。真正做进去才发现，终端上短短几秒钟的一次“支付成功”，只是整条链路的开头。</p>
 <p>授权之后还有请款、清算、结算和对账。任何一步都可能超时、重复或者出现差异，而系统必须回答三个问题：这笔交易现在是什么状态？钱走到哪里了？如果两边记录对不上，应该怎样处理？</p>
-<p>这篇文章是我对那次项目的复盘。出于保密要求，机构名称、合作方、内部系统、业务规模、金额和项目时间都经过了匿名化或泛化。文中涉及的品牌只来自公开行业示意图，与原项目无关。</p>
+<p>这篇文章是我对那次项目的复盘，部分细节已作泛化处理。</p>
 <!-- more -->
 <h2 id="heading">一、一笔刷卡交易到底经过了谁</h2>
 <p>消费者刷卡时，看到的只是 POS 或支付页面上的结果，背后其实有多个参与方：</p>

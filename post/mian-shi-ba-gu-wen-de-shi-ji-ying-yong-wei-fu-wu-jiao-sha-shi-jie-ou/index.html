@@ -302,7 +302,7 @@ public Object route(ProceedingJoinPoint point, ToggleRoute toggleRoute) throws T
 }
 </code></pre>
 <p>但异步任务提交到线程池后，会切换到另一个线程。普通 <code>ThreadLocal</code> 的数据不会自动传播到新线程，所以异步线程中读取到的可能是 <code>null</code>，也可能在错误实现下读到线程池残留的旧值。</p>
-<p>PDF 中给出的处理思路是：在进入异步线程之前，从当前线程取出 Toggle，然后显式作为参数向下传递。</p>
+<p>更稳妥的处理方式是：在进入异步线程之前，从当前线程取出 Toggle，然后显式作为参数向下传递。</p>
 <pre><code class="language-java">boolean toggle = ToggleUtils.INSTANCE.isOn();
 
 executor.execute(() -&gt; {

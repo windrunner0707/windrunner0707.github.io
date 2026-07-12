@@ -35,12 +35,12 @@
 <meta property="og:image" content="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" />
 
 
-<meta name="description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。">
+<meta name="description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
 <link rel="canonical" href="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"电子交易库存系统复盘：从整批预留到统一库存交易引擎","url":"https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/","description":"几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。","image":"/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg","datePublished":"2026-07-11T00:00:00+08:00","dateModified":"2026-07-11T18:16:00+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"电子交易库存系统复盘：从整批预留到统一库存交易引擎","url":"https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/","description":"几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。","image":"/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg","datePublished":"2026-07-11T00:00:00+08:00","dateModified":"2026-07-11T18:16:00+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/","name":"电子交易库存系统复盘：从整批预留到统一库存交易引擎","position":2}]}</script>
 <meta property="og:title" content="电子交易库存系统复盘：从整批预留到统一库存交易引擎">
-<meta property="og:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。">
+<meta property="og:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
 <meta property="og:url" content="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707‘s Blog">
@@ -48,7 +48,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
 <meta name="twitter:title" content="电子交易库存系统复盘：从整批预留到统一库存交易引擎">
-<meta name="twitter:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。">
+<meta name="twitter:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
 <meta name="twitter:image" content="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg">
 </head>
 <body class="flavor-theme">
@@ -211,7 +211,7 @@
   <div class="article-content">
     <p>几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。</p>
 <p>真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。</p>
-<p>这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。出于保密要求，企业名称、平台名称、内部服务名、仓库信息、业务规模、数据量、项目时间和部署拓扑均已删除或泛化。文中的流程和示例只用于说明通用设计，不对应任何具体生产系统。</p>
+<p>这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。</p>
 <!-- more -->
 <h2 id="heading">一、旧库存模型为什么逐渐失效</h2>
 <p>最早让我们意识到模型需要重做的，是一类很普通的多商品订单。订单里三件商品，两件有货，一件暂时缺货。旧系统只有两个答案：全部预留成功，或者全部失败。即使业务愿意先锁定已经有货的两件商品，系统也表达不了这种状态。</p>
