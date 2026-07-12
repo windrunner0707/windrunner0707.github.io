@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+
+
+<style>:root { --heatmap-color: #39d353; }</style>
+
+
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('flavor-theme');
+      var theme = saved || 'dark';
+      if (theme === 'light') {
+        document.documentElement.classList.add('theme-light');
+      }
+    } catch (e) { }
+  })();
+</script>
+  <meta name="generator" content="Gridea Pro 1.2.2">
+  <title>日麻入门：从牌型、向听到牌效率 | 0707‘s Blog</title>
+  
+<meta property="og:title" content="日麻入门：从牌型、向听到牌效率" />
+<meta property="og:type" content="article" />
+
+<meta property="og:image" content="/post-images/riichi-mahjong-basics-tile-efficiency.png" />
+
+
+<meta name="description" content="日麻常被误解成一种主要靠“运气”的游戏。单局当然会受牌山影响，但竞技麻将真正比较的，是玩家能否在大量对局里持续做出更高期望的选择：更快组成好形、更准确地判断进攻与防守，并接受正确选择偶尔也会得到坏结果。 这篇文章根据我学习日麻时整理的思维导图，从牌的组成、和牌结构、搭子质量、向听数与听牌选择说起。重点不是背完所有规则，而是先建立一套能指导每次摸切的牌效率框架。">
+<link rel="canonical" href="https://windrunner0707.tech/post/riichi-mahjong-basics-tile-efficiency/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"日麻入门：从牌型、向听到牌效率","url":"https://windrunner0707.tech/post/riichi-mahjong-basics-tile-efficiency/","description":"日麻常被误解成一种主要靠“运气”的游戏。单局当然会受牌山影响，但竞技麻将真正比较的，是玩家能否在大量对局里持续做出更高期望的选择：更快组成好形、更准确地判断进攻与防守，并接受正确选择偶尔也会得到坏结果。 这篇文章根据我学习日麻时整理的思维导图，从牌的组成、和牌结构、搭子质量、向听数与听牌选择说起。重点不是背完所有规则，而是先建立一套能指导每次摸切的牌效率框架。","image":"/post-images/riichi-mahjong-basics-tile-efficiency.png","datePublished":"2026-02-25T00:00:00+08:00","dateModified":"2026-07-12T13:33:32+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/riichi-mahjong-basics-tile-efficiency/","name":"日麻入门：从牌型、向听到牌效率","position":2}]}</script>
+<meta property="og:title" content="日麻入门：从牌型、向听到牌效率">
+<meta property="og:description" content="日麻常被误解成一种主要靠“运气”的游戏。单局当然会受牌山影响，但竞技麻将真正比较的，是玩家能否在大量对局里持续做出更高期望的选择：更快组成好形、更准确地判断进攻与防守，并接受正确选择偶尔也会得到坏结果。 这篇文章根据我学习日麻时整理的思维导图，从牌的组成、和牌结构、搭子质量、向听数与听牌选择说起。重点不是背完所有规则，而是先建立一套能指导每次摸切的牌效率框架。">
+<meta property="og:url" content="https://windrunner0707.tech/post/riichi-mahjong-basics-tile-efficiency/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="0707‘s Blog">
+<meta property="og:image" content="/post-images/riichi-mahjong-basics-tile-efficiency.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://windrunner0707.tech/post/riichi-mahjong-basics-tile-efficiency/">
+<meta name="twitter:title" content="日麻入门：从牌型、向听到牌效率">
+<meta name="twitter:description" content="日麻常被误解成一种主要靠“运气”的游戏。单局当然会受牌山影响，但竞技麻将真正比较的，是玩家能否在大量对局里持续做出更高期望的选择：更快组成好形、更准确地判断进攻与防守，并接受正确选择偶尔也会得到坏结果。 这篇文章根据我学习日麻时整理的思维导图，从牌的组成、和牌结构、搭子质量、向听数与听牌选择说起。重点不是背完所有规则，而是先建立一套能指导每次摸切的牌效率框架。">
+<meta name="twitter:image" content="/post-images/riichi-mahjong-basics-tile-efficiency.png">
+</head>
+<body class="flavor-theme">
+
+  <header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <div class="top-bar">
+
+      
+      <div class="top-bar__left">
+        
+        <a href="https://windrunner0707.tech" class="site-avatar-link" aria-label="返回首页">
+          <img class="site-avatar" src="/images/avatar.png" alt="0707‘s Blog" />
+        </a>
+        
+        <a href="https://windrunner0707.tech" class="site-name-link">0707‘s Blog</a>
+      </div>
+
+      
+      <nav class="top-bar__nav" id="sectionBar">
+        
+        
+        <a class="nav-item" href="/">首页</a>
+        
+        <a class="nav-item" href="/post">博客</a>
+        
+        <a class="nav-item" href="/memos">闪念</a>
+        
+        <a class="nav-item" href="/archives">归档</a>
+        
+        <a class="nav-item" href="/tags">标签</a>
+        
+        <a class="nav-item" href="/links">友链</a>
+        
+        <a class="nav-item" href="/post/about">关于</a>
+        
+        
+      </nav>
+
+      
+      <div class="top-bar__right">
+        <button class="btn-icon btn-search search-btn" id="btnSearch" type="button" aria-label="搜索">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-sun" id="themeToggleSun" type="button"
+          aria-label="切换到浅色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"></path>
+            <path d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"></path>
+            <path d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"></path>
+            <path d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"></path>
+            <path d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"></path>
+            <path d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"></path>
+            <path d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"></path>
+            <path d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-moon" id="themeToggleMoon" type="button"
+          aria-label="切换到深色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"></path>
+            <path d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon btn-nav-toggle mobile-only" id="btnNavToggle" type="button" aria-label="切换导航">
+          <div class="hamburger" id="hamburger">
+            <span class="hamburger__line hamburger__line--top"></span>
+            <span class="hamburger__line hamburger__line--bottom"></span>
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+<div class="header-spacer"></div>
+
+<script>
+(function(){
+  var btn = document.getElementById('btnNavToggle');
+  var nav = document.getElementById('sectionBar');
+  var hamburger = document.getElementById('hamburger');
+  if (btn && nav) {
+    btn.addEventListener('click', function(){
+      nav.classList.toggle('top-bar__nav--open');
+      if (hamburger) hamburger.classList.toggle('is-active');
+    });
+    nav.querySelectorAll('.nav-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        nav.classList.remove('top-bar__nav--open');
+        if (hamburger) hamburger.classList.remove('is-active');
+      });
+    });
+  }
+
+  var root = document.documentElement;
+  var applyTheme = function(theme, persist){
+    if (theme === 'light') {
+      root.classList.add('theme-light');
+    } else {
+      root.classList.remove('theme-light');
+    }
+    if (persist) {
+      try { localStorage.setItem('flavor-theme', theme); } catch (e) {}
+    }
+  };
+  document.querySelectorAll('.theme-toggle').forEach(function(el){
+    el.addEventListener('click', function(){
+      applyTheme(root.classList.contains('theme-light') ? 'dark' : 'light', true);
+    });
+  });
+})();
+</script>
+
+  <main class="site-main" role="main">
+    
+<article class="article-container">
+  <header class="article-header">
+    <h1 class="article-title">日麻入门：从牌型、向听到牌效率</h1>
+    <div class="article-meta">
+      
+      
+      <a href="/category/xing-qu/" class="article-meta__category">兴趣</a>
+      
+      
+      <span class="article-meta__sep">·</span>
+      
+      <span class="article-meta__item">2026-02-25</span>
+      
+      <span class="article-meta__sep">·</span>
+      <span class="article-meta__item">6 分钟阅读</span>
+      
+    </div>
+    
+    <div class="article-header__tags">
+      
+      <a href="/tag/riichi-mahjong/" class="tag-pill tag-pill--sm">日麻</a>
+      
+    </div>
+    
+  </header>
+
+  
+  <div class="article-feature">
+    <img src="/post-images/riichi-mahjong-basics-tile-efficiency.png" alt="日麻入门：从牌型、向听到牌效率" />
+  </div>
+  
+
+  <div class="article-content">
+    <p>日麻常被误解成一种主要靠“运气”的游戏。单局当然会受牌山影响，但竞技麻将真正比较的，是玩家能否在大量对局里持续做出更高期望的选择：更快组成好形、更准确地判断进攻与防守，并接受正确选择偶尔也会得到坏结果。</p>
+<p>这篇文章根据我学习日麻时整理的思维导图，从牌的组成、和牌结构、搭子质量、向听数与听牌选择说起。重点不是背完所有规则，而是先建立一套能指导每次摸切的牌效率框架。</p>
+<!-- more -->
+<figure class="mindmap-figure">
+  <button class="zoomable-image-trigger" type="button" data-zoom-src="/post-images/riichi-mahjong-basics-mindmap.png" aria-label="放大查看日麻基础思维导图">
+    <img src="/post-images/riichi-mahjong-basics-mindmap.png" alt="日麻基础与牌效率思维导图" loading="lazy">
+    <span>点击图片放大查看</span>
+  </button>
+  <figcaption>日麻基础思维导图（支持放大、缩小和拖动）</figcaption>
+</figure>
+<h1 id="heading">一、先建立正确的竞技观</h1>
+<p>麻将既不是纯粹的运气游戏，也不是每一局都能靠技术获胜。我们无法决定下一张摸到什么，却能决定保留哪些牌、打出哪张牌、是否鸣牌，以及什么时候停止进攻。</p>
+<p>因此，评价一次决策时，应当把“选择是否合理”和“结果是否成功”分开：</p>
+<ul>
+<li>好选择可能因为牌山和对手的行动而失败；</li>
+<li>坏选择也可能偶然和牌；</li>
+<li>一次输赢无法证明打法优劣，长期结果才更接近真实水平。</li>
+</ul>
+<p>所谓“运气”更像尚未观察到结果的随机过程。竞技日麻要做的，是在信息不完整的情况下提高每一次选择的成功概率，并控制失败时的损失。</p>
+<h1 id="heading-1">二、认识一副日麻牌</h1>
+<p>日麻通常使用 136 张牌，每种牌各 4 张。</p>
+<h2 id="1-">1. 数牌</h2>
+<p>数牌分为三门，每门从 1 到 9：</p>
+<ul>
+<li><strong>万子（m）</strong>：一万到九万；</li>
+<li><strong>筒子（p）</strong>：一筒到九筒；</li>
+<li><strong>索子（s）</strong>：一索到九索。</li>
+</ul>
+<p>记谱时常把同一门写在一起。例如 <code>345m</code> 表示三万、四万、五万，<code>68p</code> 表示六筒和八筒。</p>
+<h2 id="2-">2. 字牌</h2>
+<p>字牌共 7 种：</p>
+<ul>
+<li>风牌：东、南、西、北；</li>
+<li>三元牌：白、发、中。</li>
+</ul>
+<p>数牌能够组成顺子，字牌不能组成顺子，只能做对子或刻子。这一点直接决定了它们的组合效率。</p>
+<h1 id="heading-2">三、和牌的基本结构</h1>
+<p>最常见的和牌结构是 <strong>四组面子加一组雀头</strong>，即常说的“四面子一雀头”。</p>
+<ul>
+<li><strong>顺子</strong>：同一门连续三张数牌，如 <code>345m</code>；</li>
+<li><strong>刻子</strong>：三张相同的牌，如 <code>777p</code>；</li>
+<li><strong>杠子</strong>：四张相同的牌，结构上作为一组面子；</li>
+<li><strong>雀头</strong>：两张相同的牌，也就是对子。</li>
+</ul>
+<p>除此之外，还有七对子、国士无双等特殊结构。入门阶段可以先以四面子一雀头为主，因为大多数牌局都沿着这条路线发展。</p>
+<p>还要特别注意：<strong>日麻和牌不仅要完成牌型，还必须至少有一个役。</strong> “牌已经凑齐”和“规则允许和牌”不是同一件事。立直、断幺九、役牌、平和等役种，需要在学习牌效率之后继续补上。</p>
+<h1 id="heading-3">四、搭子决定进张效率</h1>
+<p>两张牌中，已经相同的两张叫对子；有机会补成顺子的两张叫搭子。搭子的质量，决定了牌手能用多少种牌把手牌推进一步。</p>
+<table>
+<thead>
+<tr>
+<th>搭子</th>
+<th>示例</th>
+<th>可完成的牌</th>
+<th>未见相关牌时的剩余枚数</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>两面</td>
+<td><code>34s</code></td>
+<td><code>2s</code>、<code>5s</code></td>
+<td>最多 8 枚</td>
+<td>进张最宽，通常是最好形</td>
+</tr>
+<tr>
+<td>嵌张</td>
+<td><code>68p</code></td>
+<td><code>7p</code></td>
+<td>最多 4 枚</td>
+<td>只等中间一张</td>
+</tr>
+<tr>
+<td>边张</td>
+<td><code>12m</code></td>
+<td><code>3m</code></td>
+<td>最多 4 枚</td>
+<td>只等一侧，且改良空间有限</td>
+</tr>
+</tbody>
+</table>
+<p>这里的“枚数”要扣除自己手牌、牌河和副露中已经看见的牌。比如四张 <code>7p</code> 中已经出现两张，那么 <code>68p</code> 实际只剩两枚有效牌。</p>
+<h2 id="1--1">1. 为什么两面优先</h2>
+<p>两面同时接受两种牌，通常比嵌张和边张多一倍进张。例如 <code>34s</code> 摸到 <code>2s</code> 或 <code>5s</code> 都能成为顺子，而 <code>68p</code> 只能等 <code>7p</code>。如果两种搭子在其他条件上相近，应优先保留两面。</p>
+<h2 id="2--1">2. 复合形不要过早拆散</h2>
+<p>三张以上的连续或相邻数牌，经常同时包含多个搭子。例如 <code>344s</code> 既保留对子，也包含 <code>34s</code> 的两面变化；<code>122m</code> 则同时具有对子与边张的性质。</p>
+<p>拆牌前不要只看眼前的两张，而要先问：</p>
+<ol>
+<li>这组牌能接受哪些进张？</li>
+<li>进张后会形成两面、对子还是愚形？</li>
+<li>拆掉其中一张，会不会同时损失多条变化路线？</li>
+</ol>
+<p>牌效率不是把手牌机械地切成若干组，而是保留彼此有联系的复合形。</p>
+<h1 id="heading-4">五、对子与雀头的价值会变化</h1>
+<p>对子既可能成为雀头，也可能摸到第三张后成为刻子。它的价值取决于整手牌中已有多少个对子：</p>
+<ul>
+<li><strong>没有对子</strong>：第一个对子很重要，因为标准形最终需要雀头；</li>
+<li><strong>只有一个对子</strong>：它通常是雀头候选，应谨慎拆除；</li>
+<li><strong>有两个对子</strong>：一个可以做雀头，另一个有机会发展为刻子，变化较丰富；</li>
+<li><strong>对子过多</strong>：标准形的顺子空间会被挤压，此时要比较继续做标准形、七对子或对对和等路线的距离与价值。</li>
+</ul>
+<p>对子并非固定的“好牌”或“坏牌”。同一组对子，在缺雀头时价值很高，在对子已经过剩时则可能成为阻碍。</p>
+<h1 id="heading-5">六、为什么中张通常比幺九牌灵活</h1>
+<p>数牌并不是位置越大越强。判断一张孤立牌的效率，要看它能参与多少种顺子。</p>
+<ul>
+<li>1 只能参与 <code>123</code>；</li>
+<li>2 可以参与 <code>123</code>、<code>234</code>；</li>
+<li>3 可以参与 <code>123</code>、<code>234</code>、<code>345</code>；</li>
+<li>4 至 6 各能参与四种顺子；</li>
+<li>7、8、9 与 3、2、1 对称。</li>
+</ul>
+<p>因此，在没有役种、打点和安全度等额外因素时，孤立数牌的组合效率大致可以记成：</p>
+<pre><code class="language-text">3～7 ＞ 2、8 ＞ 1、9 ＞ 无役价值的孤立字牌
+</code></pre>
+<p>这只是默认排序，不是绝对弃牌表。役牌对子、混一色路线、宝牌、场况和防守价值，都可能改变一张牌的实际优先级。</p>
+<h1 id="heading-6">七、用向听数衡量“离和牌还有多远”</h1>
+<p><strong>向听数</strong>表示一手牌距离听牌还差多少步：</p>
+<ul>
+<li>一向听：再一次有效进张就可能听牌；</li>
+<li>二向听：还需要两次有效进张；</li>
+<li>零向听：已经听牌。</li>
+</ul>
+<p>每次切牌时，最基本的目标是优先减少向听数；如果不同切法的向听数相同，再比较它们的 <strong>有效牌种类与剩余枚数</strong>，也就是常说的“受入”。</p>
+<p>可以把基本判断顺序概括为：</p>
+<pre><code class="language-text">先避免退向听
+    → 再比较有效牌数量
+    → 再比较进张后的形状
+    → 最后结合打点、役、安全度和场况
+</code></pre>
+<p>只数当前受入仍然不够。有的切法眼前有效牌很多，却会把手牌固定成大量嵌张和边张；另一些切法当前少一两枚，却能在后续改良成多个两面。真正高效的选择，需要同时看“现在能进什么”和“进张以后会变成什么”。</p>
+<h1 id="heading-7">八、鸣牌是速度工具，也有明确代价</h1>
+<p>吃、碰、杠可以缩短成牌距离，因此鸣牌本质上是一种用手牌自由度换速度的工具。它不是看到能鸣就鸣，也不是为了保持门清而一律不鸣。</p>
+<p>决定是否鸣牌前，至少检查四件事：</p>
+<ol>
+<li><strong>鸣牌后是否有役</strong>：没有役就无法和牌；</li>
+<li><strong>实际减少了多少向听</strong>：只是改变形状、没有提高速度的鸣牌价值有限；</li>
+<li><strong>打点损失是否可接受</strong>：鸣牌通常会失去立直、门前清自摸和一部分役种；</li>
+<li><strong>局面是否需要速度</strong>：领先时的局消化、末盘争一位、对手明显做大牌时，答案可能完全不同。</li>
+</ol>
+<p>鸣牌还会固定一部分牌形，让可调整空间与防守牌减少。竞技麻将追求的不是永远门清或永远速攻，而是让每次鸣牌都有清晰目的。</p>
+<h1 id="heading-8">九、听牌不只看“等几张”</h1>
+<p>听牌以后，仍然要比较听牌质量。两面通常优于嵌张、边张和单骑，但实际选择还应考虑：</p>
+<ul>
+<li>剩余枚数：等待的牌是否已经大量可见；</li>
+<li>和了率：是否容易被对手使用或打出；</li>
+<li>打点：改变听牌是否能增加役、宝牌或符数；</li>
+<li>振听：自己牌河中是否已经出现过所等待的牌；</li>
+<li>场况：巡目、点棒、亲家与否、对手攻势都会改变目标。</li>
+</ul>
+<p>牌效率解决的是“怎样更快、更好地组成手牌”，但它不是唯一目标。越接近实战后半段，安全度、押引判断与点数状况的权重就越高。</p>
+<h1 id="heading-9">十、一套可以直接练习的摸切流程</h1>
+<p>每次摸牌后，可以按下面的顺序快速检查：</p>
+<ol>
+<li>当前是几向听？</li>
+<li>哪些切法不会退向听？</li>
+<li>各切法分别有多少种、多少枚有效牌？</li>
+<li>有效牌进来后，是两面还是愚形？有没有继续改良的空间？</li>
+<li>手牌是否已有可靠的雀头与役？</li>
+<li>宝牌、打点和鸣牌计划是什么？</li>
+<li>牌桌上是否已经出现必须转入防守的信号？</li>
+</ol>
+<p>训练时可以先暂时忽略复杂点数，只练习“向听数—受入—好形”三件事。等基本判断形成直觉，再逐步加入役种、宝牌、场况与防守，学习负担会小得多。</p>
+<h1 id="heading-10">结语</h1>
+<p>日麻的竞技性，来自长期重复决策形成的差距。高手并不是每局都能摸到更好的牌，而是更少浪费有效进张、更少破坏复合形，也更清楚什么时候该用打点换速度、什么时候该放弃眼前的和牌机会。</p>
+<p>入门阶段先记住三句话就够了：<strong>先看向听，再数受入；同样受入，优先好形；评价决策，不被单局结果绑架。</strong> 当这些原则能够自然地进入每一次摸切，牌效率才真正从知识变成了能力。</p>
+
+  </div>
+
+  
+  <nav class="post-nav">
+    
+    <a href="/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/" class="post-nav-card post-nav-card--prev">
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.jpg" alt="路由器里面的一些入门概念" loading="lazy" />
+      </div>
+      
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">上一篇</span>
+        <span class="post-nav-card__title">路由器里面的一些入门概念</span>
+      </div>
+      <span class="post-nav-card__arrow">&larr;</span>
+    </a>
+    
+    
+    <a href="/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/" class="post-nav-card post-nav-card--next">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">下一篇</span>
+        <span class="post-nav-card__title">面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦</span>
+      </div>
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg" alt="面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦" loading="lazy" />
+      </div>
+      
+      <span class="post-nav-card__arrow">&rarr;</span>
+    </a>
+    
+  </nav>
+
+  
+  
+
+
+</article>
+
+<div class="image-zoom-modal" id="imageZoomModal" role="dialog" aria-modal="true" aria-label="图片查看器" hidden>
+  <div class="image-zoom-toolbar">
+    <button type="button" data-zoom-action="out" aria-label="缩小图片">−</button>
+    <output id="imageZoomLevel" aria-live="polite">100%</output>
+    <button type="button" data-zoom-action="in" aria-label="放大图片">＋</button>
+    <button type="button" data-zoom-action="reset">重置</button>
+    <button type="button" data-zoom-action="close" aria-label="关闭图片查看器">关闭</button>
+  </div>
+  <div class="image-zoom-stage">
+    <img class="image-zoom-target" alt="" draggable="false" />
+  </div>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-inner">
+
+    
+    
+    <nav class="footer-nav" aria-label="页脚导航">
+      
+      <a class="footer-nav__link" href="/">首页</a>
+      
+      <a class="footer-nav__link" href="/post">博客</a>
+      
+      <a class="footer-nav__link" href="/memos">闪念</a>
+      
+      <a class="footer-nav__link" href="/archives">归档</a>
+      
+      <a class="footer-nav__link" href="/tags">标签</a>
+      
+      <a class="footer-nav__link" href="/links">友链</a>
+      
+      <a class="footer-nav__link" href="/post/about">关于</a>
+      
+    </nav>
+    
+
+    
+    <div class="footer-social">
+      
+      
+      
+      <a class="footer-social__link" href="/feed.xml" aria-label="RSS">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.18 15.64a2.18 2.18 0 110 4.36 2.18 2.18 0 010-4.36zM4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44zm0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+        </svg>
+      </a>
+    </div>
+
+    
+    <div class="footer-copyright">
+      <p>&copy; 2026 0707‘s Blog. All rights reserved.</p>
+    </div>
+
+    
+    
+    <div class="footer-custom">
+      Powered by Gridea Pro
+    </div>
+    
+
+    
+    <div class="footer-powered">
+      <span>Powered by <a href="https://gridea.pro" target="_blank" rel="noopener noreferrer">Gridea Pro</a></span>
+    </div>
+
+  </div>
+</footer>
+
+  
+  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-modal">
+    <div class="search-header">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <span class="search-kbd">&#8984;K</span>
+      <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<script src="/scripts/search.js"></script>
+  
+
+  
+<script src="/scripts/image-zoom.js"></script>
+
+
+  
+
+  
+
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: flavor-theme v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+</html>
