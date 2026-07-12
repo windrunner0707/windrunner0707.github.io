@@ -19,7 +19,7 @@
   (function () {
     try {
       var saved = localStorage.getItem('flavor-theme');
-      var theme = saved || 'dark';
+      var theme = saved || 'light';
       if (theme === 'light') {
         document.documentElement.classList.add('theme-light');
       }
@@ -27,7 +27,7 @@
   })();
 </script>
   <meta name="generator" content="Gridea Pro 1.2.2">
-  <title>金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付 | 0707‘s Blog</title>
+  <title>金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付 | 0707&#39;s Blog</title>
   
 <meta property="og:title" content="金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付" />
 <meta property="og:type" content="article" />
@@ -37,13 +37,13 @@
 
 <meta name="description" content="在金融项目里谈持续交付，难点通常不是“怎样把应用自动部署到 Kubernetes”，而是怎样让每次变更都经过授权、能够追踪、可以复现，并在出现问题时安全地恢复。 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共同维护运行环境。随着应用和集群数量增加，脚本、人工操作和分散配置带来的问题越来越明显：同一份配置在不同环境中不一致，线上变更难以还原，部署权限边界也不够清晰。 GitOps 给我们的价值，不只是多了一个自动化工具，而是把系统的期望状态、审批记录和实际运行状态连成了一个可以持续校验的闭环。文中部分细节已作泛化处理。">
 <link rel="canonical" href="https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付","url":"https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/","description":"在金融项目里谈持续交付，难点通常不是“怎样把应用自动部署到 Kubernetes”，而是怎样让每次变更都经过授权、能够追踪、可以复现，并在出现问题时安全地恢复。 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共同维护运行环境。随着应用和集群数量增加，脚本、人工操作和分散配置带来的问题越来越明显：同一份配置在不同环境中不一致，线上变更难以还原，部署权限边界也不够清晰。 GitOps 给我们的价值，不只是多了一个自动化工具，而是把系统的期望状态、审批记录和实际运行状态连成了一个可以持续校验的闭环。文中部分细节已作泛化处理。","image":"/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.png","datePublished":"2026-05-06T00:00:00+08:00","dateModified":"2026-07-12T13:48:56+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/","name":"金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付","position":2}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付","url":"https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/","description":"在金融项目里谈持续交付，难点通常不是“怎样把应用自动部署到 Kubernetes”，而是怎样让每次变更都经过授权、能够追踪、可以复现，并在出现问题时安全地恢复。 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共同维护运行环境。随着应用和集群数量增加，脚本、人工操作和分散配置带来的问题越来越明显：同一份配置在不同环境中不一致，线上变更难以还原，部署权限边界也不够清晰。 GitOps 给我们的价值，不只是多了一个自动化工具，而是把系统的期望状态、审批记录和实际运行状态连成了一个可以持续校验的闭环。文中部分细节已作泛化处理。","image":"/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.png","datePublished":"2026-05-06T00:00:00+08:00","dateModified":"2026-07-12T13:48:56+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/","name":"金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付","position":2}]}</script>
 <meta property="og:title" content="金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付">
 <meta property="og:description" content="在金融项目里谈持续交付，难点通常不是“怎样把应用自动部署到 Kubernetes”，而是怎样让每次变更都经过授权、能够追踪、可以复现，并在出现问题时安全地恢复。 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共同维护运行环境。随着应用和集群数量增加，脚本、人工操作和分散配置带来的问题越来越明显：同一份配置在不同环境中不一致，线上变更难以还原，部署权限边界也不够清晰。 GitOps 给我们的价值，不只是多了一个自动化工具，而是把系统的期望状态、审批记录和实际运行状态连成了一个可以持续校验的闭环。文中部分细节已作泛化处理。">
 <meta property="og:url" content="https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/">
 <meta property="og:type" content="article">
-<meta property="og:site_name" content="0707‘s Blog">
+<meta property="og:site_name" content="0707's Blog">
 <meta property="og:image" content="/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/">
@@ -61,10 +61,10 @@
       <div class="top-bar__left">
         
         <a href="https://windrunner0707.tech" class="site-avatar-link" aria-label="返回首页">
-          <img class="site-avatar" src="/images/avatar.png" alt="0707‘s Blog" />
+          <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
         </a>
         
-        <a href="https://windrunner0707.tech" class="site-name-link">0707‘s Blog</a>
+        <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
       </div>
 
       
@@ -382,6 +382,14 @@
     
     <div class="footer-social">
       
+      <a class="footer-social__link" href="https://github.com/windrunner0707" target="_blank" rel="noopener noreferrer"
+        aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+        </svg>
+      </a>
+      
       
       
       <a class="footer-social__link" href="/feed.xml" aria-label="RSS">
@@ -393,7 +401,7 @@
 
     
     <div class="footer-copyright">
-      <p>&copy; 2026 0707‘s Blog. All rights reserved.</p>
+      <p>&copy; 2026 0707&#39;s Blog. All rights reserved.</p>
     </div>
 
     
