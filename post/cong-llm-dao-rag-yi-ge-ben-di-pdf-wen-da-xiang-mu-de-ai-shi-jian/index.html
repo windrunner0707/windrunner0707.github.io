@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+
+
+<style>:root { --heatmap-color: #39d353; }</style>
+
+
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('flavor-theme');
+      var theme = saved || 'dark';
+      if (theme === 'light') {
+        document.documentElement.classList.add('theme-light');
+      }
+    } catch (e) { }
+  })();
+</script>
+  <meta name="generator" content="Gridea Pro 1.2.2">
+  <title>从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践 | 0707‘s Blog</title>
+  
+<meta property="og:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践" />
+<meta property="og:type" content="article" />
+
+
+<meta name="description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
+<link rel="canonical" href="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","url":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","description":"最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。","datePublished":"2026-07-12T00:00:00+08:00","dateModified":"2026-07-12T13:46:01+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","name":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","position":2}]}</script>
+<meta property="og:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践">
+<meta property="og:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
+<meta property="og:url" content="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="0707‘s Blog">
+<meta property="og:image" content="/images/avatar.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
+<meta name="twitter:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践">
+<meta name="twitter:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
+<meta name="twitter:image" content="/images/avatar.png">
+</head>
+<body class="flavor-theme">
+
+  <header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <div class="top-bar">
+
+      
+      <div class="top-bar__left">
+        
+        <a href="https://windrunner0707.tech" class="site-avatar-link" aria-label="返回首页">
+          <img class="site-avatar" src="/images/avatar.png" alt="0707‘s Blog" />
+        </a>
+        
+        <a href="https://windrunner0707.tech" class="site-name-link">0707‘s Blog</a>
+      </div>
+
+      
+      <nav class="top-bar__nav" id="sectionBar">
+        
+        
+        <a class="nav-item" href="/">首页</a>
+        
+        <a class="nav-item" href="/post">博客</a>
+        
+        <a class="nav-item" href="/memos">闪念</a>
+        
+        <a class="nav-item" href="/archives">归档</a>
+        
+        <a class="nav-item" href="/tags">标签</a>
+        
+        <a class="nav-item" href="/links">友链</a>
+        
+        <a class="nav-item" href="/post/about">关于</a>
+        
+        
+      </nav>
+
+      
+      <div class="top-bar__right">
+        <button class="btn-icon btn-search search-btn" id="btnSearch" type="button" aria-label="搜索">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-sun" id="themeToggleSun" type="button"
+          aria-label="切换到浅色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"></path>
+            <path d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"></path>
+            <path d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"></path>
+            <path d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"></path>
+            <path d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"></path>
+            <path d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"></path>
+            <path d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"></path>
+            <path d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-moon" id="themeToggleMoon" type="button"
+          aria-label="切换到深色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"></path>
+            <path d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon btn-nav-toggle mobile-only" id="btnNavToggle" type="button" aria-label="切换导航">
+          <div class="hamburger" id="hamburger">
+            <span class="hamburger__line hamburger__line--top"></span>
+            <span class="hamburger__line hamburger__line--bottom"></span>
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+<div class="header-spacer"></div>
+
+<script>
+(function(){
+  var btn = document.getElementById('btnNavToggle');
+  var nav = document.getElementById('sectionBar');
+  var hamburger = document.getElementById('hamburger');
+  if (btn && nav) {
+    btn.addEventListener('click', function(){
+      nav.classList.toggle('top-bar__nav--open');
+      if (hamburger) hamburger.classList.toggle('is-active');
+    });
+    nav.querySelectorAll('.nav-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        nav.classList.remove('top-bar__nav--open');
+        if (hamburger) hamburger.classList.remove('is-active');
+      });
+    });
+  }
+
+  var root = document.documentElement;
+  var applyTheme = function(theme, persist){
+    if (theme === 'light') {
+      root.classList.add('theme-light');
+    } else {
+      root.classList.remove('theme-light');
+    }
+    if (persist) {
+      try { localStorage.setItem('flavor-theme', theme); } catch (e) {}
+    }
+  };
+  document.querySelectorAll('.theme-toggle').forEach(function(el){
+    el.addEventListener('click', function(){
+      applyTheme(root.classList.contains('theme-light') ? 'dark' : 'light', true);
+    });
+  });
+})();
+</script>
+
+  <main class="site-main" role="main">
+    
+<article class="article-container">
+  <header class="article-header">
+    <h1 class="article-title">从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践</h1>
+    <div class="article-meta">
+      
+      
+      <a href="/category/ji-shu/" class="article-meta__category">技术</a>
+      
+      
+      <span class="article-meta__sep">·</span>
+      
+      <span class="article-meta__item">2026-07-12</span>
+      
+      <span class="article-meta__sep">·</span>
+      <span class="article-meta__item">12 分钟阅读</span>
+      
+    </div>
+    
+    <div class="article-header__tags">
+      
+      <a href="/tag/ren-gong-zhi-neng/" class="tag-pill tag-pill--sm">人工智能</a>
+      
+      <a href="/tag/rag/" class="tag-pill tag-pill--sm">RAG</a>
+      
+      <a href="/tag/jia-gou-she-ji/" class="tag-pill tag-pill--sm">架构设计</a>
+      
+    </div>
+    
+  </header>
+
+  
+
+  <div class="article-content">
+    <p>最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：<a href="https://github.com/windrunner0707/ai-tooling">windrunner0707/ai-tooling</a>。</p>
+<p>这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。</p>
+<p>本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。</p>
+<!-- more -->
+<h2 id="-ai-">一、先把几个 AI 概念说清楚</h2>
+<h3 id="1-llm">1. LLM：会根据上下文继续生成文本的模型</h3>
+<p>LLM 是 Large Language Model，即大语言模型。可以先把它理解为一个能力很强的文本生成器：接收一组消息，根据训练中学到的语言规律，逐个生成后续 token。</p>
+<p>项目使用 Ollama 在本地运行 <code>qwen3:8b</code>。其中 <code>8b</code> 表示模型大约有 80 亿参数，但参数量不是效果的唯一标准。模型版本、量化方式、上下文长度、硬件和任务类型都会影响最终体验。</p>
+<p>LLM 有通用知识，也擅长总结、翻译和改写，但它并不知道我刚刚上传的 PDF。即使模型“听说过”这本书，它也可能记忆不完整或直接编造细节。因此，单纯把问题发给模型，并不能可靠地完成私有资料问答。</p>
+<h3 id="2-prompt">2. Prompt：给模型的任务说明和上下文</h3>
+<p>Prompt 不只是用户输入的一句话，也包括系统角色、任务约束、参考资料和输出格式。项目把常用任务做成了模板，例如内容总结、翻译、文本润色、提取待办和代码解释：</p>
+<pre><code class="language-python">return [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_content},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt},
+]
+</code></pre>
+<p>这里的 <code>system</code> 消息定义模型怎样工作，<code>user</code> 消息承载本次输入。模板能让同一种任务的提示词保持稳定，但它不是权限控制，也不能保证模型百分之百遵守规则。重要约束仍应由程序和数据访问层落实。</p>
+<h3 id="3-embedding">3. Embedding：把文本变成可比较的数字向量</h3>
+<p>Embedding（向量表示）会把一段文本转换成一组浮点数。语义相近的文本，向量在空间中的距离通常也更近。</p>
+<p>例如，“怎样恢复数据库备份”和“数据库灾难恢复步骤”用词不同，关键词匹配可能漏掉，但它们的语义接近，向量检索更容易把它们联系起来。</p>
+<p>项目使用 Ollama 中的 <code>bge-m3:latest</code> 生成 1024 维向量，并在代码中检查返回维度：</p>
+<pre><code class="language-python">embedding = embeddings[0]
+if len(embedding) != settings.rag_embedding_dimensions:
+    raise RAGServiceError(&quot;Embedding 维度与数据库配置不一致&quot;)
+</code></pre>
+<p>维度必须和数据库字段 <code>VECTOR(1024)</code> 一致。Embedding 模型一旦更换，向量维度和语义空间都可能变化，已有文档通常需要重新生成向量，而不是只改一个模型名称。</p>
+<h3 id="4-">4. 向量数据库：保存向量并找出相似内容</h3>
+<p>向量数据库的核心能力，是按距离寻找与查询最相近的记录。这个 Demo 没有另外引入专用数据库，而是在 PostgreSQL 中安装 pgvector 扩展：</p>
+<pre><code class="language-sql">CREATE TABLE document_chunks (
+  id BIGSERIAL PRIMARY KEY,
+  document_id BIGINT REFERENCES rag_documents(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  embedding VECTOR(1024)
+);
+
+CREATE INDEX document_chunks_embedding_hnsw_idx
+  ON document_chunks
+  USING hnsw (embedding vector_cosine_ops);
+</code></pre>
+<p>这样，文档信息、文本、页码等元数据和向量可以放在同一个数据库中。HNSW 索引用更多存储和建索引成本，换取较快的近似最近邻搜索，适合这个小型实践继续向更大数据量扩展。</p>
+<h3 id="5-rag">5. RAG：先检索资料，再让模型回答</h3>
+<p>RAG 是 Retrieval-Augmented Generation，即检索增强生成。它不是一种新模型，而是一套应用流程：先从外部知识库检索与问题相关的内容，再把这些内容和问题一起交给 LLM。</p>
+<p>可以把它压缩成一句话：</p>
+<pre><code class="language-text">RAG = Retrieval（找资料）+ Augmented Prompt（把资料放进提示词）+ Generation（生成回答）
+</code></pre>
+<p>它的价值不是让模型突然“学会”一本书，而是在每次回答前临时给模型一份开卷资料。知识库内容变化时，不需要重新训练 LLM，只需要更新文档和向量。</p>
+<h3 id="6-litellm">6. LiteLLM：统一不同模型的调用入口</h3>
+<p>LiteLLM 不是 LLM，也不负责从文档中检索内容。它更像模型网关：在应用和具体模型服务之间提供统一的 OpenAI 兼容 API，并把应用使用的模型名称映射到真实后端。</p>
+<p>项目中的配置很短：</p>
+<pre><code class="language-yaml">model_list:
+  - model_name: qwen3.8
+    litellm_params:
+      model: ollama/qwen3:8b
+      api_base: http://127.0.0.1:11434
+</code></pre>
+<p>应用只认识 <code>qwen3.8</code>，LiteLLM 再把请求转给本地 Ollama 的 <code>qwen3:8b</code>。以后如果增加其他本地模型或云端服务，可以尽量保持上层调用方式不变，并在网关层统一处理路由、超时、重试、日志和成本统计等问题。</p>
+<p>不过，多一层网关也意味着多一个需要部署和排查的组件。只有一个固定模型的小脚本可以直接调用 Ollama；当模型来源变多、多个应用需要统一接口时，网关的价值才更明显。</p>
+<h2 id="heading">二、项目整体结构：两条模型调用路径</h2>
+<p>项目由 React 前端、FastAPI 后端、PostgreSQL + pgvector、Ollama 和可选的 LiteLLM 组成：</p>
+<pre><code class="language-text">React 页面
+    |
+    v
+FastAPI 后端
+    |-- 普通聊天 --&gt; LiteLLM --&gt; Ollama qwen3:8b
+    |
+    |-- PDF 入库 --&gt; 文本提取/OCR --&gt; bge-m3 --&gt; PostgreSQL + pgvector
+    |
+    `-- PDF 问答 --&gt; pgvector 检索 --&gt; Ollama qwen3:8b
+</code></pre>
+<p>这里有一个值得说明的实现边界：普通聊天通过 LiteLLM 调用模型，而当前 RAG 服务为了直接使用 Ollama 的 embedding 和 chat 接口，没有经过 LiteLLM。</p>
+<p>这不影响 RAG 的成立，但形成了两套调用方式。作为学习项目，它能直观看清每一层；如果继续工程化，我会考虑让生成模型统一经过 <code>LLMService</code>，同时保留 embedding 的独立接口。这样模型切换、错误处理和监控不会散落在不同服务中。</p>
+<h2 id="-litellm--llm">三、第一步实践：通过 LiteLLM 调用本地 LLM</h2>
+<p>后端使用 OpenAI Python SDK，但 <code>base_url</code> 指向本地 LiteLLM：</p>
+<pre><code class="language-python">self.client = AsyncOpenAI(
+    api_key=settings.litellm_api_key,
+    base_url=settings.litellm_base_url,
+    timeout=settings.request_timeout_seconds,
+)
+
+response = await self.client.chat.completions.create(
+    model=model or settings.default_model,
+    messages=messages,
+    temperature=temperature,
+    max_tokens=max_tokens,
+)
+</code></pre>
+<p>这种设计把业务代码和 Ollama 的专有接口解耦了。<code>LLMService</code> 只关心 OpenAI 风格的 <code>messages</code>、模型名和采样参数。网关不可用、请求超时或返回错误状态时，再统一转换为应用自己的 <code>LLMServiceError</code>。</p>
+<p>项目还实现了流式输出。模型每生成一小段内容，后端就通过 SSE 发送一个 <code>delta</code> 事件，前端不必等完整答案生成后再显示。这不会让模型真正计算得更快，却能明显改善长回答的等待体验。</p>
+<p><code>temperature</code> 可以粗略理解为输出随机性的控制参数。翻译、抽取和 RAG 问答通常更需要稳定，适合较低值；创意写作可以适当提高。但它不是“正确率旋钮”，降低 temperature 也不能阻止模型基于错误上下文生成错误答案。</p>
+<h2 id="-pdf-">四、第二步实践：把 PDF 建成可检索的知识库</h2>
+<p>PDF 入库不是简单地把整个文件塞给模型，而是经过提取、切分、向量化和存储。</p>
+<h3 id="1--ocr">1. 提取文字，必要时使用 OCR</h3>
+<p>普通 PDF 先由 <code>pypdf</code> 读取文字层。如果所有页面都没有提取到文本，系统会用 Poppler 的 <code>pdftoppm</code> 把页面渲染成图片，再用 Tesseract 做 <code>chi_sim+eng</code> OCR。</p>
+<pre><code class="language-text">PDF
+  -&gt; pypdf 提取文字
+  -&gt; 无文字层时渲染页面图片
+  -&gt; Tesseract OCR
+  -&gt; 规范化文本
+</code></pre>
+<p>这个 fallback 让扫描版电子书也能入库，但 OCR 更慢，而且识别质量会直接影响后续检索。RAG 无法自动修复源文本中的错字、漏字和页码错位，所以数据质量仍是整个链路的上限。</p>
+<h3 id="2-chunk">2. Chunk：为什么要把长文档切成小块</h3>
+<p>项目按页处理文本，每个 chunk 最多 1200 个字符，相邻块保留 180 个字符的 overlap：</p>
+<pre><code class="language-python">end = min(start + chunk_size, len(text))
+content = text[start:end].strip()
+start = max(end - overlap, start + 1)
+</code></pre>
+<p>切分是因为 embedding 模型和 LLM 都有上下文限制，同时小块内容通常更容易精确命中。Overlap 可以减少一句话或一段话刚好被切断造成的信息丢失。</p>
+<p>但 chunk 不是越小越好。太小会缺少上下文，太大又会混入无关内容并增加 Prompt 长度。当前按字符和页切分实现简单，后续可以尝试按标题、段落或句子做结构化切分，并用真实问题集比较检索效果。</p>
+<h3 id="3--chunk--embedding">3. 为每个 chunk 生成 embedding</h3>
+<p>每个文本块都会调用 <code>bge-m3</code> 生成向量，并和原文、文件名、页码、字符范围一起写入数据库。保留原文是因为向量只适合计算相似度，真正交给 LLM 阅读的仍然是文本内容；保留 metadata 则是为了显示引用和定位来源。</p>
+<p>当前实现逐个 chunk 等待 embedding 后再写入数据库，逻辑清楚，但大 PDF 会比较慢。后续可以在模型接口支持的前提下批量生成 embedding，或者引入后台任务和进度反馈。</p>
+<h2 id="heading-1">五、第三步实践：从相似检索到带来源回答</h2>
+<p>用户在前端选择一本书并提问时，页面会同时提交 <code>question</code> 和 <code>document_id</code>：</p>
+<pre><code class="language-json">{
+  &quot;question&quot;: &quot;这本书主要讲了什么？&quot;,
+  &quot;document_id&quot;: 2
+}
+</code></pre>
+<p>后端先把问题也转换成向量，再使用 pgvector 的余弦距离运算符 <code>&lt;=&gt;</code> 取最接近的 5 个文本块：</p>
+<pre><code class="language-sql">SELECT content, metadata, embedding &lt;=&gt; :question_vector AS distance
+FROM document_chunks
+WHERE document_id = :document_id
+ORDER BY embedding &lt;=&gt; :question_vector
+LIMIT 5;
+</code></pre>
+<p><code>document_id</code> 过滤非常重要。它确保选择《A》时不会从《B》里找答案。这类范围限制应在 SQL 查询中实现，而不是只在 Prompt 里告诉模型“不要引用其他书”。前者是数据边界，后者只是生成建议。</p>
+<p>检索完成后，系统给每个片段编号，把文件名、页码和正文拼进 Prompt：</p>
+<pre><code class="language-text">你是一个本地 RAG 阅读助手。只根据下面的资料回答问题。
+如果资料不足，请直接说资料中没有找到答案。
+回答要使用中文，并在关键结论后标注来源编号。
+
+资料:
+[1] source=book.pdf, page=12
+...
+
+问题: ...
+</code></pre>
+<p>模型温度设置为 <code>0.2</code>，倾向于给出较稳定的回答。接口除了答案，还会返回命中的 chunk ID、页码、距离和文本预览，前端可以把这些来源展示给用户。</p>
+<p>这比只返回一段答案更可靠，但“带引用”不等于“引用一定支持结论”。生产场景还需要检查距离阈值、引用和结论是否一致，并用一组已知答案的问题持续评估检索召回率与回答准确性。</p>
+<h2 id="heading-2">六、这次实践让我理解的几个边界</h2>
+<h3 id="1-rag-">1. RAG 不是微调</h3>
+<p>RAG 在请求时把外部资料放进上下文，适合经常更新、需要引用的知识。微调则通过训练改变模型参数，更适合调整行为、风格或特定任务能力。把一本新 PDF 加入知识库，通常优先考虑 RAG，而不是重新训练模型。</p>
+<h3 id="2-">2. 相似不等于相关，更不等于正确</h3>
+<p>向量距离只能说明两段文本在 embedding 空间中接近。一个问题可能需要跨页推理，也可能包含人名、版本号等更适合关键词检索的信息。更完整的方案可以加入关键词与向量混合检索、reranker、相似度阈值和查询改写。</p>
+<h3 id="3-">3. 本地运行不等于天然安全</h3>
+<p>模型不出本机减少了数据发送给外部服务的风险，但上传文件、数据库权限、日志、临时 OCR 图片和接口访问仍需要保护。如果应用开放给其他人使用，还要增加文件大小与类型限制、身份认证、资源隔离和恶意 Prompt 防护。</p>
+<h3 id="4-rag-">4. RAG 也会产生幻觉</h3>
+<p>检索只负责提供材料，最终回答仍由生成模型完成。材料不相关、缺失或互相矛盾时，模型依然可能推断过度。项目中的“资料不足就明确说明”和来源展示只能降低风险，不能彻底消除幻觉。</p>
+<h3 id="5-demo-">5. Demo 与生产系统之间还有一段路</h3>
+<p>这个项目已经跑通了完整闭环，但如果用于真实业务，还需要补充异步入库、失败重试、重复文件检测、权限隔离、数据删除、模型与 Prompt 版本、调用指标、评估集以及备份恢复等能力。</p>
+<h2 id="heading-3">七、如何在本地跑起来</h2>
+<p>可以先克隆项目源码：</p>
+<pre><code class="language-bash">git clone https://github.com/windrunner0707/ai-tooling.git
+cd ai-tooling
+</code></pre>
+<p>仓库地址：<a href="https://github.com/windrunner0707/ai-tooling">github.com/windrunner0707/ai-tooling</a>。</p>
+<p>先启动 PostgreSQL + pgvector，并准备 Ollama 模型：</p>
+<pre><code class="language-bash">cd /Users/qiqibai/ai-tooling/rag-postgres
+docker compose up -d
+
+ollama pull qwen3:8b
+ollama pull bge-m3
+</code></pre>
+<p>然后分别启动后端和前端：</p>
+<pre><code class="language-bash">cd /Users/qiqibai/ai-tooling/backend
+./scripts/start_backend.sh
+
+cd /Users/qiqibai/ai-tooling/frontend
+npm run dev
+</code></pre>
+<p>如果要体验普通聊天的统一模型入口，再启动 LiteLLM：</p>
+<pre><code class="language-bash">cd /Users/qiqibai/ai-tooling/litellm-gateway
+./scripts/start_litellm.sh
+</code></pre>
+<p>最后访问 <code>http://127.0.0.1:5173</code>，上传 PDF，等待提取和 embedding 完成，选择电子书后即可提问。扫描版 PDF 还需要本机安装 Poppler、Tesseract 和中文语言包。</p>
+<h2 id="heading-4">结语</h2>
+<p>完成这个 Demo 后，我对这些概念的关系有了更具体的认识：LLM 负责理解和生成语言，Prompt 描述任务，Embedding 把语义变成可检索的向量，pgvector 保存并搜索向量，RAG 把找到的资料交给 LLM，LiteLLM 则为不同模型提供相对统一的调用入口。</p>
+<p>真正值得练习的不是记住这些缩写，而是画出一次请求经过了哪些组件，知道每一层能解决什么、不能保证什么。先跑通一个本地、可观察的小闭环，再逐步加入评估、监控和安全控制，比一开始堆叠大量 AI 框架更容易建立可靠的工程判断。</p>
+
+  </div>
+
+  
+  <nav class="post-nav">
+    
+    <div class="post-nav-card post-nav-card--empty">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">上一篇</span>
+        <span class="post-nav-card__empty-text">没有上一篇了~</span>
+      </div>
+    </div>
+    
+    
+    <a href="/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/" class="post-nav-card post-nav-card--next">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">下一篇</span>
+        <span class="post-nav-card__title">电子交易库存系统复盘：从整批预留到统一库存交易引擎</span>
+      </div>
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" alt="电子交易库存系统复盘：从整批预留到统一库存交易引擎" loading="lazy" />
+      </div>
+      
+      <span class="post-nav-card__arrow">&rarr;</span>
+    </a>
+    
+  </nav>
+
+  
+  
+
+
+</article>
+
+<div class="image-zoom-modal" id="imageZoomModal" role="dialog" aria-modal="true" aria-label="图片查看器" hidden>
+  <div class="image-zoom-toolbar">
+    <button type="button" data-zoom-action="out" aria-label="缩小图片">−</button>
+    <output id="imageZoomLevel" aria-live="polite">100%</output>
+    <button type="button" data-zoom-action="in" aria-label="放大图片">＋</button>
+    <button type="button" data-zoom-action="reset">重置</button>
+    <button type="button" data-zoom-action="close" aria-label="关闭图片查看器">关闭</button>
+  </div>
+  <div class="image-zoom-stage">
+    <img class="image-zoom-target" alt="" draggable="false" />
+  </div>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-inner">
+
+    
+    
+    <nav class="footer-nav" aria-label="页脚导航">
+      
+      <a class="footer-nav__link" href="/">首页</a>
+      
+      <a class="footer-nav__link" href="/post">博客</a>
+      
+      <a class="footer-nav__link" href="/memos">闪念</a>
+      
+      <a class="footer-nav__link" href="/archives">归档</a>
+      
+      <a class="footer-nav__link" href="/tags">标签</a>
+      
+      <a class="footer-nav__link" href="/links">友链</a>
+      
+      <a class="footer-nav__link" href="/post/about">关于</a>
+      
+    </nav>
+    
+
+    
+    <div class="footer-social">
+      
+      
+      
+      <a class="footer-social__link" href="/feed.xml" aria-label="RSS">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.18 15.64a2.18 2.18 0 110 4.36 2.18 2.18 0 010-4.36zM4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44zm0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+        </svg>
+      </a>
+    </div>
+
+    
+    <div class="footer-copyright">
+      <p>&copy; 2026 0707‘s Blog. All rights reserved.</p>
+    </div>
+
+    
+    
+    <div class="footer-custom">
+      Powered by Gridea Pro
+    </div>
+    
+
+    
+    <div class="footer-powered">
+      <span>Powered by <a href="https://gridea.pro" target="_blank" rel="noopener noreferrer">Gridea Pro</a></span>
+    </div>
+
+  </div>
+</footer>
+
+  
+  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-modal">
+    <div class="search-header">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <span class="search-kbd">&#8984;K</span>
+      <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<script src="/scripts/search.js"></script>
+  
+
+  
+<script src="/scripts/image-zoom.js"></script>
+
+
+  
+
+  
+
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: flavor-theme v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+</html>

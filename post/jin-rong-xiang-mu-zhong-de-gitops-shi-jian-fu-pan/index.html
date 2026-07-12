@@ -37,7 +37,7 @@
 
 <meta name="description" content="在金融项目里谈持续交付，难点通常不是“怎样把应用自动部署到 Kubernetes”，而是怎样让每次变更都经过授权、能够追踪、可以复现，并在出现问题时安全地恢复。 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共同维护运行环境。随着应用和集群数量增加，脚本、人工操作和分散配置带来的问题越来越明显：同一份配置在不同环境中不一致，线上变更难以还原，部署权限边界也不够清晰。 GitOps 给我们的价值，不只是多了一个自动化工具，而是把系统的期望状态、审批记录和实际运行状态连成了一个可以持续校验的闭环。出于保密要求，本文对机构名称、组织结构、仓库地址和基础设施细节都做了匿名化与泛化。">
 <link rel="canonical" href="https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付","url":"https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/","description":"在金融项目里谈持续交付，难点通常不是“怎样把应用自动部署到 Kubernetes”，而是怎样让每次变更都经过授权、能够追踪、可以复现，并在出现问题时安全地恢复。 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共同维护运行环境。随着应用和集群数量增加，脚本、人工操作和分散配置带来的问题越来越明显：同一份配置在不同环境中不一致，线上变更难以还原，部署权限边界也不够清晰。 GitOps 给我们的价值，不只是多了一个自动化工具，而是把系统的期望状态、审批记录和实际运行状态连成了一个可以持续校验的闭环。出于保密要求，本文对机构名称、组织结构、仓库地址和基础设施细节都做了匿名化与泛化。","image":"/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.png","datePublished":"2026-07-12T00:00:00+08:00","dateModified":"2026-07-12T13:24:28+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付","url":"https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/","description":"在金融项目里谈持续交付，难点通常不是“怎样把应用自动部署到 Kubernetes”，而是怎样让每次变更都经过授权、能够追踪、可以复现，并在出现问题时安全地恢复。 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共同维护运行环境。随着应用和集群数量增加，脚本、人工操作和分散配置带来的问题越来越明显：同一份配置在不同环境中不一致，线上变更难以还原，部署权限边界也不够清晰。 GitOps 给我们的价值，不只是多了一个自动化工具，而是把系统的期望状态、审批记录和实际运行状态连成了一个可以持续校验的闭环。出于保密要求，本文对机构名称、组织结构、仓库地址和基础设施细节都做了匿名化与泛化。","image":"/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.png","datePublished":"2026-05-06T00:00:00+08:00","dateModified":"2026-07-12T13:48:56+08:00","author":{"@type":"Person","name":"0707‘s Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707‘s Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707‘s Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/","name":"金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付","position":2}]}</script>
 <meta property="og:title" content="金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付">
 <meta property="og:description" content="在金融项目里谈持续交付，难点通常不是“怎样把应用自动部署到 Kubernetes”，而是怎样让每次变更都经过授权、能够追踪、可以复现，并在出现问题时安全地恢复。 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共同维护运行环境。随着应用和集群数量增加，脚本、人工操作和分散配置带来的问题越来越明显：同一份配置在不同环境中不一致，线上变更难以还原，部署权限边界也不够清晰。 GitOps 给我们的价值，不只是多了一个自动化工具，而是把系统的期望状态、审批记录和实际运行状态连成了一个可以持续校验的闭环。出于保密要求，本文对机构名称、组织结构、仓库地址和基础设施细节都做了匿名化与泛化。">
@@ -183,7 +183,7 @@
       
       <span class="article-meta__sep">·</span>
       
-      <span class="article-meta__item">2026-07-12</span>
+      <span class="article-meta__item">2026-05-06</span>
       
       <span class="article-meta__sep">·</span>
       <span class="article-meta__item">6 分钟阅读</span>
@@ -305,28 +305,28 @@
   
   <nav class="post-nav">
     
-    <a href="/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/" class="post-nav-card post-nav-card--prev">
+    <a href="/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/" class="post-nav-card post-nav-card--prev">
       
       <div class="post-nav-card__img">
-        <img src="/post-images/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun.jpg" alt="一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂" loading="lazy" />
+        <img src="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" alt="电子交易库存系统复盘：从整批预留到统一库存交易引擎" loading="lazy" />
       </div>
       
       <div class="post-nav-card__body">
         <span class="post-nav-card__label meta-text">上一篇</span>
-        <span class="post-nav-card__title">一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂</span>
+        <span class="post-nav-card__title">电子交易库存系统复盘：从整批预留到统一库存交易引擎</span>
       </div>
       <span class="post-nav-card__arrow">&larr;</span>
     </a>
     
     
-    <a href="/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/" class="post-nav-card post-nav-card--next">
+    <a href="/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/" class="post-nav-card post-nav-card--next">
       <div class="post-nav-card__body">
         <span class="post-nav-card__label meta-text">下一篇</span>
-        <span class="post-nav-card__title">电子交易库存系统复盘：从整批预留到统一库存交易引擎</span>
+        <span class="post-nav-card__title">路由器里面的一些入门概念</span>
       </div>
       
       <div class="post-nav-card__img">
-        <img src="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" alt="电子交易库存系统复盘：从整批预留到统一库存交易引擎" loading="lazy" />
+        <img src="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.jpg" alt="路由器里面的一些入门概念" loading="lazy" />
       </div>
       
       <span class="post-nav-card__arrow">&rarr;</span>
