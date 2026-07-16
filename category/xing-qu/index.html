@@ -15,6 +15,17 @@
 
 
 
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
 <script>
   (function () {
     try {
@@ -26,14 +37,15 @@
     } catch (e) { }
   })();
 </script>
+
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>兴趣 | 0707&#39;s Blog</title>
   
-<meta name="description" content="A Software Engineer's Blog">
+<meta name="description" content="记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。">
 <link rel="canonical" href="https://windrunner0707.tech/category/xing-qu/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"0707's Blog","url":"https://windrunner0707.tech","description":"A Software Engineer's Blog","potentialAction":{"@type":"SearchAction","query-input":"required name=search_term_string","target":"https://windrunner0707.tech/search?q={search_term_string}"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"0707's Blog","url":"https://windrunner0707.tech","description":"记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。","potentialAction":{"@type":"SearchAction","query-input":"required name=search_term_string","target":"https://windrunner0707.tech/search?q={search_term_string}"}}</script>
 <meta property="og:title" content="0707's Blog">
-<meta property="og:description" content="A Software Engineer's Blog">
+<meta property="og:description" content="记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。">
 <meta property="og:url" content="https://windrunner0707.tech/category/xing-qu/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="0707's Blog">
@@ -41,7 +53,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/category/xing-qu/">
 <meta name="twitter:title" content="0707's Blog">
-<meta name="twitter:description" content="A Software Engineer's Blog">
+<meta name="twitter:description" content="记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。">
 <meta name="twitter:image" content="/images/avatar.png">
 </head>
 <body class="flavor-theme">
@@ -57,7 +69,9 @@
           <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
         </a>
         
+        
         <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
       </div>
 
       
@@ -163,6 +177,7 @@
 })();
 </script>
 
+
   <main class="site-main" role="main">
     
 <div class="container">
@@ -192,7 +207,8 @@
   </div>
   
   <a href="/post/riichi-mahjong-basics-tile-efficiency/" class="post-card__thumb-link">
-    <img class="post-card__thumb" src="/post-images/riichi-mahjong-basics-tile-efficiency.png" alt="日麻入门：从牌型、向听到牌效率" loading="lazy" />
+    <img class="post-card__thumb" src="/post-images/riichi-mahjong-basics-tile-efficiency.webp" alt="日麻入门：从牌型、向听到牌效率" loading="lazy"
+      decoding="async" width="200" height="134" />
   </a>
   
 </article>
@@ -269,15 +285,18 @@
 </footer>
 
   
-  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
   <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
     <div class="search-header">
       <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
       <span class="search-kbd">&#8984;K</span>
       <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -287,11 +306,12 @@
         </svg>
       </button>
     </div>
-    <div class="search-results" id="searchResults"></div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
   </div>
 </div>
 
 <script src="/scripts/search.js"></script>
+
   
 
   

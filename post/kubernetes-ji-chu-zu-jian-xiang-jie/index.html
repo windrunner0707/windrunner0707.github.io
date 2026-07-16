@@ -15,6 +15,17 @@
 
 
 
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
 <script>
   (function () {
     try {
@@ -26,21 +37,16 @@
     } catch (e) { }
   })();
 </script>
+
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>Kubernetes基础组件详解 | 0707&#39;s Blog</title>
   
-<meta property="og:title" content="Kubernetes基础组件详解" />
-<meta property="og:type" content="article" />
-
-<meta property="og:image" content="/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp" />
-
-
-<meta name="description" content="概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： ##&amp;hellip;">
+<meta name="description" content="概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： &amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Kubernetes基础组件详解","url":"https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/","description":"概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： ##\u0026hellip;","image":"/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp","datePublished":"2025-09-30T00:00:00+08:00","dateModified":"2026-07-11T17:35:46+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Kubernetes基础组件详解","url":"https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/","description":"概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： \u0026hellip;","image":"/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp","datePublished":"2025-09-30T00:00:00+08:00","dateModified":"2026-07-11T17:35:46+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/","name":"Kubernetes基础组件详解","position":2}]}</script>
 <meta property="og:title" content="Kubernetes基础组件详解">
-<meta property="og:description" content="概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： ##&amp;hellip;">
+<meta property="og:description" content="概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： &amp;hellip;">
 <meta property="og:url" content="https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
@@ -48,7 +54,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/">
 <meta name="twitter:title" content="Kubernetes基础组件详解">
-<meta name="twitter:description" content="概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： ##&amp;hellip;">
+<meta name="twitter:description" content="概述 Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。 介绍 控制平面（Control Plane） 控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括： &amp;hellip;">
 <meta name="twitter:image" content="/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp">
 </head>
 <body class="flavor-theme">
@@ -64,7 +70,9 @@
           <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
         </a>
         
+        
         <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
       </div>
 
       
@@ -170,8 +178,10 @@
 })();
 </script>
 
+
   <main class="site-main" role="main">
     
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="readingProgressBar"></span></div>
 <article class="article-container">
   <header class="article-header">
     <h1 class="article-title">Kubernetes基础组件详解</h1>
@@ -202,36 +212,43 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp" alt="Kubernetes基础组件详解" />
+    <img src="/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp" alt="Kubernetes基础组件详解" decoding="async" fetchpriority="high" />
   </div>
   
 
+  <nav class="article-toc" id="articleToc" aria-label="文章目录" hidden>
+    <details class="article-toc__details">
+      <summary class="article-toc__summary">文章目录</summary>
+      <ol class="article-toc__list" id="articleTocList"></ol>
+    </details>
+  </nav>
+
   <div class="article-content">
     <p><img src="/post-images/1759237881724.png" alt="" /></p>
-<h1 id="heading">概述</h1>
+<h2 id="heading">概述</h2>
 <p>Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。</p>
-<h1 id="heading-1">介绍</h1>
-<h2 id="control-plane">控制平面（Control Plane）</h2>
+<h2 id="heading-1">介绍</h2>
+<h3 id="control-plane">控制平面（Control Plane）</h3>
 <p>控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括：</p>
-<h3 id="api-server">API Server</h3>
+<h4 id="api-server">API Server</h4>
 <p>API Server 暴露 Kubernetes API。<code>kubectl</code>、控制器和其他集群组件都通过它读取或修改资源；它还负责认证、鉴权、准入控制和请求校验。</p>
-<h3 id="etcd">etcd</h3>
+<h4 id="etcd">etcd</h4>
 <p>etcd 是一致性的分布式键值数据库，用于保存 Kubernetes API 对象。它是控制平面的关键数据存储，因此备份、访问控制和磁盘延迟都很重要。</p>
-<h3 id="scheduler">Scheduler</h3>
+<h4 id="scheduler">Scheduler</h4>
 <p>Scheduler 负责把新建的 Pod 分配到合适的节点上。它会综合考虑节点的 CPU、内存、亲和性、反亲和性等条件，尽量做到资源合理分配。</p>
-<h3 id="controller-manager">Controller Manager</h3>
+<h4 id="controller-manager">Controller Manager</h4>
 <p>Controller Manager 运行多种控制器，持续比较期望状态与实际状态。例如 Deployment 需要三个副本而当前只有两个时，相关控制器会创建新的 Pod 对象，随后再由调度器和 kubelet 接手。</p>
-<h2 id="worker-node">工作节点（Worker Node）</h2>
+<h3 id="worker-node">工作节点（Worker Node）</h3>
 <p>工作节点是真正运行应用的地方，每个节点上都包含以下组件：</p>
-<h3 id="kubelet">kubelet</h3>
+<h4 id="kubelet">kubelet</h4>
 <p>kubelet 监视分配到本节点的 Pod，并通过容器运行时启动容器、执行健康检查和上报状态。副本数量由控制器维护，不是 kubelet 的职责。</p>
-<h3 id="kube-proxy">kube-proxy</h3>
+<h4 id="kube-proxy">kube-proxy</h4>
 <p>kube-proxy 在节点上实现 Service 的转发规则，通常使用 iptables 或 IPVS 将虚拟 IP 的流量转到后端 Pod。Pod 网络本身通常由 CNI 插件提供。</p>
-<h3 id="container-runtime">Container Runtime</h3>
+<h4 id="container-runtime">Container Runtime</h4>
 <p>容器运行时负责镜像拉取和容器生命周期管理，并通过 CRI 与 kubelet 交互，常见实现有 containerd 和 CRI-O。Kubernetes 自 1.24 起移除了内置的 dockershim，不能再把 Docker Engine 直接当作 CRI 运行时使用。</p>
-<h3 id="pods">Pods</h3>
+<h4 id="pods">Pods</h4>
 <p>Pod 是 Kubernetes 中最小的调度单元，每个 Pod 包含一个或多个紧密相关的容器。Pod 会共享网络和存储卷，方便容器之间的通信。</p>
-<h1 id="heading-2">把一次部署串起来</h1>
+<h2 id="heading-2">把一次部署串起来</h2>
 <p>提交 Deployment 后，API Server 校验并保存对象；控制器创建所需的 Pod；Scheduler 为未调度的 Pod 选择节点；目标节点上的 kubelet 再调用容器运行时启动容器。Service 流量则由 kube-proxy 维护的转发规则送到可用 Pod。沿着这条链路排查问题，通常比孤立地背组件名称更实用。</p>
 <!-- more -->
   </div>
@@ -354,15 +371,18 @@
 </footer>
 
   
-  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
   <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
     <div class="search-header">
       <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
       <span class="search-kbd">&#8984;K</span>
       <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -372,15 +392,17 @@
         </svg>
       </button>
     </div>
-    <div class="search-results" id="searchResults"></div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
   </div>
 </div>
 
 <script src="/scripts/search.js"></script>
+
   
 
   
 <script src="/scripts/image-zoom.js"></script>
+<script src="/scripts/article-enhancements.js"></script>
 
 
   

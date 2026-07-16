@@ -15,6 +15,17 @@
 
 
 
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
 <script>
   (function () {
     try {
@@ -26,30 +37,25 @@
     } catch (e) { }
   })();
 </script>
+
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践 | 0707&#39;s Blog</title>
   
-<meta property="og:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践" />
-<meta property="og:type" content="article" />
-
-<meta property="og:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.png" />
-
-
 <meta name="description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
 <link rel="canonical" href="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","url":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","description":"最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。","image":"/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.png","datePublished":"2026-07-12T00:00:00+08:00","dateModified":"2026-07-12T13:46:01+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","url":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","description":"最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。","image":"/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp","datePublished":"2026-07-12T00:00:00+08:00","dateModified":"2026-07-12T13:46:01+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","name":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","position":2}]}</script>
 <meta property="og:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践">
 <meta property="og:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
 <meta property="og:url" content="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
-<meta property="og:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.png">
+<meta property="og:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
 <meta name="twitter:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践">
 <meta name="twitter:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
-<meta name="twitter:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.png">
+<meta name="twitter:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp">
 </head>
 <body class="flavor-theme">
 
@@ -64,7 +70,9 @@
           <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
         </a>
         
+        
         <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
       </div>
 
       
@@ -170,8 +178,10 @@
 })();
 </script>
 
+
   <main class="site-main" role="main">
     
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="readingProgressBar"></span></div>
 <article class="article-container">
   <header class="article-header">
     <h1 class="article-title">从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践</h1>
@@ -204,9 +214,16 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.png" alt="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践" />
+    <img src="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp" alt="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践" decoding="async" fetchpriority="high" />
   </div>
   
+
+  <nav class="article-toc" id="articleToc" aria-label="文章目录" hidden>
+    <details class="article-toc__details">
+      <summary class="article-toc__summary">文章目录</summary>
+      <ol class="article-toc__list" id="articleTocList"></ol>
+    </details>
+  </nav>
 
   <div class="article-content">
     <p>最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：<a href="https://github.com/windrunner0707/ai-tooling">windrunner0707/ai-tooling</a>。</p>
@@ -367,21 +384,21 @@ cd ai-tooling
 </code></pre>
 <p>仓库地址：<a href="https://github.com/windrunner0707/ai-tooling">github.com/windrunner0707/ai-tooling</a>。</p>
 <p>先启动 PostgreSQL + pgvector，并准备 Ollama 模型：</p>
-<pre><code class="language-bash">cd /Users/qiqibai/ai-tooling/rag-postgres
+<pre><code class="language-bash">cd rag-postgres
 docker compose up -d
 
 ollama pull qwen3:8b
 ollama pull bge-m3
 </code></pre>
 <p>然后分别启动后端和前端：</p>
-<pre><code class="language-bash">cd /Users/qiqibai/ai-tooling/backend
+<pre><code class="language-bash">cd ../backend
 ./scripts/start_backend.sh
 
-cd /Users/qiqibai/ai-tooling/frontend
+cd ../frontend
 npm run dev
 </code></pre>
 <p>如果要体验普通聊天的统一模型入口，再启动 LiteLLM：</p>
-<pre><code class="language-bash">cd /Users/qiqibai/ai-tooling/litellm-gateway
+<pre><code class="language-bash">cd ../litellm-gateway
 ./scripts/start_litellm.sh
 </code></pre>
 <p>最后访问 <code>http://127.0.0.1:5173</code>，上传 PDF，等待提取和 embedding 完成，选择电子书后即可提问。扫描版 PDF 还需要本机安装 Poppler、Tesseract 和中文语言包。</p>
@@ -397,7 +414,7 @@ npm run dev
     <a href="/post/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-chan-pin-jia-gou-she-ji-yu-nan-dian/" class="post-nav-card post-nav-card--prev">
       
       <div class="post-nav-card__img">
-        <img src="/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou.png" alt="元数据驱动的多租户 ERP：SaaS 产品架构设计与难点" loading="lazy" />
+        <img src="/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou.webp" alt="元数据驱动的多租户 ERP：SaaS 产品架构设计与难点" loading="lazy" />
       </div>
       
       <div class="post-nav-card__body">
@@ -509,15 +526,18 @@ npm run dev
 </footer>
 
   
-  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
   <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
     <div class="search-header">
       <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
       <span class="search-kbd">&#8984;K</span>
       <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -527,15 +547,17 @@ npm run dev
         </svg>
       </button>
     </div>
-    <div class="search-results" id="searchResults"></div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
   </div>
 </div>
 
 <script src="/scripts/search.js"></script>
+
   
 
   
 <script src="/scripts/image-zoom.js"></script>
+<script src="/scripts/article-enhancements.js"></script>
 
 
   

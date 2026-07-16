@@ -58,6 +58,19 @@
   color: var(--color-text-primary);
 }
 
+.site-wordmark-link {
+  display: flex;
+  align-items: center;
+}
+
+.site-wordmark {
+  display: block;
+  width: auto;
+  max-width: 180px;
+  height: 32px;
+  object-fit: contain;
+}
+
 .top-bar__nav {
   display: flex;
   align-items: center;

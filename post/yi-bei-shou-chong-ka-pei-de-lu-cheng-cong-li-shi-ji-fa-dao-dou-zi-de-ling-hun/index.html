@@ -15,6 +15,17 @@
 
 
 
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
 <script>
   (function () {
     try {
@@ -26,15 +37,10 @@
     } catch (e) { }
   })();
 </script>
+
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂 | 0707&#39;s Blog</title>
   
-<meta property="og:title" content="一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂" />
-<meta property="og:type" content="article" />
-
-<meta property="og:image" content="/post-images/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun.jpg" />
-
-
 <meta name="description" content="第一次接触手冲时，我以为它不过是把热水倒在咖啡粉上。真正动手以后才发现，研磨粗细、水温和注水速度稍有变化，杯里的味道就会不同。 这篇文章从手冲的由来讲起，再分享一套容易上手的冲煮方法，以及几种常见产区的风味。器具不必一步到位，先把手边的一包豆子冲明白更重要。 🌍 一、手冲咖啡是怎么来的 现代纸滤咖啡通常从 1908 年讲起。德国人梅丽塔·本茨（Melitta Bentz）不喜欢杯底残留&amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂","url":"https://windrunner0707.tech/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/","description":"第一次接触手冲时，我以为它不过是把热水倒在咖啡粉上。真正动手以后才发现，研磨粗细、水温和注水速度稍有变化，杯里的味道就会不同。 这篇文章从手冲的由来讲起，再分享一套容易上手的冲煮方法，以及几种常见产区的风味。器具不必一步到位，先把手边的一包豆子冲明白更重要。 🌍 一、手冲咖啡是怎么来的 现代纸滤咖啡通常从 1908 年讲起。德国人梅丽塔·本茨（Melitta Bentz）不喜欢杯底残留\u0026hellip;","image":"/post-images/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun.jpg","datePublished":"2025-06-20T00:00:00+08:00","dateModified":"2026-07-12T13:49:31+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
@@ -64,7 +70,9 @@
           <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
         </a>
         
+        
         <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
       </div>
 
       
@@ -170,8 +178,10 @@
 })();
 </script>
 
+
   <main class="site-main" role="main">
     
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="readingProgressBar"></span></div>
 <article class="article-container">
   <header class="article-header">
     <h1 class="article-title">一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂</h1>
@@ -200,9 +210,16 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun.jpg" alt="一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂" />
+    <img src="/post-images/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun.jpg" alt="一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂" decoding="async" fetchpriority="high" />
   </div>
   
+
+  <nav class="article-toc" id="articleToc" aria-label="文章目录" hidden>
+    <details class="article-toc__details">
+      <summary class="article-toc__summary">文章目录</summary>
+      <ol class="article-toc__list" id="articleTocList"></ol>
+    </details>
+  </nav>
 
   <div class="article-content">
     <p>第一次接触手冲时，我以为它不过是把热水倒在咖啡粉上。真正动手以后才发现，研磨粗细、水温和注水速度稍有变化，杯里的味道就会不同。</p>
@@ -408,15 +425,18 @@
 </footer>
 
   
-  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
   <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
     <div class="search-header">
       <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
       <span class="search-kbd">&#8984;K</span>
       <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -426,15 +446,17 @@
         </svg>
       </button>
     </div>
-    <div class="search-results" id="searchResults"></div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
   </div>
 </div>
 
 <script src="/scripts/search.js"></script>
+
   
 
   
 <script src="/scripts/image-zoom.js"></script>
+<script src="/scripts/article-enhancements.js"></script>
 
 
   

@@ -15,6 +15,17 @@
 
 
 
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
 <script>
   (function () {
     try {
@@ -26,15 +37,10 @@
     } catch (e) { }
   })();
 </script>
+
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>面试八股文-死锁 | 0707&#39;s Blog</title>
   
-<meta property="og:title" content="面试八股文-死锁" />
-<meta property="og:type" content="article" />
-
-<meta property="og:image" content="/post-images/mian-shi-ba-gu-wen-si-suo.webp" />
-
-
 <meta name="description" content="死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;） 死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 &amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-死锁","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-si-suo/","description":"死锁的四个必要条件（\u0026ldquo;Coffman条件\u0026rdquo;） 死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。 1.互斥条件：至少有一个资源是非共享的，必须由一个线程独占。 2.占有并等待：一个线程已经持有了一个资源，但还在请求其他资源并等待，而这些资源已被其他线程持有。 3.不可剥夺：资源不能被强行从线程中剥夺，必须由线程主动释放。 \u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-si-suo.webp","datePublished":"2024-10-23T00:00:00+08:00","dateModified":"2026-07-05T15:29:53+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
@@ -64,7 +70,9 @@
           <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
         </a>
         
+        
         <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
       </div>
 
       
@@ -170,8 +178,10 @@
 })();
 </script>
 
+
   <main class="site-main" role="main">
     
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="readingProgressBar"></span></div>
 <article class="article-container">
   <header class="article-header">
     <h1 class="article-title">面试八股文-死锁</h1>
@@ -202,9 +212,16 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/mian-shi-ba-gu-wen-si-suo.webp" alt="面试八股文-死锁" />
+    <img src="/post-images/mian-shi-ba-gu-wen-si-suo.webp" alt="面试八股文-死锁" decoding="async" fetchpriority="high" />
   </div>
   
+
+  <nav class="article-toc" id="articleToc" aria-label="文章目录" hidden>
+    <details class="article-toc__details">
+      <summary class="article-toc__summary">文章目录</summary>
+      <ol class="article-toc__list" id="articleTocList"></ol>
+    </details>
+  </nav>
 
   <div class="article-content">
     <h3 id="coffman">死锁的四个必要条件（&ldquo;Coffman条件&rdquo;）</h3>
@@ -292,7 +309,7 @@
       </div>
       
       <div class="post-nav-card__img">
-        <img src="/post-images/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai.png" alt="TypeScript 学习路线：从基础类型到泛型、模块与类型声明" loading="lazy" />
+        <img src="/post-images/typescript-xue-xi-lu-xian-cong-ji-chu-lei-xing-dao-fan-xing-yu-mo-kuai.webp" alt="TypeScript 学习路线：从基础类型到泛型、模块与类型声明" loading="lazy" />
       </div>
       
       <span class="post-nav-card__arrow">&rarr;</span>
@@ -386,15 +403,18 @@
 </footer>
 
   
-  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
   <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
     <div class="search-header">
       <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
       <span class="search-kbd">&#8984;K</span>
       <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -404,15 +424,17 @@
         </svg>
       </button>
     </div>
-    <div class="search-results" id="searchResults"></div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
   </div>
 </div>
 
 <script src="/scripts/search.js"></script>
+
   
 
   
 <script src="/scripts/image-zoom.js"></script>
+<script src="/scripts/article-enhancements.js"></script>
 
 
   

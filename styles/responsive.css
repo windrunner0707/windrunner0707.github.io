@@ -126,6 +126,16 @@
     height: 280px;
   }
 
+  .hero-section--text {
+    height: auto;
+    min-height: 220px;
+  }
+
+  .hero-section--text .hero-content {
+    bottom: auto;
+    padding: 48px 16px;
+  }
+
   .hero-content {
     bottom: 24px;
     padding: 0 16px;
@@ -133,6 +143,10 @@
 
   .hero-title {
     font-size: 1.5rem;
+  }
+
+  .hero-section--text .hero-title {
+    font-size: 2rem;
   }
 
   /* ── Header Spacer (collapsed — no section bar visible) ── */
@@ -237,6 +251,14 @@
     font-size: 16px;
   }
 
+  .article-toc__summary {
+    padding: 13px 14px;
+  }
+
+  .article-toc__list {
+    padding: 0 14px 14px;
+  }
+
   /* ── Error Page ── */
   .error-code {
     font-size: 5rem;
@@ -252,5 +274,4 @@
     font-size: 1.6rem;
   }
 }
-
 

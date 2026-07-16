@@ -15,6 +15,17 @@
 
 
 
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
 <script>
   (function () {
     try {
@@ -26,21 +37,16 @@
     } catch (e) { }
   })();
 </script>
+
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>Spring Bean注入：循环依赖与构造器注入最佳实践 | 0707&#39;s Blog</title>
   
-<meta property="og:title" content="Spring Bean注入：循环依赖与构造器注入最佳实践" />
-<meta property="og:type" content="article" />
-
-<meta property="og:image" content="/post-images/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian.jpg" />
-
-
-<meta name="description" content="概述 字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决的问题。 @Autowired的原理 @Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的依赖&amp;hellip;">
+<meta name="description" content="概述 字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决的问题。 @Autowired的原理 @Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的&amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Spring Bean注入：循环依赖与构造器注入最佳实践","url":"https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/","description":"概述 字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决的问题。 @Autowired的原理 @Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的依赖\u0026hellip;","image":"/post-images/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian.jpg","datePublished":"2024-12-14T00:00:00+08:00","dateModified":"2026-07-05T15:29:33+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Spring Bean注入：循环依赖与构造器注入最佳实践","url":"https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/","description":"概述 字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决的问题。 @Autowired的原理 @Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的\u0026hellip;","image":"/post-images/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian.jpg","datePublished":"2024-12-14T00:00:00+08:00","dateModified":"2026-07-05T15:29:33+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/","name":"Spring Bean注入：循环依赖与构造器注入最佳实践","position":2}]}</script>
 <meta property="og:title" content="Spring Bean注入：循环依赖与构造器注入最佳实践">
-<meta property="og:description" content="概述 字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决的问题。 @Autowired的原理 @Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的依赖&amp;hellip;">
+<meta property="og:description" content="概述 字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决的问题。 @Autowired的原理 @Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的&amp;hellip;">
 <meta property="og:url" content="https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
@@ -48,7 +54,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian/">
 <meta name="twitter:title" content="Spring Bean注入：循环依赖与构造器注入最佳实践">
-<meta name="twitter:description" content="概述 字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决的问题。 @Autowired的原理 @Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的依赖&amp;hellip;">
+<meta name="twitter:description" content="概述 字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决的问题。 @Autowired的原理 @Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的&amp;hellip;">
 <meta name="twitter:image" content="/post-images/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian.jpg">
 </head>
 <body class="flavor-theme">
@@ -64,7 +70,9 @@
           <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
         </a>
         
+        
         <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
       </div>
 
       
@@ -170,8 +178,10 @@
 })();
 </script>
 
+
   <main class="site-main" role="main">
     
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="readingProgressBar"></span></div>
 <article class="article-container">
   <header class="article-header">
     <h1 class="article-title">Spring Bean注入：循环依赖与构造器注入最佳实践</h1>
@@ -202,14 +212,21 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian.jpg" alt="Spring Bean注入：循环依赖与构造器注入最佳实践" />
+    <img src="/post-images/spring-bean-zhu-ru-xun-huan-yi-lai-yu-gou-zao-qi-zhu-ru-zui-jia-shi-jian.jpg" alt="Spring Bean注入：循环依赖与构造器注入最佳实践" decoding="async" fetchpriority="high" />
   </div>
   
 
+  <nav class="article-toc" id="articleToc" aria-label="文章目录" hidden>
+    <details class="article-toc__details">
+      <summary class="article-toc__summary">文章目录</summary>
+      <ol class="article-toc__list" id="articleTocList"></ol>
+    </details>
+  </nav>
+
   <div class="article-content">
-    <h1 id="heading">概述</h1>
+    <h2 id="heading">概述</h2>
 <p>字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 <code>@Autowired</code>、<code>@Inject</code>、构造器注入和 <code>@Lazy</code> 各自解决的问题。</p>
-<h2 id="autowired">@Autowired的原理</h2>
+<h3 id="autowired">@Autowired的原理</h3>
 <p>@Autowired是Spring提供的注解，用于自动装配Bean。其实现机制基于Spring的依赖注入（DI）框架：</p>
 <p>自动装配方式：Spring会根据类型（byType）在容器中查找匹配的Bean，并将其注入到目标对象中。</p>
 <p>细粒度控制：可以与@Qualifier搭配使用，基于Bean名称进行更精确的注入。</p>
@@ -219,7 +236,7 @@
 <li>通过AutowiredAnnotationBeanPostProcessor来解析并处理这些注解。</li>
 <li>如果发现多个候选Bean，且未指定@Qualifier，Spring将抛出NoUniqueBeanDefinitionException。</li>
 </ul>
-<h2 id="inject">@Inject的原理</h2>
+<h3 id="inject">@Inject的原理</h3>
 <p>@Inject是Java标准（JSR-330）中的依赖注入注解，由Spring兼容支持。与@Autowired类似，它也是基于类型的自动装配。</p>
 <p>主要特点：</p>
 <ul>
@@ -237,7 +254,7 @@
 <p>更倾向于与其他符合JSR-330规范的框架协同工作。</p>
 </li>
 </ul>
-<h2 id="heading-1">构造器注入的原理</h2>
+<h3 id="heading-1">构造器注入的原理</h3>
 <p>构造器注入是一种通过构造器传递依赖的方式，Spring容器在创建Bean实例时，会自动调用标注了@Autowired或@Inject的构造器，将所需的依赖注入。</p>
 <p>实现细节：</p>
 <ul>
@@ -255,7 +272,7 @@
 <p>如果未找到匹配的依赖且未设置可选性，Spring会抛出异常。</p>
 </li>
 </ul>
-<h2 id="lazy">用@Lazy解决循环依赖的原理</h2>
+<h3 id="lazy">用@Lazy解决循环依赖的原理</h3>
 <p>在某些场景中，两个或多个Bean可能会相互依赖，导致Spring容器在初始化时发生循环依赖错误。为了缓解这种问题，可以使用@Lazy注解：</p>
 <p>工作机制：</p>
 <ul>
@@ -273,7 +290,7 @@
 <p>虽然@Lazy提供了一种有效的解决循环依赖的方法，但从单一职责和解耦的角度出发，推荐通过构造器注入尽早发现循环依赖，并重构代码以消除循环依赖。</p>
 </li>
 </ul>
-<h2 id="heading-2">构造器注入的好处</h2>
+<h3 id="heading-2">构造器注入的好处</h3>
 <ul>
 <li>
 <p>不可变性： 构造器注入强制在对象创建时提供所有必需的依赖，从而保证对象的状态在创建后是完整且不可变的。</p>
@@ -292,7 +309,7 @@
 <p>解耦合与单一职责： 构造器注入能显式地揭示Bean的依赖关系，使得类更加专注于自己的职责。通过合理的依赖设计，能够避免类之间的耦合，提升系统的可维护性。</p>
 </li>
 </ul>
-<h2 id="requiredargsconstructor">推荐使用@RequiredArgsConstructor</h2>
+<h3 id="requiredargsconstructor">推荐使用@RequiredArgsConstructor</h3>
 <p>为了简化构造器注入的代码，Spring项目中推荐使用Lombok提供的@RequiredArgsConstructor注解：</p>
 <p>功能：</p>
 <p>自动生成一个包含所有final字段的构造器。</p>
@@ -306,7 +323,7 @@ public class MyService {
 }
 </code></pre>
 <p>在上述代码中，MyService的依赖会通过构造器注入完成，而无需显式声明构造器，代码更加简洁。</p>
-<h2 id="heading-3">选择建议</h2>
+<h3 id="heading-3">选择建议</h3>
 <p>业务类默认使用构造器注入，并把依赖字段声明为 <code>final</code>。只有依赖确实可选时才考虑 setter 注入。遇到循环依赖，先检查两个类是否承担了互相纠缠的职责，或者能否通过提取第三个服务、发布事件来解开关系；<code>@Lazy</code> 更适合作为暂时无法重构时的权宜处理。</p>
 <p><code>@RequiredArgsConstructor</code> 能减少样板代码，但也会让构造器不直接出现在源码中。团队若不使用 Lombok，手写构造器同样清楚，Spring 4.3 之后单构造器通常无需再标注 <code>@Autowired</code>。</p>
 
@@ -318,7 +335,7 @@ public class MyService {
     <a href="/post/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan/" class="post-nav-card post-nav-card--prev">
       
       <div class="post-nav-card__img">
-        <img src="/post-images/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan.jpg" alt="从一笔刷卡交易出发：收单银行业务系统项目复盘" loading="lazy" />
+        <img src="/post-images/cong-yi-bi-shua-qia-jiao-yi-chu-fa-shou-dan-yin-hang-ye-wu-xi-tong-xiang-mu-fu-pan.webp" alt="从一笔刷卡交易出发：收单银行业务系统项目复盘" loading="lazy" />
       </div>
       
       <div class="post-nav-card__body">
@@ -430,15 +447,18 @@ public class MyService {
 </footer>
 
   
-  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
   <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
     <div class="search-header">
       <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
       <span class="search-kbd">&#8984;K</span>
       <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -448,15 +468,17 @@ public class MyService {
         </svg>
       </button>
     </div>
-    <div class="search-results" id="searchResults"></div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
   </div>
 </div>
 
 <script src="/scripts/search.js"></script>
+
   
 
   
 <script src="/scripts/image-zoom.js"></script>
+<script src="/scripts/article-enhancements.js"></script>
 
 
   

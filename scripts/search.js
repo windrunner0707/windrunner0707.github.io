@@ -24,6 +24,7 @@
   var isLoading = false;
   var debounceId = null;
   var activeIdx = -1;    // highlighted result index
+  var lastFocused = null;
 
   // -- DOM refs (resolved lazily) ---------------------------------------------
   var overlay, modal, input, results, closeBtn;
@@ -60,6 +61,7 @@
   function openSearch() {
     resolveDOM();
     if (!overlay) return;
+    lastFocused = document.activeElement;
     overlay.style.display = '';
     overlay.setAttribute('aria-hidden', 'false');
     input.value = '';
@@ -102,6 +104,9 @@
     overlay.style.display = 'none';
     overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    if (lastFocused && typeof lastFocused.focus === 'function') {
+      lastFocused.focus();
+    }
   }
 
   // -- Message helpers --------------------------------------------------------

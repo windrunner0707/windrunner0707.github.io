@@ -18,7 +18,7 @@
   --color-border-hover: #444444;
   --color-text-primary: #ffffff;
   --color-text-secondary: #999999;
-  --color-text-muted: #666666;
+  --color-text-muted: #777777;
   --color-text-body: #e0e0e0;
   --color-accent: #54675e;
   --color-accent-hover: #FFFF00;
@@ -250,10 +250,10 @@ body {
   --color-border-hover: #c4c4c6;
   --color-text-primary: #111111;
   --color-text-secondary: #555555;
-  --color-text-muted: #8a8a8a;
+  --color-text-muted: #737373;
   --color-text-body: #222222;
   --color-accent: #1f1f1f;
-  --color-accent-hover: #b88a00;
+  --color-accent-hover: #765800;
   --color-badge-gold: #b88a00;
 }
 
@@ -328,5 +328,4 @@ body {
 .theme-light .hero-subtitle {
   color: rgba(255, 255, 255, 0.78);
 }
-
 

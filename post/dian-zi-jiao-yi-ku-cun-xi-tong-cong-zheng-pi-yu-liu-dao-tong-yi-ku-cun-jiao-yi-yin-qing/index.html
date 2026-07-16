@@ -15,6 +15,17 @@
 
 
 
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
 <script>
   (function () {
     try {
@@ -26,15 +37,10 @@
     } catch (e) { }
   })();
 </script>
+
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>电子交易库存系统复盘：从整批预留到统一库存交易引擎 | 0707&#39;s Blog</title>
   
-<meta property="og:title" content="电子交易库存系统复盘：从整批预留到统一库存交易引擎" />
-<meta property="og:type" content="article" />
-
-<meta property="og:image" content="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" />
-
-
 <meta name="description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
 <link rel="canonical" href="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"电子交易库存系统复盘：从整批预留到统一库存交易引擎","url":"https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/","description":"几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。","image":"/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg","datePublished":"2026-07-11T00:00:00+08:00","dateModified":"2026-07-11T18:16:00+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
@@ -64,7 +70,9 @@
           <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
         </a>
         
+        
         <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
       </div>
 
       
@@ -170,8 +178,10 @@
 })();
 </script>
 
+
   <main class="site-main" role="main">
     
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="readingProgressBar"></span></div>
 <article class="article-container">
   <header class="article-header">
     <h1 class="article-title">电子交易库存系统复盘：从整批预留到统一库存交易引擎</h1>
@@ -204,9 +214,16 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" alt="电子交易库存系统复盘：从整批预留到统一库存交易引擎" />
+    <img src="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" alt="电子交易库存系统复盘：从整批预留到统一库存交易引擎" decoding="async" fetchpriority="high" />
   </div>
   
+
+  <nav class="article-toc" id="articleToc" aria-label="文章目录" hidden>
+    <details class="article-toc__details">
+      <summary class="article-toc__summary">文章目录</summary>
+      <ol class="article-toc__list" id="articleTocList"></ol>
+    </details>
+  </nav>
 
   <div class="article-content">
     <p>几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。</p>
@@ -400,7 +417,7 @@ WHERE stock_key = :stockKey
     <a href="/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/" class="post-nav-card post-nav-card--prev">
       
       <div class="post-nav-card__img">
-        <img src="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.png" alt="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践" loading="lazy" />
+        <img src="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp" alt="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践" loading="lazy" />
       </div>
       
       <div class="post-nav-card__body">
@@ -418,7 +435,7 @@ WHERE stock_key = :stockKey
       </div>
       
       <div class="post-nav-card__img">
-        <img src="/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.png" alt="金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付" loading="lazy" />
+        <img src="/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.webp" alt="金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付" loading="lazy" />
       </div>
       
       <span class="post-nav-card__arrow">&rarr;</span>
@@ -512,15 +529,18 @@ WHERE stock_key = :stockKey
 </footer>
 
   
-  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
   <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
     <div class="search-header">
       <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
       <span class="search-kbd">&#8984;K</span>
       <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -530,15 +550,17 @@ WHERE stock_key = :stockKey
         </svg>
       </button>
     </div>
-    <div class="search-results" id="searchResults"></div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
   </div>
 </div>
 
 <script src="/scripts/search.js"></script>
+
   
 
   
 <script src="/scripts/image-zoom.js"></script>
+<script src="/scripts/article-enhancements.js"></script>
 
 
   

@@ -3,7 +3,7 @@
   <channel>
     <title>0707&#39;s Blog</title>
     <link>https://windrunner0707.tech/</link>
-    <description>A Software Engineer&#39;s Blog</description>
+    <description>记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
     <lastBuildDate>Sun, 12 Jul 2026 13:49:20 +0800</lastBuildDate>
@@ -235,7 +235,7 @@ public void submit(SubmitOrderCommand command) {
       <category>Spring</category>
       <category>架构设计</category>
       <category>分布式系统</category>
-      <enclosure url="https://windrunner0707.tech/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou.png" length="0" type="image/png"></enclosure>
+      <enclosure url="https://windrunner0707.tech/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
       <title>从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践</title>
@@ -400,21 +400,21 @@ cd ai-tooling
 </code></pre>
 <p>仓库地址：<a href="https://github.com/windrunner0707/ai-tooling">github.com/windrunner0707/ai-tooling</a>。</p>
 <p>先启动 PostgreSQL + pgvector，并准备 Ollama 模型：</p>
-<pre><code class="language-bash">cd /Users/qiqibai/ai-tooling/rag-postgres
+<pre><code class="language-bash">cd rag-postgres
 docker compose up -d
 
 ollama pull qwen3:8b
 ollama pull bge-m3
 </code></pre>
 <p>然后分别启动后端和前端：</p>
-<pre><code class="language-bash">cd /Users/qiqibai/ai-tooling/backend
+<pre><code class="language-bash">cd ../backend
 ./scripts/start_backend.sh
 
-cd /Users/qiqibai/ai-tooling/frontend
+cd ../frontend
 npm run dev
 </code></pre>
 <p>如果要体验普通聊天的统一模型入口，再启动 LiteLLM：</p>
-<pre><code class="language-bash">cd /Users/qiqibai/ai-tooling/litellm-gateway
+<pre><code class="language-bash">cd ../litellm-gateway
 ./scripts/start_litellm.sh
 </code></pre>
 <p>最后访问 <code>http://127.0.0.1:5173</code>，上传 PDF，等待提取和 embedding 完成，选择电子书后即可提问。扫描版 PDF 还需要本机安装 Poppler、Tesseract 和中文语言包。</p>
@@ -425,7 +425,7 @@ npm run dev
       <category>人工智能</category>
       <category>RAG</category>
       <category>架构设计</category>
-      <enclosure url="https://windrunner0707.tech/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.png" length="0" type="image/png"></enclosure>
+      <enclosure url="https://windrunner0707.tech/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
       <title>电子交易库存系统复盘：从整批预留到统一库存交易引擎</title>
@@ -718,7 +718,7 @@ WHERE stock_key = :stockKey
       <category>CI/CD</category>
       <category>云原生</category>
       <category>架构设计</category>
-      <enclosure url="https://windrunner0707.tech/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.png" length="0" type="image/png"></enclosure>
+      <enclosure url="https://windrunner0707.tech/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
       <title>路由器里面的一些入门概念</title>
@@ -727,10 +727,10 @@ WHERE stock_key = :stockKey
       <pubDate>Wed, 15 Apr 2026 00:00:00 +0800</pubDate>
       <description><![CDATA[<p>最近在折腾路由器和软路由，接触到了不少看起来熟悉、实际又容易混淆的概念。这篇文章不讨论复杂的网络协议，先从双频、无线速率、Wi-Fi 6，以及家里信号弱时常见的解决方案说起。</p>
 <!-- more -->
-<h1 id="heading">双频路由器</h1>
+<h2 id="heading">双频路由器</h2>
 <p>现在常见的无线路由器基本都支持 <strong>2.4GHz</strong> 和 <strong>5GHz</strong> 两个频段，因此经常被称为“双频路由器”。有些路由器会分别显示两个 Wi-Fi 名称，也有些会使用同一个名称，通过“双频合一”自动为设备选择频段。</p>
 <p>这里所说的“5G Wi-Fi”，准确来说是 <strong>5GHz Wi-Fi</strong>，它和手机通信中的 <strong>5G 移动网络</strong>不是一回事：前者是家庭局域网使用的无线频段，后者是蜂窝移动通信技术。</p>
-<h2 id="24ghz--5ghz-">2.4GHz 和 5GHz 有什么区别</h2>
+<h3 id="24ghz--5ghz-">2.4GHz 和 5GHz 有什么区别</h3>
 <p>电磁波的频率与波长成反比。通常来说，2.4GHz 波长更长，传播距离更远，绕射能力也相对更好；5GHz 波长更短，经过墙体等障碍物后衰减通常更明显。</p>
 <table>
 <thead>
@@ -770,20 +770,20 @@ WHERE stock_key = :stockKey
 </table>
 <p>5GHz 往往更快，并不只是因为频率更高。它通常可以使用更宽的信道，而且受到蓝牙、老旧 Wi-Fi 和部分家用无线设备的干扰更少。实际使用时，可以遵循一个简单原则：<strong>离路由器近、追求速度时优先使用 5GHz；距离远或隔墙较多时尝试 2.4GHz。</strong></p>
 <p>需要注意的是，穿墙效果不是一个绝对结论。承重墙、钢筋混凝土、金属柜和路由器摆放位置，都会明显影响信号。与其只看路由器宣传的“穿墙能力”，不如结合房屋结构实测。</p>
-<h1 id="wi-fi-">Wi-Fi 参数说明</h1>
-<h2 id="mbps--mbs">Mbps 和 MB/s</h2>
+<h2 id="wi-fi-">Wi-Fi 参数说明</h2>
+<h3 id="mbps--mbs">Mbps 和 MB/s</h3>
 <p>路由器包装和详情页上常见的 300Mbps、1200Mbps、3000Mbps，单位都是 <strong>Mbps（兆比特每秒）</strong>；电脑下载文件时常见的 MB/s，则是 <strong>兆字节每秒</strong>。</p>
 <p>因为 1 Byte = 8 bit，所以理论换算关系为：</p>
 <pre><code class="language-text">100Mbps ÷ 8 = 12.5MB/s
 </code></pre>
 <p>例如，宽带为 500Mbps，理想状态下的最高下载速度约为 62.5MB/s。但真实速度还会受到协议开销、无线干扰、信号强度、终端性能、网线规格、路由器端口速率和下载服务器带宽等因素影响，因此通常达不到理论上限。</p>
-<h2 id="heading-1">标称速率不等于实际网速</h2>
+<h3 id="heading-1">标称速率不等于实际网速</h3>
 <p>以“AX3000”路由器为例，3000Mbps 通常是不同频段理论无线速率相加后再取整得到的产品等级，并不代表一台设备可以跑到 3000Mbps，也不代表家里的外网宽带就是 3000Mbps。</p>
 <p>判断实际速度时，需要看整条链路中最慢的一环：</p>
 <pre><code class="language-text">运营商宽带 → 光猫 → 路由器 WAN/LAN 口 → 网线或 Wi-Fi → 终端设备
 </code></pre>
 <p>例如办理了千兆宽带，但路由器只有百兆网口，那么外网速度仍会被限制在百兆附近。想发挥千兆及以上宽带的能力，还要确认光猫、路由器端口、网线和终端网卡是否匹配。</p>
-<h1 id="wi-fi-6-">Wi-Fi 6 是什么</h1>
+<h2 id="wi-fi-6-">Wi-Fi 6 是什么</h2>
 <p>Wi-Fi 6 对应 IEEE 802.11ax。相比 Wi-Fi 5，它的改进不只是峰值速度，更重要的是在手机、电脑、电视和智能家居设备较多时，能够更有效地安排无线资源。</p>
 <p>可以先记住几个特点：</p>
 <ul>
@@ -793,18 +793,18 @@ WHERE stock_key = :stockKey
 <li><strong>TWT</strong>：让支持的终端协商唤醒时间，有助于降低部分设备的耗电。</li>
 </ul>
 <p>不过，使用 Wi-Fi 6 需要路由器和终端都支持相应标准。Wi-Fi 6 路由器可以兼容旧设备，但旧手机或旧电脑连接后仍会按照它自身支持的标准工作。</p>
-<h1 id="heading-2">信号弱的解决方案</h1>
+<h2 id="heading-2">信号弱的解决方案</h2>
 <p>当一个路由器无法覆盖全屋时，首先可以尝试把主路由放在房屋相对居中的开放位置，并远离金属遮挡、弱电箱和大型电器。如果调整位置仍然不够，再考虑下面几种方案。</p>
-<h2 id="heading-3">电力猫</h2>
+<h3 id="heading-3">电力猫</h3>
 <p>电力猫通过家里的电力线传输网络数据，一端连接路由器，另一端插在需要网络的房间，适合不方便重新布置网线的场景。</p>
 <p>它的优点是安装简单，不需要无线信号跨越多堵墙；缺点是效果很依赖房屋电路。同一电表、同一回路通常更容易取得较好效果，空气开关、插排、老旧线路和大功率电器都可能造成干扰。因此，电力猫的标称速率同样不能直接当成实际速度，购买前最好确认可以退换并进行实测。</p>
-<h2 id="heading-4">无线桥接</h2>
+<h3 id="heading-4">无线桥接</h3>
 <p>无线桥接或中继，是让副路由通过 Wi-Fi 连接主路由，再把信号转发出去。它不需要在两个位置之间布置网线，适合临时补盲或对速度要求不高的区域。</p>
 <p>它的限制也很明显：副路由必须先收到质量足够好的上游信号。如果把副路由放在原本就几乎没有信号的位置，它只是把一个很差的连接继续转发。单射频设备在接收和转发之间还需要共享无线资源，实际吞吐量和稳定性通常会下降。</p>
-<h2 id="ap-">AP 模式与有线回程</h2>
+<h3 id="ap-">AP 模式与有线回程</h3>
 <p>如果房间之间已经预埋网线，更推荐让副路由使用 <strong>AP 模式</strong>，通过网线连接主路由。此时主路由负责拨号、DHCP 和 NAT，副路由主要负责提供无线接入，可以避免多层 NAT，也通常比无线桥接更稳定。</p>
 <p>需要区分的是，有些设备设置中的“桥接模式”是指关闭光猫或路由器的拨号、NAT 功能，把公网连接交给下一级路由器；它和“无线桥接/无线中继”并不是同一个概念。配置前应先确认设备界面对“桥接”的具体定义。</p>
-<h2 id="mesh-">Mesh 组网</h2>
+<h3 id="mesh-">Mesh 组网</h3>
 <p>Mesh 由一个主节点和一个或多个子节点组成，它们共同提供覆盖，并协调设备在节点之间漫游。相较于简单中继，Mesh 的统一管理和漫游体验通常更好，适合面积较大、房间较多或多楼层的住宅。</p>
 <p>Mesh 的节点之间可以使用无线回程，也可以使用有线回程：</p>
 <ul>
@@ -812,7 +812,7 @@ WHERE stock_key = :stockKey
 <li><strong>有线回程</strong>占用网线，却通常能获得更稳定的速度，是有预埋网线时的优先选择。</li>
 </ul>
 <p>部署无线 Mesh 时，子节点也不能放在信号死角里，通常应放在主节点与目标区域之间。购买前还应确认不同型号是否属于同一 Mesh 生态，因为不同品牌乃至同一品牌的不同系列未必能够混合组网。</p>
-<h1 id="heading-5">如何选择</h1>
+<h2 id="heading-5">如何选择</h2>
 <p>可以根据家里的条件快速判断：</p>
 <table>
 <thead>
@@ -845,13 +845,13 @@ WHERE stock_key = :stockKey
 </tbody>
 </table>
 <p>路由器不是功率越大、天线越多就一定越好。终端发射功率、房屋结构、邻居 Wi-Fi 干扰和节点位置，都会影响最终体验。对家庭网络来说，合理摆放、多节点覆盖和稳定的有线回程，往往比单纯更换一台“穿墙王”更有效。</p>
-<h1 id="heading-6">参考视频</h1>
+<h2 id="heading-6">参考视频</h2>
 <ul>
 <li><a href="https://www.bilibili.com/video/BV1n64y1r7ym">路由器相关入门视频（哔哩哔哩）</a></li>
 </ul>
 ]]></description>
       <category>路由器</category>
-      <enclosure url="https://windrunner0707.tech/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.jpg" length="0" type="image/jpeg"></enclosure>
+      <enclosure url="https://windrunner0707.tech/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
       <title>日麻入门：从牌型、向听到牌效率</title>
@@ -862,13 +862,13 @@ WHERE stock_key = :stockKey
 <p>这篇文章根据我学习日麻时整理的思维导图，从牌的组成、和牌结构、搭子质量、向听数与听牌选择说起。重点不是背完所有规则，而是先建立一套能指导每次摸切的牌效率框架。</p>
 <!-- more -->
 <figure class="mindmap-figure">
-  <button class="zoomable-image-trigger" type="button" data-zoom-src="https://windrunner0707.tech/post-images/riichi-mahjong-basics-mindmap.png" aria-label="放大查看日麻基础思维导图">
-    <img src="https://windrunner0707.tech/post-images/riichi-mahjong-basics-mindmap.png" alt="日麻基础与牌效率思维导图" loading="lazy">
+  <button class="zoomable-image-trigger" type="button" data-zoom-src="https://windrunner0707.tech/post-images/riichi-mahjong-basics-mindmap.webp" aria-label="放大查看日麻基础思维导图">
+    <img src="https://windrunner0707.tech/post-images/riichi-mahjong-basics-mindmap.webp" alt="日麻基础与牌效率思维导图" loading="lazy">
     <span>点击图片放大查看</span>
   </button>
   <figcaption>日麻基础思维导图（支持放大、缩小和拖动）</figcaption>
 </figure>
-<h1 id="heading">一、先建立正确的竞技观</h1>
+<h2 id="heading">一、先建立正确的竞技观</h2>
 <p>麻将既不是纯粹的运气游戏，也不是每一局都能靠技术获胜。我们无法决定下一张摸到什么，却能决定保留哪些牌、打出哪张牌、是否鸣牌，以及什么时候停止进攻。</p>
 <p>因此，评价一次决策时，应当把“选择是否合理”和“结果是否成功”分开：</p>
 <ul>
@@ -877,9 +877,9 @@ WHERE stock_key = :stockKey
 <li>一次输赢无法证明打法优劣，长期结果才更接近真实水平。</li>
 </ul>
 <p>所谓“运气”更像尚未观察到结果的随机过程。竞技日麻要做的，是在信息不完整的情况下提高每一次选择的成功概率，并控制失败时的损失。</p>
-<h1 id="heading-1">二、认识一副日麻牌</h1>
+<h2 id="heading-1">二、认识一副日麻牌</h2>
 <p>日麻通常使用 136 张牌，每种牌各 4 张。</p>
-<h2 id="1-">1. 数牌</h2>
+<h3 id="1-">1. 数牌</h3>
 <p>数牌分为三门，每门从 1 到 9：</p>
 <ul>
 <li><strong>万子（m）</strong>：一万到九万；</li>
@@ -887,14 +887,14 @@ WHERE stock_key = :stockKey
 <li><strong>索子（s）</strong>：一索到九索。</li>
 </ul>
 <p>记谱时常把同一门写在一起。例如 <code>345m</code> 表示三万、四万、五万，<code>68p</code> 表示六筒和八筒。</p>
-<h2 id="2-">2. 字牌</h2>
+<h3 id="2-">2. 字牌</h3>
 <p>字牌共 7 种：</p>
 <ul>
 <li>风牌：东、南、西、北；</li>
 <li>三元牌：白、发、中。</li>
 </ul>
 <p>数牌能够组成顺子，字牌不能组成顺子，只能做对子或刻子。这一点直接决定了它们的组合效率。</p>
-<h1 id="heading-2">三、和牌的基本结构</h1>
+<h2 id="heading-2">三、和牌的基本结构</h2>
 <p>最常见的和牌结构是 <strong>四组面子加一组雀头</strong>，即常说的“四面子一雀头”。</p>
 <ul>
 <li><strong>顺子</strong>：同一门连续三张数牌，如 <code>345m</code>；</li>
@@ -904,7 +904,7 @@ WHERE stock_key = :stockKey
 </ul>
 <p>除此之外，还有七对子、国士无双等特殊结构。入门阶段可以先以四面子一雀头为主，因为大多数牌局都沿着这条路线发展。</p>
 <p>还要特别注意：<strong>日麻和牌不仅要完成牌型，还必须至少有一个役。</strong> “牌已经凑齐”和“规则允许和牌”不是同一件事。立直、断幺九、役牌、平和等役种，需要在学习牌效率之后继续补上。</p>
-<h1 id="heading-3">四、搭子决定进张效率</h1>
+<h2 id="heading-3">四、搭子决定进张效率</h2>
 <p>两张牌中，已经相同的两张叫对子；有机会补成顺子的两张叫搭子。搭子的质量，决定了牌手能用多少种牌把手牌推进一步。</p>
 <table>
 <thead>
@@ -941,9 +941,9 @@ WHERE stock_key = :stockKey
 </tbody>
 </table>
 <p>这里的“枚数”要扣除自己手牌、牌河和副露中已经看见的牌。比如四张 <code>7p</code> 中已经出现两张，那么 <code>68p</code> 实际只剩两枚有效牌。</p>
-<h2 id="1--1">1. 为什么两面优先</h2>
+<h3 id="1--1">1. 为什么两面优先</h3>
 <p>两面同时接受两种牌，通常比嵌张和边张多一倍进张。例如 <code>34s</code> 摸到 <code>2s</code> 或 <code>5s</code> 都能成为顺子，而 <code>68p</code> 只能等 <code>7p</code>。如果两种搭子在其他条件上相近，应优先保留两面。</p>
-<h2 id="2--1">2. 复合形不要过早拆散</h2>
+<h3 id="2--1">2. 复合形不要过早拆散</h3>
 <p>三张以上的连续或相邻数牌，经常同时包含多个搭子。例如 <code>344s</code> 既保留对子，也包含 <code>34s</code> 的两面变化；<code>122m</code> 则同时具有对子与边张的性质。</p>
 <p>拆牌前不要只看眼前的两张，而要先问：</p>
 <ol>
@@ -952,7 +952,7 @@ WHERE stock_key = :stockKey
 <li>拆掉其中一张，会不会同时损失多条变化路线？</li>
 </ol>
 <p>牌效率不是把手牌机械地切成若干组，而是保留彼此有联系的复合形。</p>
-<h1 id="heading-4">五、对子与雀头的价值会变化</h1>
+<h2 id="heading-4">五、对子与雀头的价值会变化</h2>
 <p>对子既可能成为雀头，也可能摸到第三张后成为刻子。它的价值取决于整手牌中已有多少个对子：</p>
 <ul>
 <li><strong>没有对子</strong>：第一个对子很重要，因为标准形最终需要雀头；</li>
@@ -961,7 +961,7 @@ WHERE stock_key = :stockKey
 <li><strong>对子过多</strong>：标准形的顺子空间会被挤压，此时要比较继续做标准形、七对子或对对和等路线的距离与价值。</li>
 </ul>
 <p>对子并非固定的“好牌”或“坏牌”。同一组对子，在缺雀头时价值很高，在对子已经过剩时则可能成为阻碍。</p>
-<h1 id="heading-5">六、为什么中张通常比幺九牌灵活</h1>
+<h2 id="heading-5">六、为什么中张通常比幺九牌灵活</h2>
 <p>数牌并不是位置越大越强。判断一张孤立牌的效率，要看它能参与多少种顺子。</p>
 <ul>
 <li>1 只能参与 <code>123</code>；</li>
@@ -974,7 +974,7 @@ WHERE stock_key = :stockKey
 <pre><code class="language-text">3～7 ＞ 2、8 ＞ 1、9 ＞ 无役价值的孤立字牌
 </code></pre>
 <p>这只是默认排序，不是绝对弃牌表。役牌对子、混一色路线、宝牌、场况和防守价值，都可能改变一张牌的实际优先级。</p>
-<h1 id="heading-6">七、用向听数衡量“离和牌还有多远”</h1>
+<h2 id="heading-6">七、用向听数衡量“离和牌还有多远”</h2>
 <p><strong>向听数</strong>表示一手牌距离听牌还差多少步：</p>
 <ul>
 <li>一向听：再一次有效进张就可能听牌；</li>
@@ -989,7 +989,7 @@ WHERE stock_key = :stockKey
     → 最后结合打点、役、安全度和场况
 </code></pre>
 <p>只数当前受入仍然不够。有的切法眼前有效牌很多，却会把手牌固定成大量嵌张和边张；另一些切法当前少一两枚，却能在后续改良成多个两面。真正高效的选择，需要同时看“现在能进什么”和“进张以后会变成什么”。</p>
-<h1 id="heading-7">八、鸣牌是速度工具，也有明确代价</h1>
+<h2 id="heading-7">八、鸣牌是速度工具，也有明确代价</h2>
 <p>吃、碰、杠可以缩短成牌距离，因此鸣牌本质上是一种用手牌自由度换速度的工具。它不是看到能鸣就鸣，也不是为了保持门清而一律不鸣。</p>
 <p>决定是否鸣牌前，至少检查四件事：</p>
 <ol>
@@ -999,7 +999,7 @@ WHERE stock_key = :stockKey
 <li><strong>局面是否需要速度</strong>：领先时的局消化、末盘争一位、对手明显做大牌时，答案可能完全不同。</li>
 </ol>
 <p>鸣牌还会固定一部分牌形，让可调整空间与防守牌减少。竞技麻将追求的不是永远门清或永远速攻，而是让每次鸣牌都有清晰目的。</p>
-<h1 id="heading-8">九、听牌不只看“等几张”</h1>
+<h2 id="heading-8">九、听牌不只看“等几张”</h2>
 <p>听牌以后，仍然要比较听牌质量。两面通常优于嵌张、边张和单骑，但实际选择还应考虑：</p>
 <ul>
 <li>剩余枚数：等待的牌是否已经大量可见；</li>
@@ -1009,7 +1009,7 @@ WHERE stock_key = :stockKey
 <li>场况：巡目、点棒、亲家与否、对手攻势都会改变目标。</li>
 </ul>
 <p>牌效率解决的是“怎样更快、更好地组成手牌”，但它不是唯一目标。越接近实战后半段，安全度、押引判断与点数状况的权重就越高。</p>
-<h1 id="heading-9">十、一套可以直接练习的摸切流程</h1>
+<h2 id="heading-9">十、一套可以直接练习的摸切流程</h2>
 <p>每次摸牌后，可以按下面的顺序快速检查：</p>
 <ol>
 <li>当前是几向听？</li>
@@ -1021,12 +1021,12 @@ WHERE stock_key = :stockKey
 <li>牌桌上是否已经出现必须转入防守的信号？</li>
 </ol>
 <p>训练时可以先暂时忽略复杂点数，只练习“向听数—受入—好形”三件事。等基本判断形成直觉，再逐步加入役种、宝牌、场况与防守，学习负担会小得多。</p>
-<h1 id="heading-10">结语</h1>
+<h2 id="heading-10">结语</h2>
 <p>日麻的竞技性，来自长期重复决策形成的差距。高手并不是每局都能摸到更好的牌，而是更少浪费有效进张、更少破坏复合形，也更清楚什么时候该用打点换速度、什么时候该放弃眼前的和牌机会。</p>
 <p>入门阶段先记住三句话就够了：<strong>先看向听，再数受入；同样受入，优先好形；评价决策，不被单局结果绑架。</strong> 当这些原则能够自然地进入每一次摸切，牌效率才真正从知识变成了能力。</p>
 ]]></description>
       <category>日麻</category>
-      <enclosure url="https://windrunner0707.tech/post-images/riichi-mahjong-basics-tile-efficiency.png" length="0" type="image/png"></enclosure>
+      <enclosure url="https://windrunner0707.tech/post-images/riichi-mahjong-basics-tile-efficiency.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
       <title>面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦</title>
@@ -1257,30 +1257,30 @@ executor.execute(() -&gt; {
       <guid isPermaLink="true">https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/</guid>
       <pubDate>Tue, 30 Sep 2025 00:00:00 +0800</pubDate>
       <description><![CDATA[<p><img src="https://windrunner0707.tech/post-images/1759237881724.png" alt="" /></p>
-<h1 id="heading">概述</h1>
+<h2 id="heading">概述</h2>
 <p>Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。</p>
-<h1 id="heading-1">介绍</h1>
-<h2 id="control-plane">控制平面（Control Plane）</h2>
+<h2 id="heading-1">介绍</h2>
+<h3 id="control-plane">控制平面（Control Plane）</h3>
 <p>控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括：</p>
-<h3 id="api-server">API Server</h3>
+<h4 id="api-server">API Server</h4>
 <p>API Server 暴露 Kubernetes API。<code>kubectl</code>、控制器和其他集群组件都通过它读取或修改资源；它还负责认证、鉴权、准入控制和请求校验。</p>
-<h3 id="etcd">etcd</h3>
+<h4 id="etcd">etcd</h4>
 <p>etcd 是一致性的分布式键值数据库，用于保存 Kubernetes API 对象。它是控制平面的关键数据存储，因此备份、访问控制和磁盘延迟都很重要。</p>
-<h3 id="scheduler">Scheduler</h3>
+<h4 id="scheduler">Scheduler</h4>
 <p>Scheduler 负责把新建的 Pod 分配到合适的节点上。它会综合考虑节点的 CPU、内存、亲和性、反亲和性等条件，尽量做到资源合理分配。</p>
-<h3 id="controller-manager">Controller Manager</h3>
+<h4 id="controller-manager">Controller Manager</h4>
 <p>Controller Manager 运行多种控制器，持续比较期望状态与实际状态。例如 Deployment 需要三个副本而当前只有两个时，相关控制器会创建新的 Pod 对象，随后再由调度器和 kubelet 接手。</p>
-<h2 id="worker-node">工作节点（Worker Node）</h2>
+<h3 id="worker-node">工作节点（Worker Node）</h3>
 <p>工作节点是真正运行应用的地方，每个节点上都包含以下组件：</p>
-<h3 id="kubelet">kubelet</h3>
+<h4 id="kubelet">kubelet</h4>
 <p>kubelet 监视分配到本节点的 Pod，并通过容器运行时启动容器、执行健康检查和上报状态。副本数量由控制器维护，不是 kubelet 的职责。</p>
-<h3 id="kube-proxy">kube-proxy</h3>
+<h4 id="kube-proxy">kube-proxy</h4>
 <p>kube-proxy 在节点上实现 Service 的转发规则，通常使用 iptables 或 IPVS 将虚拟 IP 的流量转到后端 Pod。Pod 网络本身通常由 CNI 插件提供。</p>
-<h3 id="container-runtime">Container Runtime</h3>
+<h4 id="container-runtime">Container Runtime</h4>
 <p>容器运行时负责镜像拉取和容器生命周期管理，并通过 CRI 与 kubelet 交互，常见实现有 containerd 和 CRI-O。Kubernetes 自 1.24 起移除了内置的 dockershim，不能再把 Docker Engine 直接当作 CRI 运行时使用。</p>
-<h3 id="pods">Pods</h3>
+<h4 id="pods">Pods</h4>
 <p>Pod 是 Kubernetes 中最小的调度单元，每个 Pod 包含一个或多个紧密相关的容器。Pod 会共享网络和存储卷，方便容器之间的通信。</p>
-<h1 id="heading-2">把一次部署串起来</h1>
+<h2 id="heading-2">把一次部署串起来</h2>
 <p>提交 Deployment 后，API Server 校验并保存对象；控制器创建所需的 Pod；Scheduler 为未调度的 Pod 选择节点；目标节点上的 kubelet 再调用容器运行时启动容器。Service 流量则由 kube-proxy 维护的转发规则送到可用 Pod。沿着这条链路排查问题，通常比孤立地背组件名称更实用。</p>
 <!-- more -->]]></description>
       <category>Kubernetes</category>
@@ -1294,18 +1294,18 @@ executor.execute(() -&gt; {
       <pubDate>Tue, 30 Sep 2025 00:00:00 +0800</pubDate>
       <description><![CDATA[<p><img src="https://windrunner0707.tech/post-images/1759235815489.webp" alt="" /></p>
 <p>API 学习内容很多：HTTP、认证、接口风格、网关和性能经常被放在一张路线图里，初学时很难判断先后顺序。下面按照“先会调用，再会设计，最后处理生产问题”的思路整理这些知识点。</p>
-<h1 id="api-">一、API 是什么？为什么重要？</h1>
+<h2 id="api-">一、API 是什么？为什么重要？</h2>
 <p>简单来说，API 是一套约定，规定了两个软件系统之间如何交流。</p>
 <p>API 是系统对外公布的一份调用契约：请求怎么发、数据是什么格式、成功或失败如何表示。它能降低系统之间的直接依赖，但版本兼容、权限和错误处理仍需要明确设计。</p>
-<h1 id="api--1">二、API 学习路线详解</h1>
-<h2 id="1-introduction-to-apisapi-">1. Introduction to APIs（API 基础）</h2>
+<h2 id="api--1">二、API 学习路线详解</h2>
+<h3 id="1-introduction-to-apisapi-">1. Introduction to APIs（API 基础）</h3>
 <p>API 定义：一组规则与协议，用来让应用之间进行通信。</p>
 <p>API 类型：</p>
 <p>Public API：对外开放（例如微信/支付宝支付 API）</p>
 <p>Private API：企业内部使用（比如内部微服务接口）</p>
 <p>Partner API：合作伙伴间使用（例如电商平台和物流系统对接）</p>
 <p>这三类名称描述的是开放范围，并不代表不同的技术实现。</p>
-<h2 id="2-api-terminologies">2. API Terminologies（常见术语）</h2>
+<h3 id="2-api-terminologies">2. API Terminologies（常见术语）</h3>
 <p>学习 API，就绕不开 HTTP 协议：</p>
 <p>HTTP Versions：HTTP/1.1（广泛使用）、HTTP/2（多路复用）、HTTP/3（基于 QUIC，更快）。</p>
 <p>HTTP Methods：GET（获取）、POST（新增）、PUT（修改）、DELETE（删除）。</p>
@@ -1313,14 +1313,14 @@ executor.execute(() -&gt; {
 <p>HTTP Headers：传递附加信息，比如 Content-Type、Authorization。</p>
 <p>Cookies 和 Caching：实现状态保持与性能优化。</p>
 <p>学习时至少要能用 <code>curl</code> 或 Postman 发送请求，读懂请求头、响应体和状态码，并理解 HTTPS、缓存与跨域的基本行为。</p>
-<h2 id="3-api-stylesapi-">3. API Styles（API 风格）</h2>
+<h3 id="3-api-stylesapi-">3. API Styles（API 风格）</h3>
 <p>不同 API 风格，适合不同场景：</p>
 <p>REST：最常见，基于 HTTP 资源操作。</p>
 <p>GraphQL：前端友好，按需取数。</p>
 <p>gRPC：高性能，适合微服务内部通信。</p>
 <p>SOAP：偏老，但在金融、电信等领域仍广泛使用。</p>
 <p>WebSocket：实时通信（例如在线聊天、股票行情）。</p>
-<h2 id="4-api-authentication">4. API Authentication（认证机制）</h2>
+<h3 id="4-api-authentication">4. API Authentication（认证机制）</h3>
 <p>API 安全离不开认证：</p>
 <p>Basic Auth：最简单的用户名+密码。</p>
 <p>Token Auth：发放一次性令牌，代替密码。</p>
@@ -1328,13 +1328,13 @@ executor.execute(() -&gt; {
 <p>OAuth：第三方授权（例如用微信/谷歌账号登录第三方应用）。</p>
 <p>Session Auth：依赖服务端保存会话。</p>
 <p>需要特别区分 OAuth 2.0、OpenID Connect 和 JWT：OAuth 2.0 是授权框架，OpenID Connect 在其上补充身份认证，而 JWT 只是一种令牌格式。</p>
-<h2 id="5-api-documentation">5. API Documentation（文档工具）</h2>
+<h3 id="5-api-documentation">5. API Documentation（文档工具）</h3>
 <p>好的文档能让 API 更易用：</p>
 <p>Swagger / OpenAPI Spec：常见的 API 设计与文档标准。</p>
 <p>Postman：调试和测试接口的利器。</p>
 <p>Redoc / DapperDox：文档生成工具。</p>
 <p>文档至少应包含请求与响应示例、错误码、认证方式、限流规则和版本变更记录。</p>
-<h2 id="6-api-features">6. API Features（功能特性）</h2>
+<h3 id="6-api-features">6. API Features（功能特性）</h3>
 <p>API 不只是“能用”，还要“好用”：</p>
 <p>Pagination：分页，避免一次返回过多数据。</p>
 <p>Idempotency：幂等性，避免重复提交导致的错误。</p>
@@ -1342,7 +1342,7 @@ executor.execute(() -&gt; {
 <p>参数传递：URL、Query、Path 参数。</p>
 <p>API Versioning：不同版本兼容升级。</p>
 <p>Content Negotiation：返回 JSON 还是 XML。</p>
-<h2 id="7-api-performance">7. API Performance（性能优化）</h2>
+<h3 id="7-api-performance">7. API Performance（性能优化）</h3>
 <p>保证 API 快速稳定：</p>
 <p>Caching：减少重复请求。</p>
 <p>Rate Limiting：防止恶意刷接口。</p>
@@ -1350,19 +1350,19 @@ executor.execute(() -&gt; {
 <p>Pagination：避免数据过大拖垮接口。</p>
 <p>Indexing &amp; Scaling：数据库优化和系统扩展。</p>
 <p>Performance Testing：压测，提前发现瓶颈。</p>
-<h2 id="8-api-gateways">8. API Gateways（网关）</h2>
+<h3 id="8-api-gateways">8. API Gateways（网关）</h3>
 <p>网关位于客户端和后端服务之间：</p>
 <p>负责请求路由、限流、认证。</p>
 <p>常见产品：AWS API Gateway、Kong、Azure API Service、Apigee、Nginx。</p>
 <p>网关不是所有系统的必选项。服务数量少时，引入网关可能只会增加运维成本和故障点。</p>
-<h2 id="9-api-implementation-frameworks">9. API Implementation Frameworks（开发框架）</h2>
+<h3 id="9-api-implementation-frameworks">9. API Implementation Frameworks（开发框架）</h3>
 <p>常见的 API 开发框架：</p>
 <p>Flask、Django（Python）</p>
 <p>Node.js（JavaScript/TypeScript）</p>
 <p>Spring（Java）</p>
 <p>FastAPI（Python，高性能异步支持）</p>
 <p>框架只是实现工具，选择时更应关注团队技术栈、生态、可观测性和维护成本。</p>
-<h2 id="10-api-integration-patterns">10. API Integration Patterns（集成模式）</h2>
+<h3 id="10-api-integration-patterns">10. API Integration Patterns（集成模式）</h3>
 <p>复杂系统里，API 往往不是单打独斗：</p>
 <p>Sync vs Async：同步/异步调用。</p>
 <p>API Gateway：统一入口管理。</p>
@@ -1370,7 +1370,7 @@ executor.execute(() -&gt; {
 <p>Webhooks：事件驱动的回调机制。</p>
 <p>Polling / Batch Processing / Message Queue：处理大规模数据的常见模式。</p>
 <p>这部分需要结合超时、重试、幂等和最终一致性一起学习，否则只记住模式名称仍不足以应对生产问题。</p>
-<h1 id="heading">三、建议的学习顺序</h1>
+<h2 id="heading">三、建议的学习顺序</h2>
 <p>先用现成 API 练习 HTTP 和认证，再设计一个带分页、错误码和幂等处理的小型 REST API。完成后补上 OpenAPI 文档、自动化测试和基础监控。等单体接口跑通，再学习网关、异步消息、限流和分布式追踪，会比逐项背概念更容易形成完整认识。</p>
 <!-- more -->]]></description>
       <category>API</category>
@@ -1381,9 +1381,9 @@ executor.execute(() -&gt; {
       <link>https://windrunner0707.tech/post/api-led-jia-gou-jie-xi-cong-li-nian-dao-shi-jian/</link>
       <guid isPermaLink="true">https://windrunner0707.tech/post/api-led-jia-gou-jie-xi-cong-li-nian-dao-shi-jian/</guid>
       <pubDate>Tue, 30 Sep 2025 00:00:00 +0800</pubDate>
-      <description><![CDATA[<h1 id="heading">概述</h1>
+      <description><![CDATA[<h2 id="heading">概述</h2>
 <p>当一个新渠道需要同时读取核心系统、CRM 和风控平台的数据时，点对点接口很快会变得难以维护。API-Led（API-Led Connectivity）试图解决的正是这类问题：把底层访问、业务编排和渠道适配拆开，让接口可以复用，也更容易治理。</p>
-<h1 id="-api-led-">什么是 API-Led 架构</h1>
+<h2 id="-api-led-">什么是 API-Led 架构</h2>
 <p>API-Led 架构由 MuleSoft 提出，它的核心做法不是继续增加点对点接口，而是按职责对 API 分层。</p>
 <p><img src="https://windrunner0707.tech/post-images/1759238612483.png" alt="" /></p>
 <p>典型的三层：</p>
@@ -1394,19 +1394,19 @@ executor.execute(() -&gt; {
 </ul>
 <p>分层后，底层系统变化通常只影响 System API，多个渠道也可以复用同一套业务编排。不过，分层并非越多越好，每增加一层都会带来部署、监控和调用延迟成本。</p>
 <p><img src="https://windrunner0707.tech/post-images/1759238658029.png" alt="" /></p>
-<h1 id="api-led">API-Led架构与微服务架构的区别</h1>
+<h2 id="api-led">API-Led架构与微服务架构的区别</h2>
 <p>很多人会把API-Led和微服务混淆，二者虽然相关，但关注点不同：</p>
-<h2 id="heading-1">关注层面不同</h2>
+<h3 id="heading-1">关注层面不同</h3>
 <p>微服务架构：强调将单体应用拆分为小而独立的服务，每个服务独立开发、部署、扩展。</p>
 <p>API-Led 架构：强调系统之间如何互联互通，如何通过 API 实现复用与治理。</p>
-<h2 id="heading-2">目标不同</h2>
+<h3 id="heading-2">目标不同</h3>
 <p>微服务：解决“系统内部分解”的问题。</p>
 <p>API-Led：解决“跨系统集成”的问题。</p>
-<h2 id="heading-3">实现方式不同</h2>
+<h3 id="heading-3">实现方式不同</h3>
 <p>微服务内部可能直接暴露 API，但往往没有分层概念。</p>
 <p>API-Led 强调分层 API，避免直接对接，提升灵活性。</p>
 <p>可以理解为：微服务是系统构建方式，而 API-Led 是系统之间的连接方式。两者是互补关系，而不是替代关系。</p>
-<h1 id="api-led-">API-Led 架构为什么在银行领域广泛使用</h1>
+<h2 id="api-led-">API-Led 架构为什么在银行领域广泛使用</h2>
 <p>银行 IT 系统复杂，往往包含核心账务系统、支付清算系统、风控系统、CRM、渠道系统（柜面、网银、手机银行）等。这种环境下：</p>
 <ul>
 <li>系统异构严重：老的核心系统可能基于 COBOL，新应用可能基于 Java 或微服务。</li>
@@ -1421,8 +1421,8 @@ executor.execute(() -&gt; {
 <li>统一治理和合规（API 网关+API 管理平台）。</li>
 </ul>
 <p>因此，这种思路适合遗留系统多、渠道多且接口治理要求严格的银行场景。但是否采用三层模型，仍取决于现有系统和团队边界。</p>
-<h1 id="api-led--1">API-Led 架构的优缺点</h1>
-<h2 id="heading-4">优点：</h2>
+<h2 id="api-led--1">API-Led 架构的优缺点</h2>
+<h3 id="heading-4">优点：</h3>
 <ul>
 <li>解耦性强：通过分层 API，底层系统改造不会影响上层应用。</li>
 <li>复用性高：System API 和 Process API 可被多个 Experience API 重用。</li>
@@ -1430,14 +1430,14 @@ executor.execute(() -&gt; {
 <li>治理完善：便于统一做 API 管理、监控、安全认证。</li>
 <li>支持开放生态：银行、保险等可快速对接合作伙伴 API。</li>
 </ul>
-<h2 id="heading-5">缺点：</h2>
+<h3 id="heading-5">缺点：</h3>
 <ul>
 <li>设计复杂度提升：需要良好的 API 设计规范和治理体系。</li>
 <li>实现成本高：需要 API 管理平台（如 MuleSoft、Kong、Apigee）。</li>
 <li>性能挑战：层级过多可能带来调用链路长、延迟增加。</li>
 <li>组织协同要求高：API-Led 要求跨部门统一治理，否则容易变成“新的烟囱”。</li>
 </ul>
-<h1 id="heading-6">落地时怎么判断</h1>
+<h2 id="heading-6">落地时怎么判断</h2>
 <p>如果多个渠道反复调用相同的底层系统，而且接口变更经常牵动多支团队，API-Led 值得考虑。先识别真正可复用的系统能力和业务流程，再决定如何分层；不要为了套用三层模型而制造只做透传的 API。</p>
 <p>API 网关只能处理入口处的认证、限流和路由，无法替代接口所有权、版本策略、监控和下线机制。API-Led 能否奏效，最终取决于这些治理工作，而不是是否购买了某个 API 管理平台。</p>
 <!-- more -->]]></description>

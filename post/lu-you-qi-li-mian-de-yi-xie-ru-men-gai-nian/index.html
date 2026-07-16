@@ -15,6 +15,17 @@
 
 
 
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
 <script>
   (function () {
     try {
@@ -26,30 +37,25 @@
     } catch (e) { }
   })();
 </script>
+
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>路由器里面的一些入门概念 | 0707&#39;s Blog</title>
   
-<meta property="og:title" content="路由器里面的一些入门概念" />
-<meta property="og:type" content="article" />
-
-<meta property="og:image" content="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.jpg" />
-
-
 <meta name="description" content="最近在折腾路由器和软路由，接触到了不少看起来熟悉、实际又容易混淆的概念。这篇文章不讨论复杂的网络协议，先从双频、无线速率、Wi-Fi 6，以及家里信号弱时常见的解决方案说起。">
 <link rel="canonical" href="https://windrunner0707.tech/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"路由器里面的一些入门概念","url":"https://windrunner0707.tech/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/","description":"最近在折腾路由器和软路由，接触到了不少看起来熟悉、实际又容易混淆的概念。这篇文章不讨论复杂的网络协议，先从双频、无线速率、Wi-Fi 6，以及家里信号弱时常见的解决方案说起。","image":"/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.jpg","datePublished":"2026-04-15T00:00:00+08:00","dateModified":"2026-07-11T18:40:18+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"路由器里面的一些入门概念","url":"https://windrunner0707.tech/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/","description":"最近在折腾路由器和软路由，接触到了不少看起来熟悉、实际又容易混淆的概念。这篇文章不讨论复杂的网络协议，先从双频、无线速率、Wi-Fi 6，以及家里信号弱时常见的解决方案说起。","image":"/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.webp","datePublished":"2026-04-15T00:00:00+08:00","dateModified":"2026-07-11T18:40:18+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/","name":"路由器里面的一些入门概念","position":2}]}</script>
 <meta property="og:title" content="路由器里面的一些入门概念">
 <meta property="og:description" content="最近在折腾路由器和软路由，接触到了不少看起来熟悉、实际又容易混淆的概念。这篇文章不讨论复杂的网络协议，先从双频、无线速率、Wi-Fi 6，以及家里信号弱时常见的解决方案说起。">
 <meta property="og:url" content="https://windrunner0707.tech/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
-<meta property="og:image" content="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.jpg">
+<meta property="og:image" content="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.webp">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/">
 <meta name="twitter:title" content="路由器里面的一些入门概念">
 <meta name="twitter:description" content="最近在折腾路由器和软路由，接触到了不少看起来熟悉、实际又容易混淆的概念。这篇文章不讨论复杂的网络协议，先从双频、无线速率、Wi-Fi 6，以及家里信号弱时常见的解决方案说起。">
-<meta name="twitter:image" content="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.jpg">
+<meta name="twitter:image" content="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.webp">
 </head>
 <body class="flavor-theme">
 
@@ -64,7 +70,9 @@
           <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
         </a>
         
+        
         <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
       </div>
 
       
@@ -170,8 +178,10 @@
 })();
 </script>
 
+
   <main class="site-main" role="main">
     
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="readingProgressBar"></span></div>
 <article class="article-container">
   <header class="article-header">
     <h1 class="article-title">路由器里面的一些入门概念</h1>
@@ -200,17 +210,24 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.jpg" alt="路由器里面的一些入门概念" />
+    <img src="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.webp" alt="路由器里面的一些入门概念" decoding="async" fetchpriority="high" />
   </div>
   
+
+  <nav class="article-toc" id="articleToc" aria-label="文章目录" hidden>
+    <details class="article-toc__details">
+      <summary class="article-toc__summary">文章目录</summary>
+      <ol class="article-toc__list" id="articleTocList"></ol>
+    </details>
+  </nav>
 
   <div class="article-content">
     <p>最近在折腾路由器和软路由，接触到了不少看起来熟悉、实际又容易混淆的概念。这篇文章不讨论复杂的网络协议，先从双频、无线速率、Wi-Fi 6，以及家里信号弱时常见的解决方案说起。</p>
 <!-- more -->
-<h1 id="heading">双频路由器</h1>
+<h2 id="heading">双频路由器</h2>
 <p>现在常见的无线路由器基本都支持 <strong>2.4GHz</strong> 和 <strong>5GHz</strong> 两个频段，因此经常被称为“双频路由器”。有些路由器会分别显示两个 Wi-Fi 名称，也有些会使用同一个名称，通过“双频合一”自动为设备选择频段。</p>
 <p>这里所说的“5G Wi-Fi”，准确来说是 <strong>5GHz Wi-Fi</strong>，它和手机通信中的 <strong>5G 移动网络</strong>不是一回事：前者是家庭局域网使用的无线频段，后者是蜂窝移动通信技术。</p>
-<h2 id="24ghz--5ghz-">2.4GHz 和 5GHz 有什么区别</h2>
+<h3 id="24ghz--5ghz-">2.4GHz 和 5GHz 有什么区别</h3>
 <p>电磁波的频率与波长成反比。通常来说，2.4GHz 波长更长，传播距离更远，绕射能力也相对更好；5GHz 波长更短，经过墙体等障碍物后衰减通常更明显。</p>
 <table>
 <thead>
@@ -250,20 +267,20 @@
 </table>
 <p>5GHz 往往更快，并不只是因为频率更高。它通常可以使用更宽的信道，而且受到蓝牙、老旧 Wi-Fi 和部分家用无线设备的干扰更少。实际使用时，可以遵循一个简单原则：<strong>离路由器近、追求速度时优先使用 5GHz；距离远或隔墙较多时尝试 2.4GHz。</strong></p>
 <p>需要注意的是，穿墙效果不是一个绝对结论。承重墙、钢筋混凝土、金属柜和路由器摆放位置，都会明显影响信号。与其只看路由器宣传的“穿墙能力”，不如结合房屋结构实测。</p>
-<h1 id="wi-fi-">Wi-Fi 参数说明</h1>
-<h2 id="mbps--mbs">Mbps 和 MB/s</h2>
+<h2 id="wi-fi-">Wi-Fi 参数说明</h2>
+<h3 id="mbps--mbs">Mbps 和 MB/s</h3>
 <p>路由器包装和详情页上常见的 300Mbps、1200Mbps、3000Mbps，单位都是 <strong>Mbps（兆比特每秒）</strong>；电脑下载文件时常见的 MB/s，则是 <strong>兆字节每秒</strong>。</p>
 <p>因为 1 Byte = 8 bit，所以理论换算关系为：</p>
 <pre><code class="language-text">100Mbps ÷ 8 = 12.5MB/s
 </code></pre>
 <p>例如，宽带为 500Mbps，理想状态下的最高下载速度约为 62.5MB/s。但真实速度还会受到协议开销、无线干扰、信号强度、终端性能、网线规格、路由器端口速率和下载服务器带宽等因素影响，因此通常达不到理论上限。</p>
-<h2 id="heading-1">标称速率不等于实际网速</h2>
+<h3 id="heading-1">标称速率不等于实际网速</h3>
 <p>以“AX3000”路由器为例，3000Mbps 通常是不同频段理论无线速率相加后再取整得到的产品等级，并不代表一台设备可以跑到 3000Mbps，也不代表家里的外网宽带就是 3000Mbps。</p>
 <p>判断实际速度时，需要看整条链路中最慢的一环：</p>
 <pre><code class="language-text">运营商宽带 → 光猫 → 路由器 WAN/LAN 口 → 网线或 Wi-Fi → 终端设备
 </code></pre>
 <p>例如办理了千兆宽带，但路由器只有百兆网口，那么外网速度仍会被限制在百兆附近。想发挥千兆及以上宽带的能力，还要确认光猫、路由器端口、网线和终端网卡是否匹配。</p>
-<h1 id="wi-fi-6-">Wi-Fi 6 是什么</h1>
+<h2 id="wi-fi-6-">Wi-Fi 6 是什么</h2>
 <p>Wi-Fi 6 对应 IEEE 802.11ax。相比 Wi-Fi 5，它的改进不只是峰值速度，更重要的是在手机、电脑、电视和智能家居设备较多时，能够更有效地安排无线资源。</p>
 <p>可以先记住几个特点：</p>
 <ul>
@@ -273,18 +290,18 @@
 <li><strong>TWT</strong>：让支持的终端协商唤醒时间，有助于降低部分设备的耗电。</li>
 </ul>
 <p>不过，使用 Wi-Fi 6 需要路由器和终端都支持相应标准。Wi-Fi 6 路由器可以兼容旧设备，但旧手机或旧电脑连接后仍会按照它自身支持的标准工作。</p>
-<h1 id="heading-2">信号弱的解决方案</h1>
+<h2 id="heading-2">信号弱的解决方案</h2>
 <p>当一个路由器无法覆盖全屋时，首先可以尝试把主路由放在房屋相对居中的开放位置，并远离金属遮挡、弱电箱和大型电器。如果调整位置仍然不够，再考虑下面几种方案。</p>
-<h2 id="heading-3">电力猫</h2>
+<h3 id="heading-3">电力猫</h3>
 <p>电力猫通过家里的电力线传输网络数据，一端连接路由器，另一端插在需要网络的房间，适合不方便重新布置网线的场景。</p>
 <p>它的优点是安装简单，不需要无线信号跨越多堵墙；缺点是效果很依赖房屋电路。同一电表、同一回路通常更容易取得较好效果，空气开关、插排、老旧线路和大功率电器都可能造成干扰。因此，电力猫的标称速率同样不能直接当成实际速度，购买前最好确认可以退换并进行实测。</p>
-<h2 id="heading-4">无线桥接</h2>
+<h3 id="heading-4">无线桥接</h3>
 <p>无线桥接或中继，是让副路由通过 Wi-Fi 连接主路由，再把信号转发出去。它不需要在两个位置之间布置网线，适合临时补盲或对速度要求不高的区域。</p>
 <p>它的限制也很明显：副路由必须先收到质量足够好的上游信号。如果把副路由放在原本就几乎没有信号的位置，它只是把一个很差的连接继续转发。单射频设备在接收和转发之间还需要共享无线资源，实际吞吐量和稳定性通常会下降。</p>
-<h2 id="ap-">AP 模式与有线回程</h2>
+<h3 id="ap-">AP 模式与有线回程</h3>
 <p>如果房间之间已经预埋网线，更推荐让副路由使用 <strong>AP 模式</strong>，通过网线连接主路由。此时主路由负责拨号、DHCP 和 NAT，副路由主要负责提供无线接入，可以避免多层 NAT，也通常比无线桥接更稳定。</p>
 <p>需要区分的是，有些设备设置中的“桥接模式”是指关闭光猫或路由器的拨号、NAT 功能，把公网连接交给下一级路由器；它和“无线桥接/无线中继”并不是同一个概念。配置前应先确认设备界面对“桥接”的具体定义。</p>
-<h2 id="mesh-">Mesh 组网</h2>
+<h3 id="mesh-">Mesh 组网</h3>
 <p>Mesh 由一个主节点和一个或多个子节点组成，它们共同提供覆盖，并协调设备在节点之间漫游。相较于简单中继，Mesh 的统一管理和漫游体验通常更好，适合面积较大、房间较多或多楼层的住宅。</p>
 <p>Mesh 的节点之间可以使用无线回程，也可以使用有线回程：</p>
 <ul>
@@ -292,7 +309,7 @@
 <li><strong>有线回程</strong>占用网线，却通常能获得更稳定的速度，是有预埋网线时的优先选择。</li>
 </ul>
 <p>部署无线 Mesh 时，子节点也不能放在信号死角里，通常应放在主节点与目标区域之间。购买前还应确认不同型号是否属于同一 Mesh 生态，因为不同品牌乃至同一品牌的不同系列未必能够混合组网。</p>
-<h1 id="heading-5">如何选择</h1>
+<h2 id="heading-5">如何选择</h2>
 <p>可以根据家里的条件快速判断：</p>
 <table>
 <thead>
@@ -325,7 +342,7 @@
 </tbody>
 </table>
 <p>路由器不是功率越大、天线越多就一定越好。终端发射功率、房屋结构、邻居 Wi-Fi 干扰和节点位置，都会影响最终体验。对家庭网络来说，合理摆放、多节点覆盖和稳定的有线回程，往往比单纯更换一台“穿墙王”更有效。</p>
-<h1 id="heading-6">参考视频</h1>
+<h2 id="heading-6">参考视频</h2>
 <ul>
 <li><a href="https://www.bilibili.com/video/BV1n64y1r7ym">路由器相关入门视频（哔哩哔哩）</a></li>
 </ul>
@@ -338,7 +355,7 @@
     <a href="/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/" class="post-nav-card post-nav-card--prev">
       
       <div class="post-nav-card__img">
-        <img src="/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.png" alt="金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付" loading="lazy" />
+        <img src="/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.webp" alt="金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付" loading="lazy" />
       </div>
       
       <div class="post-nav-card__body">
@@ -356,7 +373,7 @@
       </div>
       
       <div class="post-nav-card__img">
-        <img src="/post-images/riichi-mahjong-basics-tile-efficiency.png" alt="日麻入门：从牌型、向听到牌效率" loading="lazy" />
+        <img src="/post-images/riichi-mahjong-basics-tile-efficiency.webp" alt="日麻入门：从牌型、向听到牌效率" loading="lazy" />
       </div>
       
       <span class="post-nav-card__arrow">&rarr;</span>
@@ -450,15 +467,18 @@
 </footer>
 
   
-  <div class="search-overlay" id="searchOverlay" style="display:none;">
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
   <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
     <div class="search-header">
       <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off" />
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
       <span class="search-kbd">&#8984;K</span>
       <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -468,15 +488,17 @@
         </svg>
       </button>
     </div>
-    <div class="search-results" id="searchResults"></div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
   </div>
 </div>
 
 <script src="/scripts/search.js"></script>
+
   
 
   
 <script src="/scripts/image-zoom.js"></script>
+<script src="/scripts/article-enhancements.js"></script>
 
 
   
