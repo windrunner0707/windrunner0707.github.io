@@ -7,6 +7,38 @@
 <link rel="stylesheet" href="/styles/main.min.css">
 
 
+<style>
+  .hero-section--text {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 260px;
+    background-color: var(--color-bg);
+  }
+  .hero-section--text .hero-content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  .hero-section--text .hero-title {
+    color: var(--color-text-primary);
+  }
+  .hero-section--text .hero-subtitle {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .hero-section--text {
+      min-height: 220px;
+    }
+    .hero-section--text .hero-content {
+      padding: 48px 16px;
+    }
+  }
+</style>
+
+
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
 
@@ -80,7 +112,9 @@
         
         <a class="nav-item" href="/">首页</a>
         
-        <a class="nav-item" href="/post">博客</a>
+        <a class="nav-item" href="/category/tech/">技术</a>
+        
+        <a class="nav-item" href="/category/life/">生活</a>
         
         <a class="nav-item" href="/memos">闪念</a>
         
@@ -202,6 +236,14 @@
 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-12-25
       
     </div>
@@ -228,6 +270,14 @@
 首先，描述一下线上系统出现内存、CPU负载过高或者...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-10-25
       
     </div>
@@ -254,6 +304,14 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
 原子性（Atomicit...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-10-24
       
     </div>
@@ -278,6 +336,14 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
 1.互斥条件：至少有一个资源是非共享的，必须由一个线...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-10-23
       
     </div>
@@ -306,7 +372,9 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
       
       <a class="footer-nav__link" href="/">首页</a>
       
-      <a class="footer-nav__link" href="/post">博客</a>
+      <a class="footer-nav__link" href="/category/tech/">技术</a>
+      
+      <a class="footer-nav__link" href="/category/life/">生活</a>
       
       <a class="footer-nav__link" href="/memos">闪念</a>
       

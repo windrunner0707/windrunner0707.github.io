@@ -7,6 +7,38 @@
 <link rel="stylesheet" href="/styles/main.min.css">
 
 
+<style>
+  .hero-section--text {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 260px;
+    background-color: var(--color-bg);
+  }
+  .hero-section--text .hero-content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  .hero-section--text .hero-title {
+    color: var(--color-text-primary);
+  }
+  .hero-section--text .hero-subtitle {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .hero-section--text {
+      min-height: 220px;
+    }
+    .hero-section--text .hero-content {
+      padding: 48px 16px;
+    }
+  }
+</style>
+
+
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
 
@@ -80,7 +112,9 @@
         
         <a class="nav-item" href="/">首页</a>
         
-        <a class="nav-item" href="/post">博客</a>
+        <a class="nav-item" href="/category/tech/">技术</a>
+        
+        <a class="nav-item" href="/category/life/">生活</a>
         
         <a class="nav-item" href="/memos">闪念</a>
         
@@ -201,6 +235,14 @@
       当查询性能下降时，大多数工程师通常会首先检查应用代码，以识别问题。然而，问题的根源也可能出现在数据存储层，而索引则是决定能否精准查找与避免盲目全表扫描、从而提高性能的关键。只要建立了合适的索引，原本需要筛选数百万行的数据查询就能在毫秒...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-07-01
       
     </div>
@@ -227,6 +269,14 @@
 首先，描述一下线上系统出现内存、CPU负载过高或者...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-10-25
       
     </div>
@@ -255,7 +305,9 @@
       
       <a class="footer-nav__link" href="/">首页</a>
       
-      <a class="footer-nav__link" href="/post">博客</a>
+      <a class="footer-nav__link" href="/category/tech/">技术</a>
+      
+      <a class="footer-nav__link" href="/category/life/">生活</a>
       
       <a class="footer-nav__link" href="/memos">闪念</a>
       

@@ -1,3 +1,14 @@
+@media (min-width: 769px) and (max-width: 1050px) {
+  .top-bar {
+    padding: 0 16px;
+  }
+
+  .nav-item {
+    padding: 0 8px;
+    font-size: 12px;
+  }
+}
+
 /* ============================================================================
    § 27. RESPONSIVE — TABLET (max-width: 768px)
    ============================================================================ */
@@ -31,7 +42,7 @@
   }
 
   .top-bar__nav--open {
-    max-height: 400px;
+    max-height: 460px;
     opacity: 1;
   }
 
@@ -56,6 +67,7 @@
   .top-bar__nav--open .nav-item:nth-child(5) { transition-delay: 0.25s; }
   .top-bar__nav--open .nav-item:nth-child(6) { transition-delay: 0.3s; }
   .top-bar__nav--open .nav-item:nth-child(7) { transition-delay: 0.35s; }
+  .top-bar__nav--open .nav-item:nth-child(8) { transition-delay: 0.4s; }
 
   .top-bar__nav .nav-item:hover,
   .top-bar__nav .nav-item--active {
@@ -90,6 +102,15 @@
   /* ── Compact Grid ── */
   .compact-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section-header--channels {
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .section-channel-links {
+    justify-content: flex-start;
   }
 
   /* ── List Post Card Thumbnail ── */
@@ -209,6 +230,25 @@
 
 @media (max-width: 480px) {
 
+  .section-header--channels {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .section-channel-links {
+    width: 100%;
+  }
+
+  .section-channel-link {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .section-channel-links .section-more {
+    width: 100%;
+    margin-top: 4px;
+  }
+
   /* ── Compact Grid: single column ── */
   .compact-grid {
     grid-template-columns: 1fr;
@@ -274,4 +314,3 @@
     font-size: 1.6rem;
   }
 }
-

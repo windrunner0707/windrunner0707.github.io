@@ -7,6 +7,38 @@
 <link rel="stylesheet" href="/styles/main.min.css">
 
 
+<style>
+  .hero-section--text {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 260px;
+    background-color: var(--color-bg);
+  }
+  .hero-section--text .hero-content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  .hero-section--text .hero-title {
+    color: var(--color-text-primary);
+  }
+  .hero-section--text .hero-subtitle {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .hero-section--text {
+      min-height: 220px;
+    }
+    .hero-section--text .hero-content {
+      padding: 48px 16px;
+    }
+  }
+</style>
+
+
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
 
@@ -80,7 +112,9 @@
         
         <a class="nav-item" href="/">首页</a>
         
-        <a class="nav-item" href="/post">博客</a>
+        <a class="nav-item" href="/category/tech/">技术</a>
+        
+        <a class="nav-item" href="/category/life/">生活</a>
         
         <a class="nav-item" href="/memos">闪念</a>
         
@@ -201,9 +235,20 @@
   
   
   <section class="section-popular">
-    <div class="section-header">
-      <h2 class="section-title">近期精选</h2>
-      <a href="/post" class="section-more meta-text">查看全部 &rarr;</a>
+    <div class="section-header section-header--channels">
+      <div class="section-header__group">
+        <p class="section-kicker meta-text">LATEST UPDATES</p>
+        <h2 class="section-title">近期更新</h2>
+      </div>
+      <nav class="section-channel-links" aria-label="内容频道">
+        <a class="section-channel-link" href="/category/tech/">
+          <span>技术</span><span aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="section-channel-link" href="/category/life/">
+          <span>生活</span><span aria-hidden="true">&rarr;</span>
+        </a>
+        <a href="/post" class="section-more meta-text">全部文章 &rarr;</a>
+      </nav>
     </div>
     <div class="compact-grid">
       
@@ -212,7 +257,14 @@
   <a href="/post/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-chan-pin-jia-gou-she-ji-yu-nan-dian/" class="post-card__inner">
     <div class="post-card__body">
       <h3 class="post-card__title clamp-2">元数据驱动的多租户 ERP：SaaS 产品架构设计与难点</h3>
-      <div class="post-card__meta meta-text">2026-07-12</div>
+      <div class="post-card__meta meta-text">
+        
+        
+        <span class="post-card__channel">技术</span><span class="post-card__meta-sep" aria-hidden="true"> / </span>
+        
+        
+        2026-07-12
+      </div>
     </div>
     
     <img class="post-card__thumb-square" src="/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou.webp" alt="元数据驱动的多租户 ERP：SaaS 产品架构设计与难点" loading="lazy"
@@ -228,7 +280,14 @@
   <a href="/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/" class="post-card__inner">
     <div class="post-card__body">
       <h3 class="post-card__title clamp-2">从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践</h3>
-      <div class="post-card__meta meta-text">2026-07-12</div>
+      <div class="post-card__meta meta-text">
+        
+        
+        <span class="post-card__channel">技术</span><span class="post-card__meta-sep" aria-hidden="true"> / </span>
+        
+        
+        2026-07-12
+      </div>
     </div>
     
     <img class="post-card__thumb-square" src="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp" alt="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践" loading="lazy"
@@ -244,7 +303,14 @@
   <a href="/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/" class="post-card__inner">
     <div class="post-card__body">
       <h3 class="post-card__title clamp-2">电子交易库存系统复盘：从整批预留到统一库存交易引擎</h3>
-      <div class="post-card__meta meta-text">2026-07-11</div>
+      <div class="post-card__meta meta-text">
+        
+        
+        <span class="post-card__channel">技术</span><span class="post-card__meta-sep" aria-hidden="true"> / </span>
+        
+        
+        2026-07-11
+      </div>
     </div>
     
     <img class="post-card__thumb-square" src="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg" alt="电子交易库存系统复盘：从整批预留到统一库存交易引擎" loading="lazy"
@@ -260,7 +326,14 @@
   <a href="/post/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan/" class="post-card__inner">
     <div class="post-card__body">
       <h3 class="post-card__title clamp-2">金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付</h3>
-      <div class="post-card__meta meta-text">2026-05-06</div>
+      <div class="post-card__meta meta-text">
+        
+        
+        <span class="post-card__channel">技术</span><span class="post-card__meta-sep" aria-hidden="true"> / </span>
+        
+        
+        2026-05-06
+      </div>
     </div>
     
     <img class="post-card__thumb-square" src="/post-images/jin-rong-xiang-mu-zhong-de-gitops-shi-jian-fu-pan.webp" alt="金融项目中的 GitOps 实践复盘：从自动部署到可审计的持续交付" loading="lazy"
@@ -272,7 +345,49 @@
       
       
       
+      <article class="post-card post-card--compact">
+  <a href="/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/" class="post-card__inner">
+    <div class="post-card__body">
+      <h3 class="post-card__title clamp-2">路由器里面的一些入门概念</h3>
+      <div class="post-card__meta meta-text">
+        
+        
+        <span class="post-card__channel">技术</span><span class="post-card__meta-sep" aria-hidden="true"> / </span>
+        
+        
+        2026-04-15
+      </div>
+    </div>
+    
+    <img class="post-card__thumb-square" src="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.webp" alt="路由器里面的一些入门概念" loading="lazy"
+      decoding="async" width="72" height="72" />
+    
+  </a>
+</article>
+
       
+      
+      
+      <article class="post-card post-card--compact">
+  <a href="/post/riichi-mahjong-basics-tile-efficiency/" class="post-card__inner">
+    <div class="post-card__body">
+      <h3 class="post-card__title clamp-2">日麻入门：从牌型、向听到牌效率</h3>
+      <div class="post-card__meta meta-text">
+        
+        
+        <span class="post-card__channel">生活</span><span class="post-card__meta-sep" aria-hidden="true"> / </span>
+        
+        
+        2026-02-25
+      </div>
+    </div>
+    
+    <img class="post-card__thumb-square" src="/post-images/riichi-mahjong-basics-tile-efficiency.webp" alt="日麻入门：从牌型、向听到牌效率" loading="lazy"
+      decoding="async" width="72" height="72" />
+    
+  </a>
+</article>
+
       
       
       
@@ -293,7 +408,7 @@
       
       <section class="section-latest">
         <div class="section-header">
-          <h2 class="section-title">最新文章</h2>
+          <h2 class="section-title">更多文章</h2>
         </div>
         <div class="post-list">
           
@@ -306,55 +421,7 @@
           
           
           
-          <article class="post-card post-card--list">
-  <div class="post-card__body">
-    <a href="/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/" class="post-card__title-link">
-      <h3 class="post-card__title clamp-3">路由器里面的一些入门概念</h3>
-    </a>
-    <a href="/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/" class="post-card__excerpt clamp-2">
-      最近在折腾路由器和软路由，接触到了不少看起来熟悉、实际又容易混淆的概念。这篇文章不讨论复杂的网络协议，先从双频、无线速率、Wi-Fi 6，以及家里信号弱时常见的解决方案说起。
-
-双频路由器
-现在常见的无线路由器基本都支持 2.4GHz...
-    </a>
-    <div class="post-card__meta meta-text">
-      2026-04-15
-      
-    </div>
-  </div>
-  
-  <a href="/post/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian/" class="post-card__thumb-link">
-    <img class="post-card__thumb" src="/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.webp" alt="路由器里面的一些入门概念" loading="lazy"
-      decoding="async" width="200" height="134" />
-  </a>
-  
-</article>
-
           
-          
-          
-          <article class="post-card post-card--list">
-  <div class="post-card__body">
-    <a href="/post/riichi-mahjong-basics-tile-efficiency/" class="post-card__title-link">
-      <h3 class="post-card__title clamp-3">日麻入门：从牌型、向听到牌效率</h3>
-    </a>
-    <a href="/post/riichi-mahjong-basics-tile-efficiency/" class="post-card__excerpt clamp-2">
-      日麻常被误解成一种主要靠“运气”的游戏。单局当然会受牌山影响，但竞技麻将真正比较的，是玩家能否在大量对局里持续做出更高期望的选择：更快组成好形、更准确地判断进攻与防守，并接受正确选择偶尔也会得到坏结果。
-这篇文章根据我学习日麻时整理的...
-    </a>
-    <div class="post-card__meta meta-text">
-      2026-02-25
-      
-    </div>
-  </div>
-  
-  <a href="/post/riichi-mahjong-basics-tile-efficiency/" class="post-card__thumb-link">
-    <img class="post-card__thumb" src="/post-images/riichi-mahjong-basics-tile-efficiency.webp" alt="日麻入门：从牌型、向听到牌效率" loading="lazy"
-      decoding="async" width="200" height="134" />
-  </a>
-  
-</article>
-
           
           
           
@@ -368,6 +435,14 @@
 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-12-25
       
     </div>
@@ -396,6 +471,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
 控制平面接收...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-09-30
       
     </div>
@@ -422,6 +505,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
 简单来说，API 是一...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-09-30
       
     </div>
@@ -447,6 +538,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
 当一个新渠道需要同时读取核心系统、CRM 和风控平台的数据时，点对点接口很快会变得难以维护。API-Led（API-Led Connectivity）试图解决的正是这类问题：把底层访问、业务编排和渠道适配拆开，让接口可以复用，也...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-09-30
       
     </div>
@@ -590,7 +689,9 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
       
       <a class="footer-nav__link" href="/">首页</a>
       
-      <a class="footer-nav__link" href="/post">博客</a>
+      <a class="footer-nav__link" href="/category/tech/">技术</a>
+      
+      <a class="footer-nav__link" href="/category/life/">生活</a>
       
       <a class="footer-nav__link" href="/memos">闪念</a>
       

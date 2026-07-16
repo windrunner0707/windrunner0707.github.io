@@ -7,6 +7,38 @@
 <link rel="stylesheet" href="/styles/main.min.css">
 
 
+<style>
+  .hero-section--text {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 260px;
+    background-color: var(--color-bg);
+  }
+  .hero-section--text .hero-content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  .hero-section--text .hero-title {
+    color: var(--color-text-primary);
+  }
+  .hero-section--text .hero-subtitle {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .hero-section--text {
+      min-height: 220px;
+    }
+    .hero-section--text .hero-content {
+      padding: 48px 16px;
+    }
+  }
+</style>
+
+
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
 
@@ -39,19 +71,19 @@
 </script>
 
   <meta name="generator" content="Gridea Pro 1.2.2">
-  <title>咖啡 | 0707&#39;s Blog</title>
+  <title>生活 | 0707&#39;s Blog</title>
   
 <meta name="description" content="记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。">
-<link rel="canonical" href="https://windrunner0707.tech/category/ka-pei/">
+<link rel="canonical" href="https://windrunner0707.tech/category/life/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"0707's Blog","url":"https://windrunner0707.tech","description":"记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。","potentialAction":{"@type":"SearchAction","query-input":"required name=search_term_string","target":"https://windrunner0707.tech/search?q={search_term_string}"}}</script>
 <meta property="og:title" content="0707's Blog">
 <meta property="og:description" content="记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。">
-<meta property="og:url" content="https://windrunner0707.tech/category/ka-pei/">
+<meta property="og:url" content="https://windrunner0707.tech/category/life/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="0707's Blog">
 <meta property="og:image" content="/images/avatar.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://windrunner0707.tech/category/ka-pei/">
+<meta name="twitter:url" content="https://windrunner0707.tech/category/life/">
 <meta name="twitter:title" content="0707's Blog">
 <meta name="twitter:description" content="记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。">
 <meta name="twitter:image" content="/images/avatar.png">
@@ -80,7 +112,9 @@
         
         <a class="nav-item" href="/">首页</a>
         
-        <a class="nav-item" href="/post">博客</a>
+        <a class="nav-item" href="/category/tech/">技术</a>
+        
+        <a class="nav-item" href="/category/life/">生活</a>
         
         <a class="nav-item" href="/memos">闪念</a>
         
@@ -181,15 +215,50 @@
   <main class="site-main" role="main">
     
 <div class="container">
-  <div class="page-header">
-    <h1 class="page-title">咖啡</h1>
+  <div class="page-header category-header">
+    <p class="category-header__eyebrow meta-text">频道</p>
+    <h1 class="page-title">生活</h1>
     
-    <p class="page-subtitle meta-text">共 1 篇文章</p>
+    <p class="category-header__description">咖啡、日麻、数码与日常记录</p>
+    
+    
+    <p class="page-subtitle meta-text">共 2 篇文章</p>
     
   </div>
 
   
   <div class="post-list">
+    
+    <article class="post-card post-card--list">
+  <div class="post-card__body">
+    <a href="/post/riichi-mahjong-basics-tile-efficiency/" class="post-card__title-link">
+      <h3 class="post-card__title clamp-3">日麻入门：从牌型、向听到牌效率</h3>
+    </a>
+    <a href="/post/riichi-mahjong-basics-tile-efficiency/" class="post-card__excerpt clamp-2">
+      日麻常被误解成一种主要靠“运气”的游戏。单局当然会受牌山影响，但竞技麻将真正比较的，是玩家能否在大量对局里持续做出更高期望的选择：更快组成好形、更准确地判断进攻与防守，并接受正确选择偶尔也会得到坏结果。
+这篇文章根据我学习日麻时整理的...
+    </a>
+    <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">生活</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
+      2026-02-25
+      
+    </div>
+  </div>
+  
+  <a href="/post/riichi-mahjong-basics-tile-efficiency/" class="post-card__thumb-link">
+    <img class="post-card__thumb" src="/post-images/riichi-mahjong-basics-tile-efficiency.webp" alt="日麻入门：从牌型、向听到牌效率" loading="lazy"
+      decoding="async" width="200" height="134" />
+  </a>
+  
+</article>
+
     
     <article class="post-card post-card--list">
   <div class="post-card__body">
@@ -201,6 +270,14 @@
 这篇文章从手冲的由来讲起，再分享一套容易上手的冲煮方法，以及几种常见产区的风味。器具不必一步到位，先把手边...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">生活</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-06-20
       
     </div>
@@ -229,7 +306,9 @@
       
       <a class="footer-nav__link" href="/">首页</a>
       
-      <a class="footer-nav__link" href="/post">博客</a>
+      <a class="footer-nav__link" href="/category/tech/">技术</a>
+      
+      <a class="footer-nav__link" href="/category/life/">生活</a>
       
       <a class="footer-nav__link" href="/memos">闪念</a>
       

@@ -7,6 +7,38 @@
 <link rel="stylesheet" href="/styles/main.min.css">
 
 
+<style>
+  .hero-section--text {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 260px;
+    background-color: var(--color-bg);
+  }
+  .hero-section--text .hero-content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  .hero-section--text .hero-title {
+    color: var(--color-text-primary);
+  }
+  .hero-section--text .hero-subtitle {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .hero-section--text {
+      min-height: 220px;
+    }
+    .hero-section--text .hero-content {
+      padding: 48px 16px;
+    }
+  }
+</style>
+
+
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
 
@@ -80,7 +112,9 @@
         
         <a class="nav-item" href="/">首页</a>
         
-        <a class="nav-item" href="/post">博客</a>
+        <a class="nav-item" href="/category/tech/">技术</a>
+        
+        <a class="nav-item" href="/category/life/">生活</a>
         
         <a class="nav-item" href="/memos">闪念</a>
         
@@ -196,7 +230,7 @@
       
       <section class="section-latest">
         <div class="section-header">
-          <h2 class="section-title">最新文章</h2>
+          <h2 class="section-title">更多文章</h2>
         </div>
         <div class="post-list">
           
@@ -210,6 +244,14 @@
       当查询性能下降时，大多数工程师通常会首先检查应用代码，以识别问题。然而，问题的根源也可能出现在数据存储层，而索引则是决定能否精准查找与避免盲目全表扫描、从而提高性能的关键。只要建立了合适的索引，原本需要筛选数百万行的数据查询就能在毫秒...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-07-01
       
     </div>
@@ -235,6 +277,14 @@
 这篇文章从手冲的由来讲起，再分享一套容易上手的冲煮方法，以及几种常见产区的风味。器具不必一步到位，先把手边...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">生活</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-06-20
       
     </div>
@@ -259,6 +309,14 @@
       本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-06-19
       
     </div>
@@ -284,6 +342,14 @@
 授权之后还有请款、清算、结算...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-12-25
       
     </div>
@@ -309,6 +375,14 @@
 字段注入写起来省事，却会把依赖藏在类的内部；循环依赖也可能直到容器启动时才暴露。构造器注入把必需依赖直接列在构造器参数中，因此更适合作为默认选择。下面比较 @Autowired、@Inject、构造器注入和 @Lazy 各自解决...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-12-14
       
     </div>
@@ -334,6 +408,14 @@
 Git 历史一旦混入大量 fix、临时提交和无意义的合并记录，代码审查与问题回溯都会变慢。本文整理提交、分支、冲突、补丁和 Git Hooks 的常用做法，并补充对应的 IDEA 操作。涉及重写历史的命令，使用前要先确认提交是否...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-12-04
       
     </div>
@@ -362,6 +444,14 @@ Git 历史一旦混入大量 fix、临时提交和无意义的合并记录，代
 首先，描述一下线上系统出现内存、CPU负载过高或者...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-10-25
       
     </div>
@@ -390,6 +480,14 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
 原子性（Atomicit...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-10-24
       
     </div>
@@ -416,6 +514,14 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
 1.互斥条件：至少有一个资源是非共享的，必须由一个线...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2024-10-23
       
     </div>
@@ -444,6 +550,14 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
 TypeScript 是 JavaScript 的超集。它不会取代 JavaScript，而是在 JavaScript 之上增加静态类型检查、编...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2023-07-31
       
     </div>
@@ -583,7 +697,9 @@ TypeScript 是 JavaScript 的超集。它不会取代 JavaScript，而是在 Jav
       
       <a class="footer-nav__link" href="/">首页</a>
       
-      <a class="footer-nav__link" href="/post">博客</a>
+      <a class="footer-nav__link" href="/category/tech/">技术</a>
+      
+      <a class="footer-nav__link" href="/category/life/">生活</a>
       
       <a class="footer-nav__link" href="/memos">闪念</a>
       

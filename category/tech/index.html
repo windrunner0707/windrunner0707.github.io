@@ -7,6 +7,38 @@
 <link rel="stylesheet" href="/styles/main.min.css">
 
 
+<style>
+  .hero-section--text {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 260px;
+    background-color: var(--color-bg);
+  }
+  .hero-section--text .hero-content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  .hero-section--text .hero-title {
+    color: var(--color-text-primary);
+  }
+  .hero-section--text .hero-subtitle {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .hero-section--text {
+      min-height: 220px;
+    }
+    .hero-section--text .hero-content {
+      padding: 48px 16px;
+    }
+  }
+</style>
+
+
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
 
@@ -42,16 +74,16 @@
   <title>技术 | 0707&#39;s Blog</title>
   
 <meta name="description" content="记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。">
-<link rel="canonical" href="https://windrunner0707.tech/category/ji-shu/">
+<link rel="canonical" href="https://windrunner0707.tech/category/tech/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"0707's Blog","url":"https://windrunner0707.tech","description":"记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。","potentialAction":{"@type":"SearchAction","query-input":"required name=search_term_string","target":"https://windrunner0707.tech/search?q={search_term_string}"}}</script>
 <meta property="og:title" content="0707's Blog">
 <meta property="og:description" content="记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。">
-<meta property="og:url" content="https://windrunner0707.tech/category/ji-shu/">
+<meta property="og:url" content="https://windrunner0707.tech/category/tech/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="0707's Blog">
 <meta property="og:image" content="/images/avatar.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://windrunner0707.tech/category/ji-shu/">
+<meta name="twitter:url" content="https://windrunner0707.tech/category/tech/">
 <meta name="twitter:title" content="0707's Blog">
 <meta name="twitter:description" content="记录后端、架构与云原生实践，也分享咖啡、日麻与数码生活。">
 <meta name="twitter:image" content="/images/avatar.png">
@@ -80,7 +112,9 @@
         
         <a class="nav-item" href="/">首页</a>
         
-        <a class="nav-item" href="/post">博客</a>
+        <a class="nav-item" href="/category/tech/">技术</a>
+        
+        <a class="nav-item" href="/category/life/">生活</a>
         
         <a class="nav-item" href="/memos">闪念</a>
         
@@ -181,8 +215,12 @@
   <main class="site-main" role="main">
     
 <div class="container">
-  <div class="page-header">
+  <div class="page-header category-header">
+    <p class="category-header__eyebrow meta-text">频道</p>
     <h1 class="page-title">技术</h1>
+    
+    <p class="category-header__description">后端、架构、云原生与工程实践</p>
+    
     
     <p class="page-subtitle meta-text">共 18 篇文章</p>
     
@@ -200,6 +238,14 @@
       大型企业级 SaaS ERP 的复杂之处，不只是处理订单、库存和结算等业务，而是让一套稳定的标准产品同时服务多个客户，并允许每个客户安全地扩展字段、页面和业务规则。产品既要保持公共能力可持续升级，又要控制租户定制对核心交易稳定性的影响...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-07-12
       
     </div>
@@ -222,6 +268,14 @@
       最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：win...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-07-12
       
     </div>
@@ -245,6 +299,14 @@
 真正开始改造后才发现，这并不是把一个定时任务换成消息队列...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-07-11
       
     </div>
@@ -268,6 +330,14 @@
 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-05-06
       
     </div>
@@ -293,6 +363,14 @@
 现在常见的无线路由器基本都支持 2.4GHz...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-04-15
       
     </div>
@@ -316,6 +394,14 @@
 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-12-25
       
     </div>
@@ -342,6 +428,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
 控制平面接收...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-09-30
       
     </div>
@@ -366,6 +460,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
 简单来说，API 是一...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-09-30
       
     </div>
@@ -389,6 +491,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
 当一个新渠道需要同时读取核心系统、CRM 和风控平台的数据时，点对点接口很快会变得难以维护。API-Led（API-Led Connectivity）试图解决的正是这类问题：把底层访问、业务编排和渠道适配拆开，让接口可以复用，也...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-09-30
       
     </div>
@@ -411,6 +521,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
       当查询性能下降时，大多数工程师通常会首先检查应用代码，以识别问题。然而，问题的根源也可能出现在数据存储层，而索引则是决定能否精准查找与避免盲目全表扫描、从而提高性能的关键。只要建立了合适的索引，原本需要筛选数百万行的数据查询就能在毫秒...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-07-01
       
     </div>
@@ -439,7 +557,9 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
       
       <a class="footer-nav__link" href="/">首页</a>
       
-      <a class="footer-nav__link" href="/post">博客</a>
+      <a class="footer-nav__link" href="/category/tech/">技术</a>
+      
+      <a class="footer-nav__link" href="/category/life/">生活</a>
       
       <a class="footer-nav__link" href="/memos">闪念</a>
       

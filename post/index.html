@@ -7,6 +7,38 @@
 <link rel="stylesheet" href="/styles/main.min.css">
 
 
+<style>
+  .hero-section--text {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 260px;
+    background-color: var(--color-bg);
+  }
+  .hero-section--text .hero-content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  .hero-section--text .hero-title {
+    color: var(--color-text-primary);
+  }
+  .hero-section--text .hero-subtitle {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .hero-section--text {
+      min-height: 220px;
+    }
+    .hero-section--text .hero-content {
+      padding: 48px 16px;
+    }
+  }
+</style>
+
+
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
 
@@ -80,7 +112,9 @@
         
         <a class="nav-item" href="/">首页</a>
         
-        <a class="nav-item" href="/post">博客</a>
+        <a class="nav-item" href="/category/tech/">技术</a>
+        
+        <a class="nav-item" href="/category/life/">生活</a>
         
         <a class="nav-item" href="/memos">闪念</a>
         
@@ -200,6 +234,14 @@
       大型企业级 SaaS ERP 的复杂之处，不只是处理订单、库存和结算等业务，而是让一套稳定的标准产品同时服务多个客户，并允许每个客户安全地扩展字段、页面和业务规则。产品既要保持公共能力可持续升级，又要控制租户定制对核心交易稳定性的影响...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-07-12
       
     </div>
@@ -222,6 +264,14 @@
       最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：win...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-07-12
       
     </div>
@@ -245,6 +295,14 @@
 真正开始改造后才发现，这并不是把一个定时任务换成消息队列...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-07-11
       
     </div>
@@ -268,6 +326,14 @@
 我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-05-06
       
     </div>
@@ -293,6 +359,14 @@
 现在常见的无线路由器基本都支持 2.4GHz...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-04-15
       
     </div>
@@ -316,6 +390,14 @@
 这篇文章根据我学习日麻时整理的...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">生活</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2026-02-25
       
     </div>
@@ -339,6 +421,14 @@
 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-12-25
       
     </div>
@@ -365,6 +455,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
 控制平面接收...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-09-30
       
     </div>
@@ -389,6 +487,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
 简单来说，API 是一...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-09-30
       
     </div>
@@ -412,6 +518,14 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
 当一个新渠道需要同时读取核心系统、CRM 和风控平台的数据时，点对点接口很快会变得难以维护。API-Led（API-Led Connectivity）试图解决的正是这类问题：把底层访问、业务编排和渠道适配拆开，让接口可以复用，也...
     </a>
     <div class="post-card__meta meta-text">
+      
+      
+      
+      <span class="post-card__channel">技术</span>
+      <span class="post-card__meta-sep" aria-hidden="true">/</span>
+      
+      
+      
       2025-09-30
       
     </div>
@@ -451,7 +565,9 @@ Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制
       
       <a class="footer-nav__link" href="/">首页</a>
       
-      <a class="footer-nav__link" href="/post">博客</a>
+      <a class="footer-nav__link" href="/category/tech/">技术</a>
+      
+      <a class="footer-nav__link" href="/category/life/">生活</a>
       
       <a class="footer-nav__link" href="/memos">闪念</a>
       
