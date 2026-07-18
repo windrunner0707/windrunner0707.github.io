@@ -13,8 +13,8 @@
       <link>https://windrunner0707.tech/post/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-chan-pin-jia-gou-she-ji-yu-nan-dian/</link>
       <guid isPermaLink="true">https://windrunner0707.tech/post/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-chan-pin-jia-gou-she-ji-yu-nan-dian/</guid>
       <pubDate>Sun, 12 Jul 2026 00:00:00 +0800</pubDate>
-      <description><![CDATA[<p>大型企业级 SaaS ERP 的复杂之处，不只是处理订单、库存和结算等业务，而是让一套稳定的标准产品同时服务多个客户，并允许每个客户安全地扩展字段、页面和业务规则。产品既要保持公共能力可持续升级，又要控制租户定制对核心交易稳定性的影响。</p>
-<p>一种可行的设计是把系统分成两层：Java 标品负责稳定的领域逻辑，租户差异由元数据和受控 DSL 承载。标品在关键方法上声明扩展点，通过 Spring AOP 调用独立部署的 Lambda DSL 服务，将租户规则植入业务生命周期。本文以销售订单为例，进一步分析头行聚合、状态机、并发加锁、租户隔离、跨子领域通信和最终一致性等难点。</p>
+      <description><![CDATA[<p>大型企业级 SaaS ERP 的难点，不只是处理订单、库存和结算，还要让一套标准产品服务多个客户，同时允许客户安全地扩展字段、页面和业务规则。公共能力要能持续升级，租户定制也不能牵动核心交易的稳定性。</p>
+<p>一种做法是把系统分成两层：Java 标品负责稳定的领域逻辑，租户差异由元数据和受控 DSL 承载。标品在关键方法上声明扩展点，通过 Spring AOP 调用独立部署的 Lambda DSL 服务，把租户规则接入业务生命周期。本文以销售订单为例，分析头行聚合、状态机、并发控制、租户隔离、跨子领域通信和最终一致性。</p>
 <!-- more -->
 <h2 id="heading">一、系统要解决的核心矛盾</h2>
 <p>企业级 SaaS 产品经常面临两个看似冲突的目标：一方面，标准产品需要保持统一和稳定，以便持续升级；另一方面，不同客户的业务流程、表单字段和校验规则又存在大量差异。</p>
@@ -243,7 +243,7 @@ public void submit(SubmitOrderCommand command) {
       <guid isPermaLink="true">https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/</guid>
       <pubDate>Sun, 12 Jul 2026 00:00:00 +0800</pubDate>
       <description><![CDATA[<p>最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：<a href="https://github.com/windrunner0707/ai-tooling">windrunner0707/ai-tooling</a>。</p>
-<p>这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。</p>
+<p>这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。</p>
 <p>本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。</p>
 <!-- more -->
 <h2 id="-ai-">一、先把几个 AI 概念说清楚</h2>
@@ -312,8 +312,8 @@ FastAPI 后端
     |
     `-- PDF 问答 --&gt; pgvector 检索 --&gt; Ollama qwen3:8b
 </code></pre>
-<p>这里有一个值得说明的实现边界：普通聊天通过 LiteLLM 调用模型，而当前 RAG 服务为了直接使用 Ollama 的 embedding 和 chat 接口，没有经过 LiteLLM。</p>
-<p>这不影响 RAG 的成立，但形成了两套调用方式。作为学习项目，它能直观看清每一层；如果继续工程化，我会考虑让生成模型统一经过 <code>LLMService</code>，同时保留 embedding 的独立接口。这样模型切换、错误处理和监控不会散落在不同服务中。</p>
+<p>这里有一个实现边界：普通聊天通过 LiteLLM 调用模型，而当前 RAG 服务直接使用 Ollama 的 embedding 和 chat 接口，没有经过 LiteLLM。</p>
+<p>这不影响 RAG 的工作，但项目里因此有两套调用方式。作为学习项目，这样能看清每一层；如果继续工程化，我会让生成模型统一经过 <code>LLMService</code>，保留 embedding 的独立接口，避免模型切换、错误处理和监控散落在不同服务中。</p>
 <h2 id="-litellm--llm">三、第一步实践：通过 LiteLLM 调用本地 LLM</h2>
 <p>后端使用 OpenAI Python SDK，但 <code>base_url</code> 指向本地 LiteLLM：</p>
 <pre><code class="language-python">self.client = AsyncOpenAI(
@@ -433,7 +433,7 @@ npm run dev
       <guid isPermaLink="true">https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/</guid>
       <pubDate>Sat, 11 Jul 2026 00:00:00 +0800</pubDate>
       <description><![CDATA[<p>几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。</p>
-<p>真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。</p>
+<p>真正开始改造后才发现，问题不只是把定时任务换成消息队列。库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分都要一起考虑。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。</p>
 <p>这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。</p>
 <!-- more -->
 <h2 id="heading">一、旧库存模型为什么逐渐失效</h2>
@@ -464,7 +464,7 @@ npm run dev
 <p><em>图 1：快照帮助业务层快速选出候选方案，真正的扣减仍由库存事务层根据实时库存完成。</em></p>
 <p>业务编排服务负责回答“订单希望怎样履约”：是否允许部分满足、哪个仓库更合适、订单优先级是多少。它读取的是库存快照，允许短暂延迟，换取低延迟和较高吞吐。</p>
 <p>库存事务服务负责回答“此刻库存事实是否允许这样做”。但它的职责不只是再检查一次余额。一次预留、取消或发货往往会同时影响店铺、平台、仓库汇总和仓库批次等多层库存。库存事务服务把这些变化看成一笔不可分割的库存交易，在一个短事务中按照固定顺序完成校验、余额迁移和流水记录。</p>
-<p>这也是后来回看项目时，我认为最容易被忽略的模型。业务人员看到的是库存准备、订单预留和发货三个流程；技术侧真正需要建立的，是藏在这些流程下面的统一库存交易能力。上层只需要表达“预留十件”“取消五件”或“确认发货八件”，至于要修改哪些库存层、数量从哪个状态转移到哪个状态，都由库存事务服务决定。</p>
+<p>回看这个项目，最容易被忽略的正是这层模型。业务人员看到的是库存准备、订单预留和发货流程；技术侧需要建立的是它们共用的库存交易能力。上层只需表达“预留十件”“取消五件”或“确认发货八件”，具体修改哪些库存层、数量如何迁移，都由库存事务服务决定。</p>
 <p>这两个服务看起来都在“判断有没有库存”，但角色并不重复。业务编排层更像前台接待：它根据快照快速判断哪座仓库最有可能满足订单，尽快给出候选方案。库存事务层则像真正的出纳：它必须面对当下的真实余额，并对最终结果负责。</p>
 <p>这也解释了一个容易产生误会的现象：业务编排层刚刚看到有货，库存事务层仍可能返回失败。因为从读取快照到实际扣减之间，其他订单可能已经拿走了最后一件商品。这个差异不是系统错误，而是使用快照换取性能必须接受的现实。我们要做的不是消灭这个窗口，而是让失败能够自然进入重试、换仓或缺货流程。</p>
 <h2 id="heading-2">三、四层库存究竟在解决什么业务问题</h2>
@@ -627,7 +627,7 @@ WHERE stock_key = :stockKey
       <pubDate>Wed, 06 May 2026 00:00:00 +0800</pubDate>
       <description><![CDATA[<p>在金融项目里谈持续交付，难点通常不是“怎样把应用自动部署到 Kubernetes”，而是怎样让每次变更都经过授权、能够追踪、可以复现，并在出现问题时安全地恢复。</p>
 <p>我曾参与过一个收单银行相关项目，其中交付团队、平台团队和云基础设施团队共同维护运行环境。随着应用和集群数量增加，脚本、人工操作和分散配置带来的问题越来越明显：同一份配置在不同环境中不一致，线上变更难以还原，部署权限边界也不够清晰。</p>
-<p>GitOps 给我们的价值，不只是多了一个自动化工具，而是把系统的期望状态、审批记录和实际运行状态连成了一个可以持续校验的闭环。文中部分细节已作泛化处理。</p>
+<p>GitOps 的价值在于把系统期望状态、审批记录和实际运行状态连成一个可以持续校验的闭环。文中部分细节已作泛化处理。</p>
 <!-- more -->
 <h2 id="gitops--yaml--git">一、先说清楚：GitOps 不等于把 YAML 放进 Git</h2>
 <p><a href="https://opengitops.dev/">OpenGitOps</a> 将 GitOps 概括为四项原则：系统期望状态应当以声明式方式表达；期望状态必须版本化且不可变；软件代理自动拉取期望状态；软件代理持续比较实际状态并进行协调。</p>
@@ -641,7 +641,7 @@ WHERE stock_key = :stockKey
     -&gt; 同步、告警或阻断
     -&gt; 持续检测漂移
 </code></pre>
-<p>这里最关键的是最后两步。Git 不只是保存一次部署的输入，控制器还要持续回答：集群现在是否仍然符合已经审批的状态？</p>
+<p>最后两步决定了它是不是一个持续运行的闭环。Git 不只是保存一次部署输入，控制器还要持续检查集群是否仍符合已审批状态。</p>
 <h2 id="gitopscicd--iac-">二、GitOps、CI/CD 与 IaC 的边界</h2>
 <p>这几个概念经常混在一起，项目中最好明确分工。</p>
 <p>**IaC（Infrastructure as Code）**关注如何用声明式代码创建和管理网络、集群、数据库等基础设施。Terraform 是典型工具，但把 Terraform 文件存进 Git，并不会自动获得完整的 GitOps 能力。</p>
@@ -698,7 +698,7 @@ WHERE stock_key = :stockKey
 <h2 id="gitops-">六、GitOps 不能解决的事情</h2>
 <p>经过这次项目，我更愿意把 GitOps 看成一套运行控制机制，而不是交付问题的万能答案。它不能代替清晰的系统所有权，也不会自动带来高质量审批；如果审阅者只点通过，Pull Request 仍然只是形式上的关卡。</p>
 <p>它也不能直接证明应用运行正确。控制器看到资源已经 <code>Synced</code> 和 <code>Healthy</code>，不代表支付成功率、交易延迟或对账结果正常。部署判断必须结合技术指标与业务指标。</p>
-<p>此外，紧急情况下可能需要进行受控的人工操作。重点不是绝对禁止，而是采用 break-glass 账号、限时授权、完整审计，并在事后把有效变更回写到 Git。否则控制器下一次协调时可能覆盖人工修复，或者让线上状态长期脱离版本库。</p>
+<p>紧急情况下可能需要受控的人工操作。应使用 break-glass 账号、限时授权和完整审计，并在事后把有效变更回写到 Git；否则控制器下一次协调时可能覆盖人工修复，线上状态也会长期脱离版本库。</p>
 <h2 id="heading-2">七、这次实践留下的检查清单</h2>
 <p>如果重新建设一套金融场景的 GitOps 平台，我会优先检查下面这些问题：</p>
 <ul>
@@ -794,7 +794,7 @@ WHERE stock_key = :stockKey
 </ul>
 <p>不过，使用 Wi-Fi 6 需要路由器和终端都支持相应标准。Wi-Fi 6 路由器可以兼容旧设备，但旧手机或旧电脑连接后仍会按照它自身支持的标准工作。</p>
 <h2 id="heading-2">信号弱的解决方案</h2>
-<p>当一个路由器无法覆盖全屋时，首先可以尝试把主路由放在房屋相对居中的开放位置，并远离金属遮挡、弱电箱和大型电器。如果调整位置仍然不够，再考虑下面几种方案。</p>
+<p>当一个路由器无法覆盖全屋时，可以先把主路由放在房屋相对居中的开放位置，避开金属遮挡、弱电箱和大型电器。调整位置仍然不够，再考虑下面几种方案。</p>
 <h3 id="heading-3">电力猫</h3>
 <p>电力猫通过家里的电力线传输网络数据，一端连接路由器，另一端插在需要网络的房间，适合不方便重新布置网线的场景。</p>
 <p>它的优点是安装简单，不需要无线信号跨越多堵墙；缺点是效果很依赖房屋电路。同一电表、同一回路通常更容易取得较好效果，空气开关、插排、老旧线路和大功率电器都可能造成干扰。因此，电力猫的标称速率同样不能直接当成实际速度，购买前最好确认可以退换并进行实测。</p>
@@ -844,7 +844,7 @@ WHERE stock_key = :stockKey
 </tr>
 </tbody>
 </table>
-<p>路由器不是功率越大、天线越多就一定越好。终端发射功率、房屋结构、邻居 Wi-Fi 干扰和节点位置，都会影响最终体验。对家庭网络来说，合理摆放、多节点覆盖和稳定的有线回程，往往比单纯更换一台“穿墙王”更有效。</p>
+<p>路由器并不是功率越大、天线越多就越好。终端发射功率、房屋结构、邻居 Wi-Fi 干扰和节点位置，都会影响实际体验。对家庭网络来说，合理摆放、多节点覆盖和稳定的有线回程，往往比更换一台“穿墙王”更有效。</p>
 <h2 id="heading-6">参考视频</h2>
 <ul>
 <li><a href="https://www.bilibili.com/video/BV1n64y1r7ym">路由器相关入门视频（哔哩哔哩）</a></li>
@@ -859,7 +859,7 @@ WHERE stock_key = :stockKey
       <guid isPermaLink="true">https://windrunner0707.tech/post/riichi-mahjong-basics-tile-efficiency/</guid>
       <pubDate>Wed, 25 Feb 2026 00:00:00 +0800</pubDate>
       <description><![CDATA[<p>日麻常被误解成一种主要靠“运气”的游戏。单局当然会受牌山影响，但竞技麻将真正比较的，是玩家能否在大量对局里持续做出更高期望的选择：更快组成好形、更准确地判断进攻与防守，并接受正确选择偶尔也会得到坏结果。</p>
-<p>这篇文章根据我学习日麻时整理的思维导图，从牌的组成、和牌结构、搭子质量、向听数与听牌选择说起。重点不是背完所有规则，而是先建立一套能指导每次摸切的牌效率框架。</p>
+<p>这篇文章整理了我学习日麻时做的思维导图，从牌的组成、和牌结构、搭子质量、向听数和听牌选择说起。重点不是一次背完所有规则，而是先建立一套能指导每次摸切的牌效率框架。</p>
 <!-- more -->
 <figure class="mindmap-figure">
   <button class="zoomable-image-trigger" type="button" data-zoom-src="https://windrunner0707.tech/post-images/riichi-mahjong-basics-mindmap.webp" aria-label="放大查看日麻基础思维导图">
@@ -876,7 +876,7 @@ WHERE stock_key = :stockKey
 <li>坏选择也可能偶然和牌；</li>
 <li>一次输赢无法证明打法优劣，长期结果才更接近真实水平。</li>
 </ul>
-<p>所谓“运气”更像尚未观察到结果的随机过程。竞技日麻要做的，是在信息不完整的情况下提高每一次选择的成功概率，并控制失败时的损失。</p>
+<p>所谓“运气”更像尚未观察到结果的随机过程。竞技日麻要做的是在信息不完整时提高选择质量，并控制失败时的损失。</p>
 <h2 id="heading-1">二、认识一副日麻牌</h2>
 <p>日麻通常使用 136 张牌，每种牌各 4 张。</p>
 <h3 id="1-">1. 数牌</h3>
@@ -1020,10 +1020,10 @@ WHERE stock_key = :stockKey
 <li>宝牌、打点和鸣牌计划是什么？</li>
 <li>牌桌上是否已经出现必须转入防守的信号？</li>
 </ol>
-<p>训练时可以先暂时忽略复杂点数，只练习“向听数—受入—好形”三件事。等基本判断形成直觉，再逐步加入役种、宝牌、场况与防守，学习负担会小得多。</p>
+<p>训练时可以先暂时忽略复杂点数，只练习“向听数、受入、好形”三件事。等基本判断形成直觉，再逐步加入役种、宝牌、场况与防守，学习负担会小得多。</p>
 <h2 id="heading-10">结语</h2>
 <p>日麻的竞技性，来自长期重复决策形成的差距。高手并不是每局都能摸到更好的牌，而是更少浪费有效进张、更少破坏复合形，也更清楚什么时候该用打点换速度、什么时候该放弃眼前的和牌机会。</p>
-<p>入门阶段先记住三句话就够了：<strong>先看向听，再数受入；同样受入，优先好形；评价决策，不被单局结果绑架。</strong> 当这些原则能够自然地进入每一次摸切，牌效率才真正从知识变成了能力。</p>
+<p>入门阶段先记住三点：<strong>先看向听，再数受入；同样受入，优先好形；评价决策，不被单局结果绑架。</strong> 当这些原则能自然地进入每一次摸切，牌效率才真正从知识变成能力。</p>
 ]]></description>
       <category>日麻</category>
       <enclosure url="https://windrunner0707.tech/post-images/riichi-mahjong-basics-tile-efficiency.webp" length="0" type="image/webp"></enclosure>
@@ -1034,7 +1034,7 @@ WHERE stock_key = :stockKey
       <guid isPermaLink="true">https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/</guid>
       <pubDate>Thu, 25 Dec 2025 00:00:00 +0800</pubDate>
       <description><![CDATA[<p>很多面试题看起来像是在背概念：微服务为什么要独立数据库？<code>ThreadLocal</code> 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？</p>
-<p>但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。</p>
+<p>真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们常常在同一个项目里同时出现，一起解决一个具体问题。</p>
 <p>本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、<code>ThreadLocal</code> 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。</p>
 <!-- more -->
 <h2 id="heading">一、项目背景：服务拆开了，数据库却没有拆开</h2>
@@ -1115,7 +1115,7 @@ public Object route(ProceedingJoinPoint point, ToggleRoute toggleRoute) throws T
 }
 </code></pre>
 <p>原设计使用 <code>@Before</code> 获取注解中的 URI，并在 <code>@After</code> 清理。实际编码时更推荐 <code>@Around + try/finally</code>，因为它能更直观地保证：无论业务正常返回还是抛出异常，清理逻辑都会执行。</p>
-<p>AOP 在这里没有承载业务规则。它只负责所有接口都需要的通用动作：读取配置、建立上下文和释放上下文。这就是 AOP 适合解决的问题——关注点横跨多个业务模块，但又不属于任何一个具体领域。</p>
+<p>AOP 在这里不承载业务规则，只负责读取配置、建立上下文和释放上下文。这类逻辑横跨多个业务模块，却不属于某个具体领域，适合交给 AOP 处理。</p>
 <h2 id="threadlocal-">五、同步与异步：ThreadLocal 为什么会失效</h2>
 <p>同步调用中，请求的入口和下游逻辑通常在同一个线程执行，因此可以直接从 <code>ThreadLocal</code> 读取 Toggle：</p>
 <pre><code class="language-java">public StockInfo queryStock(String skuId) {
@@ -1258,10 +1258,10 @@ executor.execute(() -&gt; {
       <pubDate>Tue, 30 Sep 2025 00:00:00 +0800</pubDate>
       <description><![CDATA[<p><img src="https://windrunner0707.tech/post-images/1759237881724.png" alt="" /></p>
 <h2 id="heading">概述</h2>
-<p>Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面保存并协调集群的期望状态，工作节点负责运行 Pod。理解这条主线后，各组件的职责会清楚很多。</p>
+<p>Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面维护集群的期望状态，工作节点运行 Pod。沿着这条主线理解，各组件的职责就不容易混在一起。</p>
 <h2 id="heading-1">介绍</h2>
 <h3 id="control-plane">控制平面（Control Plane）</h3>
-<p>控制平面接收声明、保存集群状态，并持续让实际状态向期望状态靠拢，主要包括：</p>
+<p>控制平面接收声明、保存集群状态，并持续推动实际状态接近期望状态，主要包括：</p>
 <h4 id="api-server">API Server</h4>
 <p>API Server 暴露 Kubernetes API。<code>kubectl</code>、控制器和其他集群组件都通过它读取或修改资源；它还负责认证、鉴权、准入控制和请求校验。</p>
 <h4 id="etcd">etcd</h4>
@@ -1288,14 +1288,14 @@ executor.execute(() -&gt; {
       <enclosure url="https://windrunner0707.tech/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
-      <title>API学习路线图全解析：从入门到进阶</title>
+      <title>API 学习路线：从入门到进阶</title>
       <link>https://windrunner0707.tech/post/api-xue-xi-lu-xian-tu-quan-jie-xi-cong-ru-men-dao-jin-jie/</link>
       <guid isPermaLink="true">https://windrunner0707.tech/post/api-xue-xi-lu-xian-tu-quan-jie-xi-cong-ru-men-dao-jin-jie/</guid>
       <pubDate>Tue, 30 Sep 2025 00:00:00 +0800</pubDate>
       <description><![CDATA[<p><img src="https://windrunner0707.tech/post-images/1759235815489.webp" alt="" /></p>
-<p>API 学习内容很多：HTTP、认证、接口风格、网关和性能经常被放在一张路线图里，初学时很难判断先后顺序。下面按照“先会调用，再会设计，最后处理生产问题”的思路整理这些知识点。</p>
+<p>API 学习内容很多，HTTP、认证、接口风格、网关和性能问题又常常混在一起。初学时不必一次记住所有名词，可以先学会调用，再练习设计，最后处理生产环境中的问题。下面按这个顺序整理。</p>
 <h2 id="api-">一、API 是什么？为什么重要？</h2>
-<p>简单来说，API 是一套约定，规定了两个软件系统之间如何交流。</p>
+<p>API 是一套约定，规定两个软件系统如何交流。</p>
 <p>API 是系统对外公布的一份调用契约：请求怎么发、数据是什么格式、成功或失败如何表示。它能降低系统之间的直接依赖，但版本兼容、权限和错误处理仍需要明确设计。</p>
 <h2 id="api--1">二、API 学习路线详解</h2>
 <h3 id="1-introduction-to-apisapi-">1. Introduction to APIs（API 基础）</h3>
@@ -1312,7 +1312,7 @@ executor.execute(() -&gt; {
 <p>HTTP Status：200 成功，404 未找到，500 服务器错误。</p>
 <p>HTTP Headers：传递附加信息，比如 Content-Type、Authorization。</p>
 <p>Cookies 和 Caching：实现状态保持与性能优化。</p>
-<p>学习时至少要能用 <code>curl</code> 或 Postman 发送请求，读懂请求头、响应体和状态码，并理解 HTTPS、缓存与跨域的基本行为。</p>
+<p>学习时要能用 <code>curl</code> 或 Postman 发送请求，读懂请求头、响应体和状态码，再逐步理解 HTTPS、缓存与跨域。</p>
 <h3 id="3-api-stylesapi-">3. API Styles（API 风格）</h3>
 <p>不同 API 风格，适合不同场景：</p>
 <p>REST：最常见，基于 HTTP 资源操作。</p>
@@ -1329,7 +1329,7 @@ executor.execute(() -&gt; {
 <p>Session Auth：依赖服务端保存会话。</p>
 <p>需要特别区分 OAuth 2.0、OpenID Connect 和 JWT：OAuth 2.0 是授权框架，OpenID Connect 在其上补充身份认证，而 JWT 只是一种令牌格式。</p>
 <h3 id="5-api-documentation">5. API Documentation（文档工具）</h3>
-<p>好的文档能让 API 更易用：</p>
+<p>文档至少要让调用方知道接口怎样调用、失败后怎么办：</p>
 <p>Swagger / OpenAPI Spec：常见的 API 设计与文档标准。</p>
 <p>Postman：调试和测试接口的利器。</p>
 <p>Redoc / DapperDox：文档生成工具。</p>
@@ -1382,9 +1382,9 @@ executor.execute(() -&gt; {
       <guid isPermaLink="true">https://windrunner0707.tech/post/api-led-jia-gou-jie-xi-cong-li-nian-dao-shi-jian/</guid>
       <pubDate>Tue, 30 Sep 2025 00:00:00 +0800</pubDate>
       <description><![CDATA[<h2 id="heading">概述</h2>
-<p>当一个新渠道需要同时读取核心系统、CRM 和风控平台的数据时，点对点接口很快会变得难以维护。API-Led（API-Led Connectivity）试图解决的正是这类问题：把底层访问、业务编排和渠道适配拆开，让接口可以复用，也更容易治理。</p>
+<p>当一个新渠道需要同时读取核心系统、CRM 和风控平台的数据时，点对点接口很快会变得难以维护。API-Led（API-Led Connectivity）把底层访问、业务编排和渠道适配拆开，让接口有复用空间，也方便统一管理。</p>
 <h2 id="-api-led-">什么是 API-Led 架构</h2>
-<p>API-Led 架构由 MuleSoft 提出，它的核心做法不是继续增加点对点接口，而是按职责对 API 分层。</p>
+<p>API-Led 架构由 MuleSoft 提出。它不再不断增加点对点接口，而是按职责对 API 分层。</p>
 <p><img src="https://windrunner0707.tech/post-images/1759238612483.png" alt="" /></p>
 <p>典型的三层：</p>
 <ul>
@@ -1394,8 +1394,8 @@ executor.execute(() -&gt; {
 </ul>
 <p>分层后，底层系统变化通常只影响 System API，多个渠道也可以复用同一套业务编排。不过，分层并非越多越好，每增加一层都会带来部署、监控和调用延迟成本。</p>
 <p><img src="https://windrunner0707.tech/post-images/1759238658029.png" alt="" /></p>
-<h2 id="api-led">API-Led架构与微服务架构的区别</h2>
-<p>很多人会把API-Led和微服务混淆，二者虽然相关，但关注点不同：</p>
+<h2 id="api-led-">API-Led 架构与微服务架构的区别</h2>
+<p>API-Led 和微服务经常一起出现，但它们解决的不是同一个问题：</p>
 <h3 id="heading-1">关注层面不同</h3>
 <p>微服务架构：强调将单体应用拆分为小而独立的服务，每个服务独立开发、部署、扩展。</p>
 <p>API-Led 架构：强调系统之间如何互联互通，如何通过 API 实现复用与治理。</p>
@@ -1406,14 +1406,14 @@ executor.execute(() -&gt; {
 <p>微服务内部可能直接暴露 API，但往往没有分层概念。</p>
 <p>API-Led 强调分层 API，避免直接对接，提升灵活性。</p>
 <p>可以理解为：微服务是系统构建方式，而 API-Led 是系统之间的连接方式。两者是互补关系，而不是替代关系。</p>
-<h2 id="api-led-">API-Led 架构为什么在银行领域广泛使用</h2>
+<h2 id="api-led--1">API-Led 架构为什么在银行领域广泛使用</h2>
 <p>银行 IT 系统复杂，往往包含核心账务系统、支付清算系统、风控系统、CRM、渠道系统（柜面、网银、手机银行）等。这种环境下：</p>
 <ul>
 <li>系统异构严重：老的核心系统可能基于 COBOL，新应用可能基于 Java 或微服务。</li>
 <li>集成需求频繁：需要快速上线新产品（如理财、贷款、联合营销）。</li>
 <li>安全与合规要求高：需要统一的 API 管理与访问控制。</li>
 </ul>
-<p>API-Led 架构能够在银行中带来显著价值：</p>
+<p>在银行场景中，这种分层主要解决几件具体的事：</p>
 <ul>
 <li>屏蔽遗留系统复杂性（通过 System API 封装）。</li>
 <li>支持快速业务编排（通过 Process API 实现跨系统流程）。</li>
@@ -1421,12 +1421,12 @@ executor.execute(() -&gt; {
 <li>统一治理和合规（API 网关+API 管理平台）。</li>
 </ul>
 <p>因此，这种思路适合遗留系统多、渠道多且接口治理要求严格的银行场景。但是否采用三层模型，仍取决于现有系统和团队边界。</p>
-<h2 id="api-led--1">API-Led 架构的优缺点</h2>
+<h2 id="api-led--2">API-Led 架构的优缺点</h2>
 <h3 id="heading-4">优点：</h3>
 <ul>
-<li>解耦性强：通过分层 API，底层系统改造不会影响上层应用。</li>
-<li>复用性高：System API 和 Process API 可被多个 Experience API 重用。</li>
-<li>敏捷性好：业务逻辑调整只需修改 Process API，开发效率提升。</li>
+<li>解耦：通过分层 API，底层系统改造不必直接牵动上层应用。</li>
+<li>复用：System API 和 Process API 可以被多个 Experience API 使用。</li>
+<li>调整业务流程时，通常只需修改 Process API。</li>
 <li>治理完善：便于统一做 API 管理、监控、安全认证。</li>
 <li>支持开放生态：银行、保险等可快速对接合作伙伴 API。</li>
 </ul>

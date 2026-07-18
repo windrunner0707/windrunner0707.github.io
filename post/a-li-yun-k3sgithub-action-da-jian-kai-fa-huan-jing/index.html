@@ -73,12 +73,12 @@
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站 | 0707&#39;s Blog</title>
   
-<meta name="description" content="本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/">
+<meta name="description" content="本文记录我如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，再通过 GitHub Actions 自动构建和部署。ChatGPT 用来辅助生成样例代码、Dockerfile 和 Kubernetes 配置；生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/">
 <link rel="canonical" href="https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站","url":"https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/","description":"本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/","image":"/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp","datePublished":"2025-06-19T00:00:00+08:00","dateModified":"2026-07-12T00:00:00+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站","url":"https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/","description":"本文记录我如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，再通过 GitHub Actions 自动构建和部署。ChatGPT 用来辅助生成样例代码、Dockerfile 和 Kubernetes 配置；生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/","image":"/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp","datePublished":"2025-06-19T00:00:00+08:00","dateModified":"2026-07-12T00:00:00+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/","name":"使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站","position":2}]}</script>
 <meta property="og:title" content="使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站">
-<meta property="og:description" content="本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/">
+<meta property="og:description" content="本文记录我如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，再通过 GitHub Actions 自动构建和部署。ChatGPT 用来辅助生成样例代码、Dockerfile 和 Kubernetes 配置；生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/">
 <meta property="og:url" content="https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
@@ -86,7 +86,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/">
 <meta name="twitter:title" content="使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站">
-<meta name="twitter:description" content="本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/">
+<meta name="twitter:description" content="本文记录我如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，再通过 GitHub Actions 自动构建和部署。ChatGPT 用来辅助生成样例代码、Dockerfile 和 Kubernetes 配置；生成内容仍需在本地验证后再提交。 演示地址：https://www.windrunner0707.tech/">
 <meta name="twitter:image" content="/post-images/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing.webp">
 </head>
 <body class="flavor-theme">
@@ -264,11 +264,11 @@
   </nav>
 
   <div class="article-content">
-    <p>本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成内容仍需在本地验证后再提交。</p>
+    <p>本文记录我如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，再通过 GitHub Actions 自动构建和部署。ChatGPT 用来辅助生成样例代码、Dockerfile 和 Kubernetes 配置；生成内容仍需在本地验证后再提交。</p>
 <p>演示地址：<a href="https://www.windrunner0707.tech/">https://www.windrunner0707.tech/</a></p>
 <!-- more -->
 <h2 id="heading">整体架构</h2>
-<p>一次代码提交会经过下面这条链路：</p>
+<p>一次代码提交会沿着下面的链路进入服务器：</p>
 <pre><code class="language-text">GitHub push
     ↓
 GitHub Actions：编译、构建镜像
@@ -342,7 +342,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 </code></pre>
-<p>相比先复制全部文件再执行 <code>npm install</code>，先复制依赖清单并使用 <code>npm ci</code> 更容易利用 Docker 构建缓存，也能保证依赖版本与锁文件一致。</p>
+<p>先复制依赖清单再执行 <code>npm ci</code>，更容易复用 Docker 构建缓存，也能让安装结果与锁文件保持一致。</p>
 <h3 id="2--dockerfile">2. 后端 Dockerfile</h3>
 <p>后端先由 Maven 生成 JAR，再制作只包含运行环境的镜像：</p>
 <pre><code class="language-dockerfile">FROM eclipse-temurin:21-jre
@@ -498,7 +498,7 @@ kubectl get ingress frontend-ingress
 curl -I https://www.windrunner0707.tech/
 </code></pre>
 <h2 id="heading-4">六、后续优化方向</h2>
-<p>至此，一个从代码提交到 HTTPS 访问的最小部署链路已经完成。接下来可以继续补齐：</p>
+<p>现在已经跑通了从代码提交到 HTTPS 访问的最小链路。后续可以补齐：</p>
 <ul>
 <li>使用 <code>readinessProbe</code> 和 <code>livenessProbe</code> 改善发布可靠性。</li>
 <li>为前后端配置 CPU、内存请求和上限，避免单个 Pod 占满服务器。</li>
@@ -516,12 +516,12 @@ curl -I https://www.windrunner0707.tech/
     <a href="/post/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun/" class="post-nav-card post-nav-card--prev">
       
       <div class="post-nav-card__img">
-        <img src="/post-images/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun.jpg" alt="一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂" loading="lazy" />
+        <img src="/post-images/yi-bei-shou-chong-ka-pei-de-lu-cheng-cong-li-shi-ji-fa-dao-dou-zi-de-ling-hun.jpg" alt="手冲咖啡入门：历史、冲法与常见产区" loading="lazy" />
       </div>
       
       <div class="post-nav-card__body">
         <span class="post-nav-card__label meta-text">上一篇</span>
-        <span class="post-nav-card__title">一杯手冲咖啡的旅程：从历史、技法到豆子的灵魂</span>
+        <span class="post-nav-card__title">手冲咖啡入门：历史、冲法与常见产区</span>
       </div>
       <span class="post-nav-card__arrow">&larr;</span>
     </a>

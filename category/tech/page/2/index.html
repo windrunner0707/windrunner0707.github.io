@@ -235,7 +235,7 @@
       <h3 class="post-card__title clamp-3">使用 ChatGPT、阿里云、K3s 与 GitHub Actions 搭建小型网站</h3>
     </a>
     <a href="/post/a-li-yun-k3sgithub-action-da-jian-kai-fa-huan-jing/" class="post-card__excerpt clamp-2">
-      本文记录如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，并通过 GitHub Actions 完成自动构建与部署。ChatGPT 主要用于辅助生成样例代码、Dockerfile 和 Kubernetes 配置；所有生成...
+      本文记录我如何在一台低配置阿里云 ECS 上，用 K3s 运行前后端服务，再通过 GitHub Actions 自动构建和部署。ChatGPT 用来辅助生成样例代码、Dockerfile 和 Kubernetes 配置；生成内容仍需在...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -360,9 +360,9 @@ Git 历史一旦混入大量 fix、临时提交和无意义的合并记录，代
     <a href="/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/" class="post-card__excerpt clamp-2">
       线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例。
 
-现象识别
+先确认现象和影响
 
-首先，描述一下线上系统出现内存、CPU负载过高或者...
+先确认问题从什么时候开始、影响哪些实例和请...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -394,9 +394,9 @@ Git 历史一旦混入大量 fix、临时提交和无意义的合并记录，代
     <a href="/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/" class="post-card__excerpt clamp-2">
       事务题容易停留在定义背诵。面试时更重要的是讲清楚：不同隔离级别允许看到什么数据，以及业务如何处理并发冲突。
 ACID 属性
-ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括：
+ACID 是事务四个属性的缩写。它们分别描述一组操作如何提交、彼此如何可见，以及提交后的结果如何保存：
 
-原子性（Atomicit...
+原子...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -426,9 +426,14 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
       <h3 class="post-card__title clamp-3">面试八股文-死锁</h3>
     </a>
     <a href="/post/mian-shi-ba-gu-wen-si-suo/" class="post-card__excerpt clamp-2">
-      死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;）
+      死锁的四个必要条件（Coffman 条件）
 死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。
-1.互斥条件：至少有一个资源是非共享的，必须由一个线...
+
+
+互斥条件：至少有一个资源不能共享，必须由一个线程独占。
+
+
+占有并等待：线...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -462,7 +467,7 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
   
   TypeScript 学习路线总览（支持放大、缩小和拖动）
 
-TypeScript 是 JavaScript 的超集。它不会取代 JavaScript，而是在 JavaScript 之上增加静态类型检查、编...
+TypeScript 是 JavaScript 的超集。它在 JavaScript 之上增加静态类型检查、编辑器提示和更可靠的重构能力，最后仍会...
     </a>
     <div class="post-card__meta meta-text">
       

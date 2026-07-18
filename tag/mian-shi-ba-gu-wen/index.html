@@ -233,7 +233,7 @@
     </a>
     <a href="/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/" class="post-card__excerpt clamp-2">
       很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？
-但真正做过系统改造后会发现，这些“八股文”并不是互不相关的...
+真正做过系统改造后会发现，这些“八股文”并不是互不相关的知...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -265,9 +265,9 @@
     <a href="/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/" class="post-card__excerpt clamp-2">
       线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例。
 
-现象识别
+先确认现象和影响
 
-首先，描述一下线上系统出现内存、CPU负载过高或者...
+先确认问题从什么时候开始、影响哪些实例和请...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -299,9 +299,9 @@
     <a href="/post/mian-shi-ba-gu-wen-shu-ju-ku-shi-wu-ge-chi-ji-bie/" class="post-card__excerpt clamp-2">
       事务题容易停留在定义背诵。面试时更重要的是讲清楚：不同隔离级别允许看到什么数据，以及业务如何处理并发冲突。
 ACID 属性
-ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性。ACID 属性包括：
+ACID 是事务四个属性的缩写。它们分别描述一组操作如何提交、彼此如何可见，以及提交后的结果如何保存：
 
-原子性（Atomicit...
+原子...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -331,9 +331,14 @@ ACID 是事务的四个关键属性的缩写，确保数据库操作的可靠性
       <h3 class="post-card__title clamp-3">面试八股文-死锁</h3>
     </a>
     <a href="/post/mian-shi-ba-gu-wen-si-suo/" class="post-card__excerpt clamp-2">
-      死锁的四个必要条件（&amp;ldquo;Coffman条件&amp;rdquo;）
+      死锁的四个必要条件（Coffman 条件）
 死锁指多个执行单元各自持有资源，同时等待对方释放资源，结果谁也无法继续。以下四个条件同时成立时才可能发生死锁。
-1.互斥条件：至少有一个资源是非共享的，必须由一个线...
+
+
+互斥条件：至少有一个资源不能共享，必须由一个线程独占。
+
+
+占有并等待：线...
     </a>
     <div class="post-card__meta meta-text">
       

@@ -73,12 +73,12 @@
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦 | 0707&#39;s Blog</title>
   
-<meta name="description" content="很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。">
+<meta name="description" content="很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们常常在同一个项目里同时出现，一起解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。">
 <link rel="canonical" href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/","description":"很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。","image":"/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg","datePublished":"2025-12-25T00:00:00+08:00","dateModified":"2026-07-11T16:50:35+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/","description":"很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们常常在同一个项目里同时出现，一起解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。","image":"/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg","datePublished":"2025-12-25T00:00:00+08:00","dateModified":"2026-07-11T16:50:35+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/","name":"面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦","position":2}]}</script>
 <meta property="og:title" content="面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦">
-<meta property="og:description" content="很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。">
+<meta property="og:description" content="很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们常常在同一个项目里同时出现，一起解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。">
 <meta property="og:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
@@ -86,7 +86,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/">
 <meta name="twitter:title" content="面试八股文的实际应用：用绞杀者模式完成商品与库存微服务解耦">
-<meta name="twitter:description" content="很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。">
+<meta name="twitter:description" content="很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？ 真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们常常在同一个项目里同时出现，一起解决一个具体问题。 本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、ThreadLocal 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。">
 <meta name="twitter:image" content="/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg">
 </head>
 <body class="flavor-theme">
@@ -261,7 +261,7 @@
 
   <div class="article-content">
     <p>很多面试题看起来像是在背概念：微服务为什么要独立数据库？<code>ThreadLocal</code> 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？</p>
-<p>但真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们往往会在同一个项目里同时出现，并共同解决一个具体问题。</p>
+<p>真正做过系统改造后会发现，这些“八股文”并不是互不相关的知识点。它们常常在同一个项目里同时出现，一起解决一个具体问题。</p>
 <p>本文以一次商品与库存微服务解耦为背景，复盘如何使用绞杀者模式、动态 Toggle、AOP、Apollo、<code>ThreadLocal</code> 和 HTTP 接口，在不中断线上业务的前提下，将共享数据库逐步改造成边界清晰的微服务架构。</p>
 <!-- more -->
 <h2 id="heading">一、项目背景：服务拆开了，数据库却没有拆开</h2>
@@ -342,7 +342,7 @@ public Object route(ProceedingJoinPoint point, ToggleRoute toggleRoute) throws T
 }
 </code></pre>
 <p>原设计使用 <code>@Before</code> 获取注解中的 URI，并在 <code>@After</code> 清理。实际编码时更推荐 <code>@Around + try/finally</code>，因为它能更直观地保证：无论业务正常返回还是抛出异常，清理逻辑都会执行。</p>
-<p>AOP 在这里没有承载业务规则。它只负责所有接口都需要的通用动作：读取配置、建立上下文和释放上下文。这就是 AOP 适合解决的问题——关注点横跨多个业务模块，但又不属于任何一个具体领域。</p>
+<p>AOP 在这里不承载业务规则，只负责读取配置、建立上下文和释放上下文。这类逻辑横跨多个业务模块，却不属于某个具体领域，适合交给 AOP 处理。</p>
 <h2 id="threadlocal-">五、同步与异步：ThreadLocal 为什么会失效</h2>
 <p>同步调用中，请求的入口和下游逻辑通常在同一个线程执行，因此可以直接从 <code>ThreadLocal</code> 读取 Toggle：</p>
 <pre><code class="language-java">public StockInfo queryStock(String skuId) {

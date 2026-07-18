@@ -73,12 +73,12 @@
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>电子交易库存系统复盘：从整批预留到统一库存交易引擎 | 0707&#39;s Blog</title>
   
-<meta name="description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
+<meta name="description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，问题不只是把定时任务换成消息队列。库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分都要一起考虑。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
 <link rel="canonical" href="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"电子交易库存系统复盘：从整批预留到统一库存交易引擎","url":"https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/","description":"几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。","image":"/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg","datePublished":"2026-07-11T00:00:00+08:00","dateModified":"2026-07-11T18:16:00+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"电子交易库存系统复盘：从整批预留到统一库存交易引擎","url":"https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/","description":"几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，问题不只是把定时任务换成消息队列。库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分都要一起考虑。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。","image":"/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg","datePublished":"2026-07-11T00:00:00+08:00","dateModified":"2026-07-11T18:16:00+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/","name":"电子交易库存系统复盘：从整批预留到统一库存交易引擎","position":2}]}</script>
 <meta property="og:title" content="电子交易库存系统复盘：从整批预留到统一库存交易引擎">
-<meta property="og:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
+<meta property="og:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，问题不只是把定时任务换成消息队列。库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分都要一起考虑。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
 <meta property="og:url" content="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
@@ -86,7 +86,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/">
 <meta name="twitter:title" content="电子交易库存系统复盘：从整批预留到统一库存交易引擎">
-<meta name="twitter:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
+<meta name="twitter:description" content="几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。 真正开始改造后才发现，问题不只是把定时任务换成消息队列。库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分都要一起考虑。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。 这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。">
 <meta name="twitter:image" content="/post-images/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing.jpg">
 </head>
 <body class="flavor-theme">
@@ -230,7 +230,7 @@
       <span class="article-meta__item">2026-07-11</span>
       
       <span class="article-meta__sep">·</span>
-      <span class="article-meta__item">14 分钟阅读</span>
+      <span class="article-meta__item">13 分钟阅读</span>
       
     </div>
     
@@ -261,7 +261,7 @@
 
   <div class="article-content">
     <p>几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。</p>
-<p>真正开始改造后才发现，这并不是把一个定时任务换成消息队列那么简单。它同时涉及库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。</p>
+<p>真正开始改造后才发现，问题不只是把定时任务换成消息队列。库存模型、仓库选择、服务边界、并发控制、事务一致性、失败补偿和数据拆分都要一起考虑。任何一处设计不完整，都可能出现“接口成功了，但库存对不上”的情况。</p>
 <p>这篇文章复盘这次改造，重点讨论订单与库存边界、四层库存模型、统一库存交易、状态机和最终一致性。文中部分细节已作泛化处理。</p>
 <!-- more -->
 <h2 id="heading">一、旧库存模型为什么逐渐失效</h2>
@@ -292,7 +292,7 @@
 <p><em>图 1：快照帮助业务层快速选出候选方案，真正的扣减仍由库存事务层根据实时库存完成。</em></p>
 <p>业务编排服务负责回答“订单希望怎样履约”：是否允许部分满足、哪个仓库更合适、订单优先级是多少。它读取的是库存快照，允许短暂延迟，换取低延迟和较高吞吐。</p>
 <p>库存事务服务负责回答“此刻库存事实是否允许这样做”。但它的职责不只是再检查一次余额。一次预留、取消或发货往往会同时影响店铺、平台、仓库汇总和仓库批次等多层库存。库存事务服务把这些变化看成一笔不可分割的库存交易，在一个短事务中按照固定顺序完成校验、余额迁移和流水记录。</p>
-<p>这也是后来回看项目时，我认为最容易被忽略的模型。业务人员看到的是库存准备、订单预留和发货三个流程；技术侧真正需要建立的，是藏在这些流程下面的统一库存交易能力。上层只需要表达“预留十件”“取消五件”或“确认发货八件”，至于要修改哪些库存层、数量从哪个状态转移到哪个状态，都由库存事务服务决定。</p>
+<p>回看这个项目，最容易被忽略的正是这层模型。业务人员看到的是库存准备、订单预留和发货流程；技术侧需要建立的是它们共用的库存交易能力。上层只需表达“预留十件”“取消五件”或“确认发货八件”，具体修改哪些库存层、数量如何迁移，都由库存事务服务决定。</p>
 <p>这两个服务看起来都在“判断有没有库存”，但角色并不重复。业务编排层更像前台接待：它根据快照快速判断哪座仓库最有可能满足订单，尽快给出候选方案。库存事务层则像真正的出纳：它必须面对当下的真实余额，并对最终结果负责。</p>
 <p>这也解释了一个容易产生误会的现象：业务编排层刚刚看到有货，库存事务层仍可能返回失败。因为从读取快照到实际扣减之间，其他订单可能已经拿走了最后一件商品。这个差异不是系统错误，而是使用快照换取性能必须接受的现实。我们要做的不是消灭这个窗口，而是让失败能够自然进入重试、换仓或缺货流程。</p>
 <h2 id="heading-2">三、四层库存究竟在解决什么业务问题</h2>

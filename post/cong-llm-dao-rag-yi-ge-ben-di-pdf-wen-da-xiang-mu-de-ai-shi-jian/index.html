@@ -73,12 +73,12 @@
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践 | 0707&#39;s Blog</title>
   
-<meta name="description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
+<meta name="description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
 <link rel="canonical" href="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","url":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","description":"最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。","image":"/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp","datePublished":"2026-07-12T00:00:00+08:00","dateModified":"2026-07-12T13:46:01+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","url":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","description":"最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。","image":"/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp","datePublished":"2026-07-12T00:00:00+08:00","dateModified":"2026-07-12T13:46:01+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","name":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","position":2}]}</script>
 <meta property="og:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践">
-<meta property="og:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
+<meta property="og:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
 <meta property="og:url" content="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
@@ -86,7 +86,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
 <meta name="twitter:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践">
-<meta name="twitter:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
+<meta name="twitter:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
 <meta name="twitter:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp">
 </head>
 <body class="flavor-theme">
@@ -261,7 +261,7 @@
 
   <div class="article-content">
     <p>最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：<a href="https://github.com/windrunner0707/ai-tooling">windrunner0707/ai-tooling</a>。</p>
-<p>这个项目不大，却刚好串起了最近经常出现的几个 AI 概念：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。它们单独看都不难，真正动手时更重要的问题是：每个组件负责什么，数据如何流动，又怎样减少模型一本正经地“编答案”。</p>
+<p>这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。</p>
 <p>本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。</p>
 <!-- more -->
 <h2 id="-ai-">一、先把几个 AI 概念说清楚</h2>
@@ -330,8 +330,8 @@ FastAPI 后端
     |
     `-- PDF 问答 --&gt; pgvector 检索 --&gt; Ollama qwen3:8b
 </code></pre>
-<p>这里有一个值得说明的实现边界：普通聊天通过 LiteLLM 调用模型，而当前 RAG 服务为了直接使用 Ollama 的 embedding 和 chat 接口，没有经过 LiteLLM。</p>
-<p>这不影响 RAG 的成立，但形成了两套调用方式。作为学习项目，它能直观看清每一层；如果继续工程化，我会考虑让生成模型统一经过 <code>LLMService</code>，同时保留 embedding 的独立接口。这样模型切换、错误处理和监控不会散落在不同服务中。</p>
+<p>这里有一个实现边界：普通聊天通过 LiteLLM 调用模型，而当前 RAG 服务直接使用 Ollama 的 embedding 和 chat 接口，没有经过 LiteLLM。</p>
+<p>这不影响 RAG 的工作，但项目里因此有两套调用方式。作为学习项目，这样能看清每一层；如果继续工程化，我会让生成模型统一经过 <code>LLMService</code>，保留 embedding 的独立接口，避免模型切换、错误处理和监控散落在不同服务中。</p>
 <h2 id="-litellm--llm">三、第一步实践：通过 LiteLLM 调用本地 LLM</h2>
 <p>后端使用 OpenAI Python SDK，但 <code>base_url</code> 指向本地 LiteLLM：</p>
 <pre><code class="language-python">self.client = AsyncOpenAI(

@@ -232,7 +232,8 @@
       <h3 class="post-card__title clamp-3">元数据驱动的多租户 ERP：SaaS 产品架构设计与难点</h3>
     </a>
     <a href="/post/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-chan-pin-jia-gou-she-ji-yu-nan-dian/" class="post-card__excerpt clamp-2">
-      大型企业级 SaaS ERP 的复杂之处，不只是处理订单、库存和结算等业务，而是让一套稳定的标准产品同时服务多个客户，并允许每个客户安全地扩展字段、页面和业务规则。产品既要保持公共能力可持续升级，又要控制租户定制对核心交易稳定性的影响...
+      大型企业级 SaaS ERP 的难点，不只是处理订单、库存和结算，还要让一套标准产品服务多个客户，同时允许客户安全地扩展字段、页面和业务规则。公共能力要能持续升级，租户定制也不能牵动核心交易的稳定性。
+一种做法是把系统分成两层：Jav...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -293,7 +294,7 @@
     </a>
     <a href="/post/dian-zi-jiao-yi-ku-cun-xi-tong-cong-zheng-pi-yu-liu-dao-tong-yi-ku-cun-jiao-yi-yin-qing/" class="post-card__excerpt clamp-2">
       几年前，我参与过一次电子交易库存系统的重构。项目最初的问题看起来很具体：系统只能整批预留、整批发货，订单量上来以后，定时任务越来越慢，预留、发货和签收又频繁竞争同一批库存记录。
-真正开始改造后才发现，这并不是把一个定时任务换成消息队列...
+真正开始改造后才发现，问题不只是把定时任务换成消息队列。...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -355,7 +356,7 @@
     </a>
     <a href="/post/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou/" class="post-card__excerpt clamp-2">
       很多面试题看起来像是在背概念：微服务为什么要独立数据库？ThreadLocal 有什么风险？AOP 适合解决什么问题？配置中心如何实现动态开关？同步调用和异步调用有什么区别？
-但真正做过系统改造后会发现，这些“八股文”并不是互不相关的...
+真正做过系统改造后会发现，这些“八股文”并不是互不相关的知...
     </a>
     <div class="post-card__meta meta-text">
       
@@ -386,7 +387,8 @@
     </a>
     <a href="/post/api-led-jia-gou-jie-xi-cong-li-nian-dao-shi-jian/" class="post-card__excerpt clamp-2">
       概述
-当一个新渠道需要同时读取核心系统、CRM 和风控平台的数据时，点对点接口很快会变得难以维护。API-Led（API-Led Connectivity）试图解决的正是这类问题：把底层访问、业务编排和渠道适配拆开，让接口可以复用，也...
+当一个新渠道需要同时读取核心系统、CRM 和风控平台的数据时，点对点接口很快会变得难以维护。API-Led（API-Led Connectivity）把底层访问、业务编排和渠道适配拆开，让接口有复用空间，也方便统一管理。
+什么是...
     </a>
     <div class="post-card__meta meta-text">
       
