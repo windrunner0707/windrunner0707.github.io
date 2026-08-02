@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<style>
+  .hero-section--text {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 260px;
+    background-color: var(--color-bg);
+  }
+  .hero-section--text .hero-content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  .hero-section--text .hero-title {
+    color: var(--color-text-primary);
+  }
+  .hero-section--text .hero-subtitle {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .hero-section--text {
+      min-height: 220px;
+    }
+    .hero-section--text .hero-content {
+      padding: 48px 16px;
+    }
+  }
+</style>
+
+
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+
+
+<style>:root { --heatmap-color: #39d353; }</style>
+
+
+
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('flavor-theme');
+      var theme = saved || 'light';
+      if (theme === 'light') {
+        document.documentElement.classList.add('theme-light');
+      }
+    } catch (e) { }
+  })();
+</script>
+
+  <meta name="generator" content="Gridea Pro 1.2.2">
+  <title>Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch | 0707&#39;s Blog</title>
+  
+<meta name="description" content="最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。">
+<link rel="canonical" href="https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch","url":"https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/","description":"最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。","image":"/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp","datePublished":"2026-08-02T00:00:00+08:00","dateModified":"2026-08-02T21:00:00+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/","name":"Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch","position":2}]}</script>
+<meta property="og:title" content="Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch">
+<meta property="og:description" content="最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。">
+<meta property="og:url" content="https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="0707's Blog">
+<meta property="og:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/">
+<meta name="twitter:title" content="Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch">
+<meta name="twitter:description" content="最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。">
+<meta name="twitter:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp">
+</head>
+<body class="flavor-theme">
+
+  <header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <div class="top-bar">
+
+      
+      <div class="top-bar__left">
+        
+        <a href="https://windrunner0707.tech" class="site-avatar-link" aria-label="返回首页">
+          <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
+        </a>
+        
+        
+        <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
+      </div>
+
+      
+      <nav class="top-bar__nav" id="sectionBar">
+        
+        
+        <a class="nav-item" href="/">首页</a>
+        
+        <a class="nav-item" href="/category/tech/">技术</a>
+        
+        <a class="nav-item" href="/category/life/">生活</a>
+        
+        <a class="nav-item" href="/memos">闪念</a>
+        
+        <a class="nav-item" href="/archives">归档</a>
+        
+        <a class="nav-item" href="/tags">标签</a>
+        
+        <a class="nav-item" href="/links">友链</a>
+        
+        <a class="nav-item" href="/post/about">关于</a>
+        
+        
+      </nav>
+
+      
+      <div class="top-bar__right">
+        <button class="btn-icon btn-search search-btn" id="btnSearch" type="button" aria-label="搜索">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-sun" id="themeToggleSun" type="button"
+          aria-label="切换到浅色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"></path>
+            <path d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"></path>
+            <path d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"></path>
+            <path d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"></path>
+            <path d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"></path>
+            <path d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"></path>
+            <path d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"></path>
+            <path d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-moon" id="themeToggleMoon" type="button"
+          aria-label="切换到深色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"></path>
+            <path d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon btn-nav-toggle mobile-only" id="btnNavToggle" type="button" aria-label="切换导航">
+          <div class="hamburger" id="hamburger">
+            <span class="hamburger__line hamburger__line--top"></span>
+            <span class="hamburger__line hamburger__line--bottom"></span>
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+<div class="header-spacer"></div>
+
+<script>
+(function(){
+  var btn = document.getElementById('btnNavToggle');
+  var nav = document.getElementById('sectionBar');
+  var hamburger = document.getElementById('hamburger');
+  if (btn && nav) {
+    btn.addEventListener('click', function(){
+      nav.classList.toggle('top-bar__nav--open');
+      if (hamburger) hamburger.classList.toggle('is-active');
+    });
+    nav.querySelectorAll('.nav-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        nav.classList.remove('top-bar__nav--open');
+        if (hamburger) hamburger.classList.remove('is-active');
+      });
+    });
+  }
+
+  var root = document.documentElement;
+  var applyTheme = function(theme, persist){
+    if (theme === 'light') {
+      root.classList.add('theme-light');
+    } else {
+      root.classList.remove('theme-light');
+    }
+    if (persist) {
+      try { localStorage.setItem('flavor-theme', theme); } catch (e) {}
+    }
+  };
+  document.querySelectorAll('.theme-toggle').forEach(function(el){
+    el.addEventListener('click', function(){
+      applyTheme(root.classList.contains('theme-light') ? 'dark' : 'light', true);
+    });
+  });
+})();
+</script>
+
+
+  <main class="site-main" role="main">
+    
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="readingProgressBar"></span></div>
+<article class="article-container">
+  <header class="article-header">
+    <h1 class="article-title">Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch</h1>
+    <div class="article-meta">
+      
+      
+      <a href="/category/tech/" class="article-meta__category">技术</a>
+      
+      
+      <span class="article-meta__sep">·</span>
+      
+      <span class="article-meta__item">2026-08-02</span>
+      
+      <span class="article-meta__sep">·</span>
+      <span class="article-meta__item">15 分钟阅读</span>
+      
+    </div>
+    
+    <div class="article-header__tags">
+      
+      <a href="/tag/ren-gong-zhi-neng/" class="tag-pill tag-pill--sm">人工智能</a>
+      
+      <a href="/tag/api/" class="tag-pill tag-pill--sm">API</a>
+      
+      <a href="/tag/jia-gou-she-ji/" class="tag-pill tag-pill--sm">架构设计</a>
+      
+    </div>
+    
+  </header>
+
+  
+  <div class="article-feature">
+    <img src="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp" alt="Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch" decoding="async" fetchpriority="high" />
+  </div>
+  
+
+  <nav class="article-toc" id="articleToc" aria-label="文章目录" hidden>
+    <details class="article-toc__details">
+      <summary class="article-toc__summary">文章目录</summary>
+      <ol class="article-toc__list" id="articleTocList"></ol>
+    </details>
+  </nav>
+
+  <div class="article-content">
+    <p>最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。</p>
+<p>这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。</p>
+<p>这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。</p>
+<blockquote>
+<p>本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。</p>
+</blockquote>
+<!-- more -->
+<h2 id="-agent">最短入门：先跑通一个 Agent</h2>
+<p>第一次接触 Vibe Coding，不要同时装 OpenCode、Codex、Claude Code、两个 Oh My 插件和一堆 MCP。先选一个你已经具备账号或 API Key 的工具，在没有敏感数据的小仓库里跑完一次闭环。</p>
+<ol>
+<li>建一个临时分支：<code>git switch -c ai/first-task</code>；</li>
+<li>启动 OpenCode 或 Codex，先只让它读项目，不修改文件；</li>
+<li>再交给它一个可验收的小任务，例如“为这个函数补三条边界测试”；</li>
+<li>要求它运行现有检查，并列出改动文件和失败输出；</li>
+<li>你确认每个改动都能解释、测试可以复现后，再合并或继续扩展工具链。</li>
+</ol>
+<p>第一次提示可以直接这样写：</p>
+<pre><code class="language-text">先阅读 README、AGENTS.md 和项目配置。不要修改文件。
+告诉我：项目如何启动、现有检查命令是什么，以及最需要注意的三个风险点。
+</code></pre>
+<p>这一步看起来朴素，却能很快验证三个问题：模型能否读懂项目，工具是否真的拿到了该有的权限，以及你能不能接住它的输出。</p>
+<h2 id="opencode-coding-agent-">一、OpenCode：先把模型和 coding agent 拆开</h2>
+<p>我喜欢 OpenCode 的地方，是它没有把 coding agent 和某个模型厂商绑死。官方文档把供应商配置单独放在 <code>provider</code> 中，既可以使用内置供应商，也可以接入 OpenAI-compatible API。DeepSeek 的文档也提供了 OpenCode 的接入方式，通常在 OpenCode 中执行 <code>/connect</code>，再选择 <code>deepseek</code> 完成认证。</p>
+<p>这带来一个很实际的好处：同一个项目、同一套提示和工具权限，可以换模型跑，而不用换整套工作流。比如：</p>
+<pre><code class="language-text">需求澄清       -&gt; GPT-5.6 / Claude
+普通 CRUD      -&gt; DeepSeek / MiMo
+大范围重构     -&gt; Claude / GPT-5.6
+代码审查       -&gt; 换一个模型交叉检查
+</code></pre>
+<p>OpenCode 也支持通过 GitHub OAuth 使用 Copilot 账号，官方文档中的方式是先执行 <code>opencode auth github</code>。这和直接购买某家模型 API 不一样：你买到的是 GitHub Copilot 计划里的模型访问和额度，具体可用模型、倍率和剩余额度要看 Copilot 当前计划。</p>
+<h3 id="heading">几个供应商怎么选：先看计费模型，再谈效果</h3>
+<p>我不建议简单地说“哪个模型最强”。API 单价、订阅费和 Copilot Credits 不是同一单位；真正需要比较的是，完成一次验收任务一共花了多少钱、花了多久、你还要修多少代码。</p>
+<table>
+<thead>
+<tr>
+<th>供应商</th>
+<th>我会先拿来做什么</th>
+<th>计费模型</th>
+<th>使用前要核对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeepSeek</td>
+<td>日常改代码、解释代码、批量生成测试</td>
+<td>官方 API 按 token 计费</td>
+<td>当前模型、缓存价格、限流和高峰规则</td>
+</tr>
+<tr>
+<td>Xiaomi MiMo</td>
+<td>中文需求、Agent 尝试</td>
+<td>API 按 token 或账户余额计费</td>
+<td>当前模型、余额和接口兼容性</td>
+</tr>
+<tr>
+<td>GitHub Copilot</td>
+<td>已经在 GitHub 工作、想少维护一套 Key</td>
+<td>订阅费加 AI Credits，用量受模型倍率影响</td>
+<td>包含 Credits、模型倍率和超额费用</td>
+</tr>
+<tr>
+<td>OpenAI / Anthropic</td>
+<td>复杂规划、跨文件修改、最终审查</td>
+<td>API 按量；订阅另有计划限制</td>
+<td>计划的使用上限、CLI 可用模型和实际延迟</td>
+</tr>
+</tbody>
+</table>
+<p>DeepSeek 的官方价格页现在列出了 DeepSeek-V4-Flash 和 DeepSeek-V4-Pro，输入、输出、缓存命中分别计价。小米 MiMo 的官方公告也说明 API 从 2026 年 1 月 26 日起开始计费。至于 Copilot，GitHub 的计划页和计费变更说明都已经改成 AI Credits 口径。下面这三个链接比任何二手价格表都更值得收藏：<a href="https://api-docs.deepseek.com/quick_start/pricing">DeepSeek 价格</a>、<a href="https://mimo.mi.com/docs/en-US/news/previous-news/billing">MiMo 计费公告</a>、<a href="https://github.com/features/copilot/plans">GitHub Copilot 计划与价格</a>。</p>
+<p>我的起步分工是：便宜模型做高频、低风险和可回滚的工作；能力更强或更稳定的模型做需求拆解、跨文件修改和最终审查。这是工作分配，不是性能结论。</p>
+<h3 id="heading-1">怎样做一次能复算的评测</h3>
+<p>如果要比较供应商，我会用同一份仓库快照和同一组任务，至少各跑三次。记录模板如下。实际数据没有跑出来前，宁可留空，也不要把印象写成分数。</p>
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th>模型与版本</th>
+<th align="right">运行次数</th>
+<th align="right">首次通过率</th>
+<th align="right">中位耗时</th>
+<th align="right">输入/输出 token</th>
+<th align="right">实际费用</th>
+<th align="right">人工修复时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>补边界测试</td>
+<td></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr>
+<td>修复一个已知 Bug</td>
+<td></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr>
+<td>跨文件小重构</td>
+<td></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+</tbody>
+</table>
+<p>对订阅制产品，可以把一个月订阅费按当月完成任务数分摊；对 API，记录控制台账单和实际 token。最终更有参考价值的指标是：<code>有效成本 = 模型调用费 + 订阅分摊 + 中转服务费 + 人工修复时间成本</code>。这个口径不完美，但至少能把“很便宜”或“很强”的印象落到可讨论的数据上。</p>
+<h3 id="oh-my-opencode-opencode-">Oh My OpenCode：给 OpenCode 加一层多代理编排</h3>
+<p>OpenCode 解决的是“模型从哪里来、Agent 怎样运行”的问题，Oh My OpenCode 解决的是“复杂任务怎样拆给多个 Agent”。它是一个社区插件，不是 OpenCode 官方内置功能。项目提供了 Sisyphus 主 Agent，以及 Prometheus、Oracle、Librarian、Explore 等不同角色；还集成了后台 Agent、LSP/AST 工具、Context7、grep.app 等能力。实际效果很依赖你接入的模型和权限配置，不能把插件的角色名称理解成固定能力保证。</p>
+<p>我第一次实践时，不会一上来就改项目配置，而是先确认 OpenCode 版本，再安装插件：</p>
+<pre><code class="language-bash">opencode --version
+bunx oh-my-opencode install
+</code></pre>
+<p>也可以用 <code>npx oh-my-opencode install</code>。安装程序会询问 Claude、OpenAI、Gemini、GitHub Copilot 等供应商的可用情况，再把相应的 Agent 和模型配置写入 OpenCode。项目文档建议使用较新的 OpenCode 版本；如果版本太旧，配置加载可能出问题。安装完成后，可以执行：</p>
+<pre><code class="language-bash">opencode
+</code></pre>
+<p>然后在一个没有敏感数据的仓库里先试一个小任务。这个项目最有辨识度的用法是 <code>ultrawork</code> 或 <code>ulw</code>：它会倾向于启用并行 Agent、深度探索和持续执行。但我不会把它当作“无脑自动驾驶”开关。并行 Agent 会扩大 token 消耗，也会让多个修改同时落到工作区，最好先在干净分支上使用。</p>
+<p>配置文件可以放在项目的 <code>.opencode/oh-my-opencode.json</code>，也可以放在用户目录的 <code>~/.config/opencode/oh-my-opencode.json</code>。项目配置优先级更高，适合把团队约定和个人偏好分开。实践中我会把它分成两类设置：</p>
+<ul>
+<li>项目级：允许的工具、代码库规则、默认模型和 MCP；</li>
+<li>用户级：个人供应商、并行度、实验性 Agent 和调试开关。</li>
+</ul>
+<p>有一点需要提前接受：Oh My OpenCode 的“强大”来自它同时启用了不少 hooks、MCP 和角色。每增加一层自动化，就多一层排查成本。遇到结果奇怪时，我会先关闭复杂任务，改用单 Agent 重跑，确认问题来自模型、插件编排还是项目本身。</p>
+<p>项目安装说明和源代码可以看 <a href="https://ohmyopencode.com/installation/">Oh My OpenCode 安装文档</a> 和 <a href="https://github.com/code-yeongyu/oh-my-opencode">官方 GitHub 仓库</a>。下载时要认准仓库，不要在声称“官方”的第三方站点输入付款信息或 API Key。</p>
+<h2 id="codexgpt-56-">二、Codex：GPT-5.6 适合做最后一轮工程化推进</h2>
+<p>OpenAI 已宣布 GPT-5.6 可用于 ChatGPT、Codex 和 API，但它会按计划和账户逐步开放；Codex CLI 也需要达到官方要求的最低版本。看不到模型时，先检查版本、计划和账户可用性，而不是先怀疑配置。<a href="https://help.openai.com/en/articles/20001354-gpt-5-6-in-chatgpt">GPT-5.6 的可用性与版本要求</a> 写得比二手教程更可靠。对我来说，Codex 的价值不只是“能生成代码”，而是它更适合在一个真实仓库里连续工作：先读取项目约定，修改多个文件，运行检查，再根据结果继续收敛。</p>
+<p>我会把 Codex 放在两个位置：</p>
+<ol>
+<li>把一个已经想清楚的功能做完整，包括配置、代码、测试和文档；</li>
+<li>对 OpenCode 或 Claude Code 的结果做一次独立审查，尤其关注权限、异常路径和回滚。</li>
+</ol>
+<p>这里的关键不是让它一次生成完美代码，而是给它一个可以验证的闭环：先告诉它允许修改哪些目录，再要求它运行现有检查，最后把失败输出带回任务中。没有测试和边界条件的 Vibe Coding，很容易只是“看起来完成了”。</p>
+<h3 id="oh-my-codex-codex-">Oh My Codex：把 Codex 变成一套可重复的工作流</h3>
+<p>Oh My Codex，项目缩写是 OMX，和 Oh My OpenCode 的思路相似，但它服务的对象不同。OMX 是 Codex CLI 的工作流层，Codex 仍然负责实际的 Agent 执行；OMX 主要增加提示词、Skill、hooks、Agent team、HUD，以及计划和运行状态管理。它会在项目里使用 <code>.omx/</code> 保存计划、日志、记忆和运行状态。</p>
+<p>我会先确认当前使用的是 Codex CLI，而不是把 Codex App 和 CLI 的体验混在一起。项目 README 明确建议优先在 macOS 或 Linux 的 Codex CLI 上使用，原生 Windows 和 Codex App 目前不是默认支持路径。安装和初始化可以这样做：</p>
+<pre><code class="language-bash">codex --version
+npm install -g oh-my-codex
+omx setup
+</code></pre>
+<p>如果 Codex CLI 还没有安装，可以单独安装 <code>@openai/codex</code>。不建议在 Homebrew 已经接管 <code>codex</code> 命令时，再用 npm 强行覆盖同一个二进制文件。初始化后，我会先做两步检查：</p>
+<pre><code class="language-bash">omx doctor
+codex login status
+omx exec --skip-git-repo-check -C . &quot;Reply with exactly OMX-EXEC-OK&quot;
+</code></pre>
+<p><code>omx doctor</code> 只能检查安装形态和依赖，真正的 <code>omx exec</code> 才能验证当前 Shell 里的登录状态、模型调用和配置是否可用。确认没问题后，再用推荐模式启动：</p>
+<pre><code class="language-bash">omx --madmax --high
+</code></pre>
+<p>我更常用的是把几个关键词当作工作流入口，而不是记一串 CLI 参数：</p>
+<pre><code class="language-text">$deep-interview   先澄清需求、边界和验收条件
+$ralplan          形成计划并审查取舍
+$ultragoal        把批准后的计划推进到完成
+</code></pre>
+<p>例如，一个“给支付接口增加重试”的任务，我会先让 <code>$deep-interview</code> 把幂等键、超时、重复扣款和回滚问清楚，再用 <code>$ralplan</code> 审查方案，最后才进入实现。这样比一上来输入“帮我加重试”更适合真实项目。</p>
+<p>OMX 还有 <code>$team</code>、<code>$ralph</code> 等更激进的执行方式，但我不会默认开启。并行 Agent 需要 <code>tmux</code> 等运行条件，也会提高资源消耗；如果任务本身没有清晰的边界，多个 Agent 只会更快地产生互相冲突的修改。我的原则是：先单线程跑通，再把独立的研究、测试和审查拆出去。</p>
+<p>另一个容易忽略的问题是版本升级。OMX 升级后通常要手动重新运行 <code>omx setup</code>，再执行 <code>omx doctor</code> 和一次真实 smoke test。不要只看到 npm 安装成功，就认为 Codex 的运行时一定已经准备好。</p>
+<p>OMX 的官方说明和安装命令以 <a href="https://github.com/Yeachan-Heo/oh-my-codex">Yeachan-Heo/oh-my-codex</a> 为准。它和 Codex 的关系可以概括成一句话：Codex 负责干活，OMX 负责把干活的流程组织起来。</p>
+<h3 id="-chatgpt-plus">在新加坡用银联卡购买 ChatGPT Plus</h3>
+<p>新加坡可在 ChatGPT 网页端使用 SGD 结账，OpenAI 官方列出的通用支付方式是信用卡和借记卡。<a href="https://help.openai.com/en/articles/10421635-which-payment-methods-are-supported-for-chatgpt">支付方式说明</a> 没有承诺网页端一定接受某一张银联卡，因此“银联可用”只能理解为可尝试，不能当作官方保证。</p>
+<p>可以按下面顺序尝试：</p>
+<ol>
+<li>在 ChatGPT 账户中打开升级页面，确认地区和账单币种显示为 Singapore/SGD；</li>
+<li>输入银联卡号、有效期和安全码，账单地址尽量填写与发卡行留存信息一致；</li>
+<li>完成银行短信或 App 验证；</li>
+<li>如果网页端被拒，不要反复提交。检查发卡行是否关闭了境外线上支付、订阅类商户或小额预授权。</li>
+</ol>
+<p>如果网页端始终不接受这张卡，可以考虑新加坡区 iPhone 的 ChatGPT App 内订阅。OpenAI 说明应用内订阅由 Apple App Store 或 Google Play 管理，价格、税费、退款和取消都应在对应商店处理。实际能否把你的银联卡加入 Apple Account 或 Apple Pay，仍然取决于发卡行和卡种。</p>
+<p>这条路线的注意点是：订阅由 Apple 管理，价格、税费、退款和取消订阅都要在 Apple Account 中处理；不要为了“能付款”去买来路不明的共享账号或代充。账号归属、付款凭证和后续退款，往往比省下几块钱更重要。</p>
+<h2 id="claude-code-">三、Claude Code 与中转站：能用，但要知道自己承担了什么</h2>
+<p>Claude Code 默认使用 Anthropic API。官方也提供了面向团队的 LLM gateway 配置方式，例如通过统一端点处理认证、预算、审计和路由；但 Anthropic 明确说明不会审核第三方网关的安全性或功能。<a href="https://docs.anthropic.com/en/docs/claude-code/llm-gateway">Claude Code LLM gateway 文档</a> 是比“找一个中转 Key”更合适的起点。无论使用哪种代理，代码、提示词、文件内容和工具调用都有可能经过该服务。</p>
+<p>我会把中转站分成三种情况来看：</p>
+<pre><code class="language-text">官方 API / 官方订阅
+        -&gt; 成本高一些，责任边界最清楚
+
+有明确公司主体和隐私条款的代理
+        -&gt; 方便，但需要审查日志、留存和退款规则
+
+个人转售 Key 或来源不明的中转
+        -&gt; 不建议用于工作项目，也不应用来绕过账户、地区或服务计划限制
+</code></pre>
+<p>如果确实需要使用中转站，至少做四件事：</p>
+<ul>
+<li>不要把生产密钥、客户数据和未脱敏日志直接交给它；</li>
+<li>给每个项目使用独立 Key，并设置余额、速率和来源 IP 限制；</li>
+<li>先用无敏感内容测试流式输出、工具调用、超时和上下文长度；</li>
+<li>保存自己的配置和消费记录，别把账号密码、订阅凭证交给所谓“代配置”。</li>
+</ul>
+<p>还有一个容易忽略的坑：中转站经常只兼容聊天接口，不一定完整兼容 Claude Code 所需的工具调用、长上下文、缓存和错误码。如果只是能收到一段文本，不代表 coding agent 真的可用。我的做法是先拿一个没有业务数据的小仓库跑完整流程，再决定是否长期使用。</p>
+<h2 id="cc-switch-skill-">四、CC Switch：把供应商切换和 Skill 管理放到同一个地方</h2>
+<p>当 OpenCode、Codex 和 Claude Code 同时存在时，最烦的事情不是安装它们，而是记住每个工具的配置位置。CC Switch 的思路就是把这些配置收进一个桌面应用里，统一管理供应商、切换配置，并提供 MCP 和 Skill 管理。</p>
+<p>它目前支持 Claude Code、Codex、Gemini CLI、OpenCode 等工具。Skill 也可以从 GitHub 仓库或压缩包安装，再分发到对应目录，例如 Claude Code 使用 <code>~/.claude/skills/</code>，Codex 使用 <code>~/.codex/skills/</code>，OpenCode 使用 <code>~/.opencode/skills/</code>。这对于需要在多个 agent 之间复用“代码审查”“文档生成”“发布检查”工作流的人很方便。</p>
+<p>我理解它最有用的地方不是“帮我点一下切换”，而是让配置变得可恢复：</p>
+<pre><code class="language-text">供应商配置
+   -&gt; 选择目标工具
+   -&gt; 切换当前模型和端点
+   -&gt; 复用同一批 Skill / MCP
+   -&gt; 出问题时恢复备份
+</code></pre>
+<p>不过，统一管理不等于自动解决兼容性。Claude Code 的 Skill 可能依赖 Anthropic 特有的工具名称，Codex 的 Skill 可能假设了不同的目录结构，OpenCode 也可能对配置字段有自己的要求。安装之后仍然要打开 Skill 看一遍，确认它是否会执行脚本、访问网络，是否包含不必要的权限。</p>
+<p>CC Switch 官方文档已经把 Skill 的安装目录、仓库管理和备份机制写得比较清楚，可以参考 <a href="https://cc-switch.cc/en/tutorials/skills-management">Skills Management</a>。项目本身也在 GitHub 上维护，仓库是 <a href="https://github.com/farion1231/cc-switch">farion1231/cc-switch</a>。</p>
+<p>第一次使用 CC Switch 时，我会按这个顺序操作：先选择目标工具，例如 OpenCode；再新增一个供应商配置，只填一个测试用 Key；切换到该配置后，在无敏感仓库里跑一条只读提示；确认工作正常，再安装一个只做“代码审查”或“发布检查”的 Skill。最后检查它生成的备份目录。这样即使某个端点、Skill 或模型不兼容，也能明确知道应该回退哪里。</p>
+<h2 id="heading-2">五、我现在的分工方式</h2>
+<p>目前我更倾向于使用一套“低成本模型负责探索，能力更强的模型负责收口”的组合：</p>
+<pre><code class="language-text">OpenCode + DeepSeek / MiMo
+    处理探索、样板代码、测试补全
+
+Claude Code + 官方或可信代理
+    处理需要长时间运行的任务
+
+Codex + GPT-5.6
+    做跨文件修改、验证和最后审查
+
+CC Switch
+    管理供应商、Skill、MCP 和备份
+</code></pre>
+<p>这样做的代价是工具变多了，配置和账号也更复杂。对刚开始的人，我反而建议只保留一个 Agent 和一个供应商，连续做完三到五个小任务后，再决定是否需要多模型、Oh My 插件或 CC Switch。</p>
+<p>Vibe Coding 说到底还是工程工作。模型可以替我写很多代码，但不能替我决定哪些数据能发给第三方，不能替我确认一次支付是否真的完成，也不能替我承担上线后的事故。把模型、账号、端点和 Skill 管理好，可能没有“让 AI 一句话写出完整应用”那么吸引人，却更接近我愿意长期使用的工作方式。</p>
+
+  </div>
+
+  
+  <nav class="post-nav">
+    
+    <div class="post-nav-card post-nav-card--empty">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">上一篇</span>
+        <span class="post-nav-card__empty-text">没有上一篇了~</span>
+      </div>
+    </div>
+    
+    
+    <a href="/post/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-chan-pin-jia-gou-she-ji-yu-nan-dian/" class="post-nav-card post-nav-card--next">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">下一篇</span>
+        <span class="post-nav-card__title">元数据驱动的多租户 ERP：SaaS 产品架构设计与难点</span>
+      </div>
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou.webp" alt="元数据驱动的多租户 ERP：SaaS 产品架构设计与难点" loading="lazy" />
+      </div>
+      
+      <span class="post-nav-card__arrow">&rarr;</span>
+    </a>
+    
+  </nav>
+
+  
+  
+
+
+</article>
+
+<div class="image-zoom-modal" id="imageZoomModal" role="dialog" aria-modal="true" aria-label="图片查看器" hidden>
+  <div class="image-zoom-toolbar">
+    <button type="button" data-zoom-action="out" aria-label="缩小图片">−</button>
+    <output id="imageZoomLevel" aria-live="polite">100%</output>
+    <button type="button" data-zoom-action="in" aria-label="放大图片">＋</button>
+    <button type="button" data-zoom-action="reset">重置</button>
+    <button type="button" data-zoom-action="close" aria-label="关闭图片查看器">关闭</button>
+  </div>
+  <div class="image-zoom-stage">
+    <img class="image-zoom-target" alt="" draggable="false" />
+  </div>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-inner">
+
+    
+    
+    <nav class="footer-nav" aria-label="页脚导航">
+      
+      <a class="footer-nav__link" href="/">首页</a>
+      
+      <a class="footer-nav__link" href="/category/tech/">技术</a>
+      
+      <a class="footer-nav__link" href="/category/life/">生活</a>
+      
+      <a class="footer-nav__link" href="/memos">闪念</a>
+      
+      <a class="footer-nav__link" href="/archives">归档</a>
+      
+      <a class="footer-nav__link" href="/tags">标签</a>
+      
+      <a class="footer-nav__link" href="/links">友链</a>
+      
+      <a class="footer-nav__link" href="/post/about">关于</a>
+      
+    </nav>
+    
+
+    
+    <div class="footer-social">
+      
+      <a class="footer-social__link" href="https://github.com/windrunner0707" target="_blank" rel="noopener noreferrer"
+        aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+        </svg>
+      </a>
+      
+      
+      
+      <a class="footer-social__link" href="/feed.xml" aria-label="RSS">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.18 15.64a2.18 2.18 0 110 4.36 2.18 2.18 0 010-4.36zM4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44zm0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+        </svg>
+      </a>
+    </div>
+
+    
+    <div class="footer-copyright">
+      <p>&copy; 2026 0707&#39;s Blog. All rights reserved.</p>
+    </div>
+
+    
+    
+    <div class="footer-custom">
+      Powered by Gridea Pro
+    </div>
+    
+
+    
+    <div class="footer-powered">
+      <span>Powered by <a href="https://gridea.pro" target="_blank" rel="noopener noreferrer">Gridea Pro</a></span>
+    </div>
+
+  </div>
+</footer>
+
+  
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
+  <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
+    <div class="search-header">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
+      <span class="search-kbd">&#8984;K</span>
+      <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="/scripts/search.js"></script>
+
+  
+
+  
+<script src="/scripts/image-zoom.js"></script>
+<script src="/scripts/article-enhancements.js"></script>
+
+
+  
+
+  
+
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: flavor-theme v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+</html>

@@ -9,6 +9,245 @@
     <lastBuildDate>Sun, 12 Jul 2026 13:49:20 +0800</lastBuildDate>
     <atom:link href="https://windrunner0707.tech/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <item>
+      <title>Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch</title>
+      <link>https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/</link>
+      <guid isPermaLink="true">https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/</guid>
+      <pubDate>Sun, 02 Aug 2026 00:00:00 +0800</pubDate>
+      <description><![CDATA[<p>最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。</p>
+<p>这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。</p>
+<p>这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。</p>
+<blockquote>
+<p>本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。</p>
+</blockquote>
+<!-- more -->
+<h2 id="-agent">最短入门：先跑通一个 Agent</h2>
+<p>第一次接触 Vibe Coding，不要同时装 OpenCode、Codex、Claude Code、两个 Oh My 插件和一堆 MCP。先选一个你已经具备账号或 API Key 的工具，在没有敏感数据的小仓库里跑完一次闭环。</p>
+<ol>
+<li>建一个临时分支：<code>git switch -c ai/first-task</code>；</li>
+<li>启动 OpenCode 或 Codex，先只让它读项目，不修改文件；</li>
+<li>再交给它一个可验收的小任务，例如“为这个函数补三条边界测试”；</li>
+<li>要求它运行现有检查，并列出改动文件和失败输出；</li>
+<li>你确认每个改动都能解释、测试可以复现后，再合并或继续扩展工具链。</li>
+</ol>
+<p>第一次提示可以直接这样写：</p>
+<pre><code class="language-text">先阅读 README、AGENTS.md 和项目配置。不要修改文件。
+告诉我：项目如何启动、现有检查命令是什么，以及最需要注意的三个风险点。
+</code></pre>
+<p>这一步看起来朴素，却能很快验证三个问题：模型能否读懂项目，工具是否真的拿到了该有的权限，以及你能不能接住它的输出。</p>
+<h2 id="opencode-coding-agent-">一、OpenCode：先把模型和 coding agent 拆开</h2>
+<p>我喜欢 OpenCode 的地方，是它没有把 coding agent 和某个模型厂商绑死。官方文档把供应商配置单独放在 <code>provider</code> 中，既可以使用内置供应商，也可以接入 OpenAI-compatible API。DeepSeek 的文档也提供了 OpenCode 的接入方式，通常在 OpenCode 中执行 <code>/connect</code>，再选择 <code>deepseek</code> 完成认证。</p>
+<p>这带来一个很实际的好处：同一个项目、同一套提示和工具权限，可以换模型跑，而不用换整套工作流。比如：</p>
+<pre><code class="language-text">需求澄清       -&gt; GPT-5.6 / Claude
+普通 CRUD      -&gt; DeepSeek / MiMo
+大范围重构     -&gt; Claude / GPT-5.6
+代码审查       -&gt; 换一个模型交叉检查
+</code></pre>
+<p>OpenCode 也支持通过 GitHub OAuth 使用 Copilot 账号，官方文档中的方式是先执行 <code>opencode auth github</code>。这和直接购买某家模型 API 不一样：你买到的是 GitHub Copilot 计划里的模型访问和额度，具体可用模型、倍率和剩余额度要看 Copilot 当前计划。</p>
+<h3 id="heading">几个供应商怎么选：先看计费模型，再谈效果</h3>
+<p>我不建议简单地说“哪个模型最强”。API 单价、订阅费和 Copilot Credits 不是同一单位；真正需要比较的是，完成一次验收任务一共花了多少钱、花了多久、你还要修多少代码。</p>
+<table>
+<thead>
+<tr>
+<th>供应商</th>
+<th>我会先拿来做什么</th>
+<th>计费模型</th>
+<th>使用前要核对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeepSeek</td>
+<td>日常改代码、解释代码、批量生成测试</td>
+<td>官方 API 按 token 计费</td>
+<td>当前模型、缓存价格、限流和高峰规则</td>
+</tr>
+<tr>
+<td>Xiaomi MiMo</td>
+<td>中文需求、Agent 尝试</td>
+<td>API 按 token 或账户余额计费</td>
+<td>当前模型、余额和接口兼容性</td>
+</tr>
+<tr>
+<td>GitHub Copilot</td>
+<td>已经在 GitHub 工作、想少维护一套 Key</td>
+<td>订阅费加 AI Credits，用量受模型倍率影响</td>
+<td>包含 Credits、模型倍率和超额费用</td>
+</tr>
+<tr>
+<td>OpenAI / Anthropic</td>
+<td>复杂规划、跨文件修改、最终审查</td>
+<td>API 按量；订阅另有计划限制</td>
+<td>计划的使用上限、CLI 可用模型和实际延迟</td>
+</tr>
+</tbody>
+</table>
+<p>DeepSeek 的官方价格页现在列出了 DeepSeek-V4-Flash 和 DeepSeek-V4-Pro，输入、输出、缓存命中分别计价。小米 MiMo 的官方公告也说明 API 从 2026 年 1 月 26 日起开始计费。至于 Copilot，GitHub 的计划页和计费变更说明都已经改成 AI Credits 口径。下面这三个链接比任何二手价格表都更值得收藏：<a href="https://api-docs.deepseek.com/quick_start/pricing">DeepSeek 价格</a>、<a href="https://mimo.mi.com/docs/en-US/news/previous-news/billing">MiMo 计费公告</a>、<a href="https://github.com/features/copilot/plans">GitHub Copilot 计划与价格</a>。</p>
+<p>我的起步分工是：便宜模型做高频、低风险和可回滚的工作；能力更强或更稳定的模型做需求拆解、跨文件修改和最终审查。这是工作分配，不是性能结论。</p>
+<h3 id="heading-1">怎样做一次能复算的评测</h3>
+<p>如果要比较供应商，我会用同一份仓库快照和同一组任务，至少各跑三次。记录模板如下。实际数据没有跑出来前，宁可留空，也不要把印象写成分数。</p>
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th>模型与版本</th>
+<th align="right">运行次数</th>
+<th align="right">首次通过率</th>
+<th align="right">中位耗时</th>
+<th align="right">输入/输出 token</th>
+<th align="right">实际费用</th>
+<th align="right">人工修复时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>补边界测试</td>
+<td></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr>
+<td>修复一个已知 Bug</td>
+<td></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr>
+<td>跨文件小重构</td>
+<td></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+</tbody>
+</table>
+<p>对订阅制产品，可以把一个月订阅费按当月完成任务数分摊；对 API，记录控制台账单和实际 token。最终更有参考价值的指标是：<code>有效成本 = 模型调用费 + 订阅分摊 + 中转服务费 + 人工修复时间成本</code>。这个口径不完美，但至少能把“很便宜”或“很强”的印象落到可讨论的数据上。</p>
+<h3 id="oh-my-opencode-opencode-">Oh My OpenCode：给 OpenCode 加一层多代理编排</h3>
+<p>OpenCode 解决的是“模型从哪里来、Agent 怎样运行”的问题，Oh My OpenCode 解决的是“复杂任务怎样拆给多个 Agent”。它是一个社区插件，不是 OpenCode 官方内置功能。项目提供了 Sisyphus 主 Agent，以及 Prometheus、Oracle、Librarian、Explore 等不同角色；还集成了后台 Agent、LSP/AST 工具、Context7、grep.app 等能力。实际效果很依赖你接入的模型和权限配置，不能把插件的角色名称理解成固定能力保证。</p>
+<p>我第一次实践时，不会一上来就改项目配置，而是先确认 OpenCode 版本，再安装插件：</p>
+<pre><code class="language-bash">opencode --version
+bunx oh-my-opencode install
+</code></pre>
+<p>也可以用 <code>npx oh-my-opencode install</code>。安装程序会询问 Claude、OpenAI、Gemini、GitHub Copilot 等供应商的可用情况，再把相应的 Agent 和模型配置写入 OpenCode。项目文档建议使用较新的 OpenCode 版本；如果版本太旧，配置加载可能出问题。安装完成后，可以执行：</p>
+<pre><code class="language-bash">opencode
+</code></pre>
+<p>然后在一个没有敏感数据的仓库里先试一个小任务。这个项目最有辨识度的用法是 <code>ultrawork</code> 或 <code>ulw</code>：它会倾向于启用并行 Agent、深度探索和持续执行。但我不会把它当作“无脑自动驾驶”开关。并行 Agent 会扩大 token 消耗，也会让多个修改同时落到工作区，最好先在干净分支上使用。</p>
+<p>配置文件可以放在项目的 <code>.opencode/oh-my-opencode.json</code>，也可以放在用户目录的 <code>~/.config/opencode/oh-my-opencode.json</code>。项目配置优先级更高，适合把团队约定和个人偏好分开。实践中我会把它分成两类设置：</p>
+<ul>
+<li>项目级：允许的工具、代码库规则、默认模型和 MCP；</li>
+<li>用户级：个人供应商、并行度、实验性 Agent 和调试开关。</li>
+</ul>
+<p>有一点需要提前接受：Oh My OpenCode 的“强大”来自它同时启用了不少 hooks、MCP 和角色。每增加一层自动化，就多一层排查成本。遇到结果奇怪时，我会先关闭复杂任务，改用单 Agent 重跑，确认问题来自模型、插件编排还是项目本身。</p>
+<p>项目安装说明和源代码可以看 <a href="https://ohmyopencode.com/installation/">Oh My OpenCode 安装文档</a> 和 <a href="https://github.com/code-yeongyu/oh-my-opencode">官方 GitHub 仓库</a>。下载时要认准仓库，不要在声称“官方”的第三方站点输入付款信息或 API Key。</p>
+<h2 id="codexgpt-56-">二、Codex：GPT-5.6 适合做最后一轮工程化推进</h2>
+<p>OpenAI 已宣布 GPT-5.6 可用于 ChatGPT、Codex 和 API，但它会按计划和账户逐步开放；Codex CLI 也需要达到官方要求的最低版本。看不到模型时，先检查版本、计划和账户可用性，而不是先怀疑配置。<a href="https://help.openai.com/en/articles/20001354-gpt-5-6-in-chatgpt">GPT-5.6 的可用性与版本要求</a> 写得比二手教程更可靠。对我来说，Codex 的价值不只是“能生成代码”，而是它更适合在一个真实仓库里连续工作：先读取项目约定，修改多个文件，运行检查，再根据结果继续收敛。</p>
+<p>我会把 Codex 放在两个位置：</p>
+<ol>
+<li>把一个已经想清楚的功能做完整，包括配置、代码、测试和文档；</li>
+<li>对 OpenCode 或 Claude Code 的结果做一次独立审查，尤其关注权限、异常路径和回滚。</li>
+</ol>
+<p>这里的关键不是让它一次生成完美代码，而是给它一个可以验证的闭环：先告诉它允许修改哪些目录，再要求它运行现有检查，最后把失败输出带回任务中。没有测试和边界条件的 Vibe Coding，很容易只是“看起来完成了”。</p>
+<h3 id="oh-my-codex-codex-">Oh My Codex：把 Codex 变成一套可重复的工作流</h3>
+<p>Oh My Codex，项目缩写是 OMX，和 Oh My OpenCode 的思路相似，但它服务的对象不同。OMX 是 Codex CLI 的工作流层，Codex 仍然负责实际的 Agent 执行；OMX 主要增加提示词、Skill、hooks、Agent team、HUD，以及计划和运行状态管理。它会在项目里使用 <code>.omx/</code> 保存计划、日志、记忆和运行状态。</p>
+<p>我会先确认当前使用的是 Codex CLI，而不是把 Codex App 和 CLI 的体验混在一起。项目 README 明确建议优先在 macOS 或 Linux 的 Codex CLI 上使用，原生 Windows 和 Codex App 目前不是默认支持路径。安装和初始化可以这样做：</p>
+<pre><code class="language-bash">codex --version
+npm install -g oh-my-codex
+omx setup
+</code></pre>
+<p>如果 Codex CLI 还没有安装，可以单独安装 <code>@openai/codex</code>。不建议在 Homebrew 已经接管 <code>codex</code> 命令时，再用 npm 强行覆盖同一个二进制文件。初始化后，我会先做两步检查：</p>
+<pre><code class="language-bash">omx doctor
+codex login status
+omx exec --skip-git-repo-check -C . &quot;Reply with exactly OMX-EXEC-OK&quot;
+</code></pre>
+<p><code>omx doctor</code> 只能检查安装形态和依赖，真正的 <code>omx exec</code> 才能验证当前 Shell 里的登录状态、模型调用和配置是否可用。确认没问题后，再用推荐模式启动：</p>
+<pre><code class="language-bash">omx --madmax --high
+</code></pre>
+<p>我更常用的是把几个关键词当作工作流入口，而不是记一串 CLI 参数：</p>
+<pre><code class="language-text">$deep-interview   先澄清需求、边界和验收条件
+$ralplan          形成计划并审查取舍
+$ultragoal        把批准后的计划推进到完成
+</code></pre>
+<p>例如，一个“给支付接口增加重试”的任务，我会先让 <code>$deep-interview</code> 把幂等键、超时、重复扣款和回滚问清楚，再用 <code>$ralplan</code> 审查方案，最后才进入实现。这样比一上来输入“帮我加重试”更适合真实项目。</p>
+<p>OMX 还有 <code>$team</code>、<code>$ralph</code> 等更激进的执行方式，但我不会默认开启。并行 Agent 需要 <code>tmux</code> 等运行条件，也会提高资源消耗；如果任务本身没有清晰的边界，多个 Agent 只会更快地产生互相冲突的修改。我的原则是：先单线程跑通，再把独立的研究、测试和审查拆出去。</p>
+<p>另一个容易忽略的问题是版本升级。OMX 升级后通常要手动重新运行 <code>omx setup</code>，再执行 <code>omx doctor</code> 和一次真实 smoke test。不要只看到 npm 安装成功，就认为 Codex 的运行时一定已经准备好。</p>
+<p>OMX 的官方说明和安装命令以 <a href="https://github.com/Yeachan-Heo/oh-my-codex">Yeachan-Heo/oh-my-codex</a> 为准。它和 Codex 的关系可以概括成一句话：Codex 负责干活，OMX 负责把干活的流程组织起来。</p>
+<h3 id="-chatgpt-plus">在新加坡用银联卡购买 ChatGPT Plus</h3>
+<p>新加坡可在 ChatGPT 网页端使用 SGD 结账，OpenAI 官方列出的通用支付方式是信用卡和借记卡。<a href="https://help.openai.com/en/articles/10421635-which-payment-methods-are-supported-for-chatgpt">支付方式说明</a> 没有承诺网页端一定接受某一张银联卡，因此“银联可用”只能理解为可尝试，不能当作官方保证。</p>
+<p>可以按下面顺序尝试：</p>
+<ol>
+<li>在 ChatGPT 账户中打开升级页面，确认地区和账单币种显示为 Singapore/SGD；</li>
+<li>输入银联卡号、有效期和安全码，账单地址尽量填写与发卡行留存信息一致；</li>
+<li>完成银行短信或 App 验证；</li>
+<li>如果网页端被拒，不要反复提交。检查发卡行是否关闭了境外线上支付、订阅类商户或小额预授权。</li>
+</ol>
+<p>如果网页端始终不接受这张卡，可以考虑新加坡区 iPhone 的 ChatGPT App 内订阅。OpenAI 说明应用内订阅由 Apple App Store 或 Google Play 管理，价格、税费、退款和取消都应在对应商店处理。实际能否把你的银联卡加入 Apple Account 或 Apple Pay，仍然取决于发卡行和卡种。</p>
+<p>这条路线的注意点是：订阅由 Apple 管理，价格、税费、退款和取消订阅都要在 Apple Account 中处理；不要为了“能付款”去买来路不明的共享账号或代充。账号归属、付款凭证和后续退款，往往比省下几块钱更重要。</p>
+<h2 id="claude-code-">三、Claude Code 与中转站：能用，但要知道自己承担了什么</h2>
+<p>Claude Code 默认使用 Anthropic API。官方也提供了面向团队的 LLM gateway 配置方式，例如通过统一端点处理认证、预算、审计和路由；但 Anthropic 明确说明不会审核第三方网关的安全性或功能。<a href="https://docs.anthropic.com/en/docs/claude-code/llm-gateway">Claude Code LLM gateway 文档</a> 是比“找一个中转 Key”更合适的起点。无论使用哪种代理，代码、提示词、文件内容和工具调用都有可能经过该服务。</p>
+<p>我会把中转站分成三种情况来看：</p>
+<pre><code class="language-text">官方 API / 官方订阅
+        -&gt; 成本高一些，责任边界最清楚
+
+有明确公司主体和隐私条款的代理
+        -&gt; 方便，但需要审查日志、留存和退款规则
+
+个人转售 Key 或来源不明的中转
+        -&gt; 不建议用于工作项目，也不应用来绕过账户、地区或服务计划限制
+</code></pre>
+<p>如果确实需要使用中转站，至少做四件事：</p>
+<ul>
+<li>不要把生产密钥、客户数据和未脱敏日志直接交给它；</li>
+<li>给每个项目使用独立 Key，并设置余额、速率和来源 IP 限制；</li>
+<li>先用无敏感内容测试流式输出、工具调用、超时和上下文长度；</li>
+<li>保存自己的配置和消费记录，别把账号密码、订阅凭证交给所谓“代配置”。</li>
+</ul>
+<p>还有一个容易忽略的坑：中转站经常只兼容聊天接口，不一定完整兼容 Claude Code 所需的工具调用、长上下文、缓存和错误码。如果只是能收到一段文本，不代表 coding agent 真的可用。我的做法是先拿一个没有业务数据的小仓库跑完整流程，再决定是否长期使用。</p>
+<h2 id="cc-switch-skill-">四、CC Switch：把供应商切换和 Skill 管理放到同一个地方</h2>
+<p>当 OpenCode、Codex 和 Claude Code 同时存在时，最烦的事情不是安装它们，而是记住每个工具的配置位置。CC Switch 的思路就是把这些配置收进一个桌面应用里，统一管理供应商、切换配置，并提供 MCP 和 Skill 管理。</p>
+<p>它目前支持 Claude Code、Codex、Gemini CLI、OpenCode 等工具。Skill 也可以从 GitHub 仓库或压缩包安装，再分发到对应目录，例如 Claude Code 使用 <code>~/.claude/skills/</code>，Codex 使用 <code>~/.codex/skills/</code>，OpenCode 使用 <code>~/.opencode/skills/</code>。这对于需要在多个 agent 之间复用“代码审查”“文档生成”“发布检查”工作流的人很方便。</p>
+<p>我理解它最有用的地方不是“帮我点一下切换”，而是让配置变得可恢复：</p>
+<pre><code class="language-text">供应商配置
+   -&gt; 选择目标工具
+   -&gt; 切换当前模型和端点
+   -&gt; 复用同一批 Skill / MCP
+   -&gt; 出问题时恢复备份
+</code></pre>
+<p>不过，统一管理不等于自动解决兼容性。Claude Code 的 Skill 可能依赖 Anthropic 特有的工具名称，Codex 的 Skill 可能假设了不同的目录结构，OpenCode 也可能对配置字段有自己的要求。安装之后仍然要打开 Skill 看一遍，确认它是否会执行脚本、访问网络，是否包含不必要的权限。</p>
+<p>CC Switch 官方文档已经把 Skill 的安装目录、仓库管理和备份机制写得比较清楚，可以参考 <a href="https://cc-switch.cc/en/tutorials/skills-management">Skills Management</a>。项目本身也在 GitHub 上维护，仓库是 <a href="https://github.com/farion1231/cc-switch">farion1231/cc-switch</a>。</p>
+<p>第一次使用 CC Switch 时，我会按这个顺序操作：先选择目标工具，例如 OpenCode；再新增一个供应商配置，只填一个测试用 Key；切换到该配置后，在无敏感仓库里跑一条只读提示；确认工作正常，再安装一个只做“代码审查”或“发布检查”的 Skill。最后检查它生成的备份目录。这样即使某个端点、Skill 或模型不兼容，也能明确知道应该回退哪里。</p>
+<h2 id="heading-2">五、我现在的分工方式</h2>
+<p>目前我更倾向于使用一套“低成本模型负责探索，能力更强的模型负责收口”的组合：</p>
+<pre><code class="language-text">OpenCode + DeepSeek / MiMo
+    处理探索、样板代码、测试补全
+
+Claude Code + 官方或可信代理
+    处理需要长时间运行的任务
+
+Codex + GPT-5.6
+    做跨文件修改、验证和最后审查
+
+CC Switch
+    管理供应商、Skill、MCP 和备份
+</code></pre>
+<p>这样做的代价是工具变多了，配置和账号也更复杂。对刚开始的人，我反而建议只保留一个 Agent 和一个供应商，连续做完三到五个小任务后，再决定是否需要多模型、Oh My 插件或 CC Switch。</p>
+<p>Vibe Coding 说到底还是工程工作。模型可以替我写很多代码，但不能替我决定哪些数据能发给第三方，不能替我确认一次支付是否真的完成，也不能替我承担上线后的事故。把模型、账号、端点和 Skill 管理好，可能没有“让 AI 一句话写出完整应用”那么吸引人，却更接近我愿意长期使用的工作方式。</p>
+]]></description>
+      <category>人工智能</category>
+      <category>API</category>
+      <category>架构设计</category>
+      <enclosure url="https://windrunner0707.tech/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp" length="0" type="image/webp"></enclosure>
+    </item>
+    <item>
       <title>元数据驱动的多租户 ERP：SaaS 产品架构设计与难点</title>
       <link>https://windrunner0707.tech/post/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-chan-pin-jia-gou-she-ji-yu-nan-dian/</link>
       <guid isPermaLink="true">https://windrunner0707.tech/post/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-chan-pin-jia-gou-she-ji-yu-nan-dian/</guid>
@@ -1375,75 +1614,6 @@ executor.execute(() -&gt; {
 <!-- more -->]]></description>
       <category>API</category>
       <enclosure url="https://windrunner0707.tech/post-images/api-xue-xi-lu-xian-tu-quan-jie-xi-cong-ru-men-dao-jin-jie.jpg" length="0" type="image/jpeg"></enclosure>
-    </item>
-    <item>
-      <title>API-Led 架构解析：从理念到实践</title>
-      <link>https://windrunner0707.tech/post/api-led-jia-gou-jie-xi-cong-li-nian-dao-shi-jian/</link>
-      <guid isPermaLink="true">https://windrunner0707.tech/post/api-led-jia-gou-jie-xi-cong-li-nian-dao-shi-jian/</guid>
-      <pubDate>Tue, 30 Sep 2025 00:00:00 +0800</pubDate>
-      <description><![CDATA[<h2 id="heading">概述</h2>
-<p>当一个新渠道需要同时读取核心系统、CRM 和风控平台的数据时，点对点接口很快会变得难以维护。API-Led（API-Led Connectivity）把底层访问、业务编排和渠道适配拆开，让接口有复用空间，也方便统一管理。</p>
-<h2 id="-api-led-">什么是 API-Led 架构</h2>
-<p>API-Led 架构由 MuleSoft 提出。它不再不断增加点对点接口，而是按职责对 API 分层。</p>
-<p><img src="https://windrunner0707.tech/post-images/1759238612483.png" alt="" /></p>
-<p>典型的三层：</p>
-<ul>
-<li>System API：屏蔽底层系统的复杂性，负责访问数据库、ERP、CRM 等。</li>
-<li>Process API：聚合和编排多个系统 API，实现业务逻辑。</li>
-<li>Experience API：面向不同渠道（Web、App、合作伙伴），提供定制化的数据和服务。</li>
-</ul>
-<p>分层后，底层系统变化通常只影响 System API，多个渠道也可以复用同一套业务编排。不过，分层并非越多越好，每增加一层都会带来部署、监控和调用延迟成本。</p>
-<p><img src="https://windrunner0707.tech/post-images/1759238658029.png" alt="" /></p>
-<h2 id="api-led-">API-Led 架构与微服务架构的区别</h2>
-<p>API-Led 和微服务经常一起出现，但它们解决的不是同一个问题：</p>
-<h3 id="heading-1">关注层面不同</h3>
-<p>微服务架构：强调将单体应用拆分为小而独立的服务，每个服务独立开发、部署、扩展。</p>
-<p>API-Led 架构：强调系统之间如何互联互通，如何通过 API 实现复用与治理。</p>
-<h3 id="heading-2">目标不同</h3>
-<p>微服务：解决“系统内部分解”的问题。</p>
-<p>API-Led：解决“跨系统集成”的问题。</p>
-<h3 id="heading-3">实现方式不同</h3>
-<p>微服务内部可能直接暴露 API，但往往没有分层概念。</p>
-<p>API-Led 强调分层 API，避免直接对接，提升灵活性。</p>
-<p>可以理解为：微服务是系统构建方式，而 API-Led 是系统之间的连接方式。两者是互补关系，而不是替代关系。</p>
-<h2 id="api-led--1">API-Led 架构为什么在银行领域广泛使用</h2>
-<p>银行 IT 系统复杂，往往包含核心账务系统、支付清算系统、风控系统、CRM、渠道系统（柜面、网银、手机银行）等。这种环境下：</p>
-<ul>
-<li>系统异构严重：老的核心系统可能基于 COBOL，新应用可能基于 Java 或微服务。</li>
-<li>集成需求频繁：需要快速上线新产品（如理财、贷款、联合营销）。</li>
-<li>安全与合规要求高：需要统一的 API 管理与访问控制。</li>
-</ul>
-<p>在银行场景中，这种分层主要解决几件具体的事：</p>
-<ul>
-<li>屏蔽遗留系统复杂性（通过 System API 封装）。</li>
-<li>支持快速业务编排（通过 Process API 实现跨系统流程）。</li>
-<li>支撑多渠道一致体验（通过 Experience API 同时服务网银、手机 App、合作伙伴接口）。</li>
-<li>统一治理和合规（API 网关+API 管理平台）。</li>
-</ul>
-<p>因此，这种思路适合遗留系统多、渠道多且接口治理要求严格的银行场景。但是否采用三层模型，仍取决于现有系统和团队边界。</p>
-<h2 id="api-led--2">API-Led 架构的优缺点</h2>
-<h3 id="heading-4">优点：</h3>
-<ul>
-<li>解耦：通过分层 API，底层系统改造不必直接牵动上层应用。</li>
-<li>复用：System API 和 Process API 可以被多个 Experience API 使用。</li>
-<li>调整业务流程时，通常只需修改 Process API。</li>
-<li>治理完善：便于统一做 API 管理、监控、安全认证。</li>
-<li>支持开放生态：银行、保险等可快速对接合作伙伴 API。</li>
-</ul>
-<h3 id="heading-5">缺点：</h3>
-<ul>
-<li>设计复杂度提升：需要良好的 API 设计规范和治理体系。</li>
-<li>实现成本高：需要 API 管理平台（如 MuleSoft、Kong、Apigee）。</li>
-<li>性能挑战：层级过多可能带来调用链路长、延迟增加。</li>
-<li>组织协同要求高：API-Led 要求跨部门统一治理，否则容易变成“新的烟囱”。</li>
-</ul>
-<h2 id="heading-6">落地时怎么判断</h2>
-<p>如果多个渠道反复调用相同的底层系统，而且接口变更经常牵动多支团队，API-Led 值得考虑。先识别真正可复用的系统能力和业务流程，再决定如何分层；不要为了套用三层模型而制造只做透传的 API。</p>
-<p>API 网关只能处理入口处的认证、限流和路由，无法替代接口所有权、版本策略、监控和下线机制。API-Led 能否奏效，最终取决于这些治理工作，而不是是否购买了某个 API 管理平台。</p>
-<!-- more -->]]></description>
-      <category>API</category>
-      <category>架构设计</category>
-      <enclosure url="https://windrunner0707.tech/post-images/api-led-jia-gou-jie-xi-cong-li-nian-dao-shi-jian.webp" length="0" type="image/webp"></enclosure>
     </item>
   </channel>
 </rss>
