@@ -73,12 +73,12 @@
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>面试八股文-线上问题排查 | 0707&#39;s Blog</title>
   
-<meta name="description" content="线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： CPU负载高：请求响应时间增加，服务性能下降，甚至&amp;hellip;">
+<meta name="description" content="线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例，并补充 Arthas 与可观测性体系的实战用法。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： C&amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-线上问题排查","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/","description":"线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： CPU负载高：请求响应时间增加，服务性能下降，甚至\u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha.webp","datePublished":"2024-10-25T00:00:00+08:00","dateModified":"2026-07-05T15:29:41+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-线上问题排查","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/","description":"线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例，并补充 Arthas 与可观测性体系的实战用法。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： C\u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha.webp","datePublished":"2024-10-25T00:00:00+08:00","dateModified":"2026-09-06T00:00:00+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/","name":"面试八股文-线上问题排查","position":2}]}</script>
 <meta property="og:title" content="面试八股文-线上问题排查">
-<meta property="og:description" content="线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： CPU负载高：请求响应时间增加，服务性能下降，甚至&amp;hellip;">
+<meta property="og:description" content="线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例，并补充 Arthas 与可观测性体系的实战用法。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： C&amp;hellip;">
 <meta property="og:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
@@ -86,7 +86,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/">
 <meta name="twitter:title" content="面试八股文-线上问题排查">
-<meta name="twitter:description" content="线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： CPU负载高：请求响应时间增加，服务性能下降，甚至&amp;hellip;">
+<meta name="twitter:description" content="线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例，并补充 Arthas 与可观测性体系的实战用法。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： C&amp;hellip;">
 <meta name="twitter:image" content="/post-images/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha.webp">
 </head>
 <body class="flavor-theme">
@@ -230,7 +230,7 @@
       <span class="article-meta__item">2024-10-25</span>
       
       <span class="article-meta__sep">·</span>
-      <span class="article-meta__item">4 分钟阅读</span>
+      <span class="article-meta__item">9 分钟阅读</span>
       
     </div>
     
@@ -258,7 +258,7 @@
   </nav>
 
   <div class="article-content">
-    <p>线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例。</p>
+    <p>线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例，并补充 Arthas 与可观测性体系的实战用法。</p>
 <ol>
 <li>先确认现象和影响</li>
 </ol>
@@ -279,7 +279,7 @@
 <p>CPU 过高时，先用 <code>top</code> 或 <code>pidstat</code> 找到进程，再用 <code>top -H -p &lt;pid&gt;</code> 找到高 CPU 线程。将十进制线程 ID 转成十六进制后，在 <code>jstack</code> 输出中定位对应的 <code>nid</code>，连续采集几次堆栈，判断线程是否反复停在同一段代码。</p>
 </blockquote>
 <blockquote>
-<p>对于内存负载过高，我会检查 GC 日志（通过设置 -XX:+PrintGCDetails），以判断是否是由于频繁的垃圾回收导致内存回收不及时。同时可以使用 jmap 命令生成堆内存快照（Heap Dump），并结合 MAT（Memory Analyzer Tool） 来分析哪些对象占用了大量内存。</p>
+<p>对于内存负载过高，我会检查 GC 日志，以判断是否是由于频繁的垃圾回收导致内存回收不及时。JDK 9 及以上使用统一日志参数（如 <code>-Xlog:gc*</code>），JDK 8 才使用 <code>-XX:+PrintGCDetails</code> 等参数。同时可以使用 jmap 命令生成堆内存快照（Heap Dump），并结合 MAT（Memory Analyzer Tool） 来分析哪些对象占用了大量内存。</p>
 </blockquote>
 <blockquote>
 <p>对于死锁问题，最常见的是通过 jstack 查看线程堆栈，检查是否有线程处于等待锁的状态。如果是多线程引发的死锁问题，线程堆栈中会显示哪些线程正在等待获得其他线程持有的锁资源。</p>
@@ -297,6 +297,93 @@
 <blockquote>
 <p>死锁问题：通过 jstack 可以分析哪些线程进入了死锁状态。如果确认有死锁，通常会在堆栈中看到 Thread-1 等待 Thread-2 的锁，而 Thread-2 又在等待 Thread-1 的锁。此时可以使用线程转储信息（如 jstack 或 jconsole）找到具体的锁争用代码，并通过代码审查或调整锁的顺序来解决死锁问题。</p>
 </blockquote>
+<h3 id="arthas">Arthas：在线验证假设</h3>
+<p>Arthas 适合在不重启 Java 进程的前提下查看 JVM、线程、方法调用和对象情况。它的价值不在于把所有命令都跑一遍，而在于用低风险的观察手段验证一个明确假设：例如“慢请求是否集中在某个方法”“某个接口的参数是否异常”“CPU 高是否由 GC 或指定线程引起”。</p>
+<p>常用的起手式如下：</p>
+<pre><code class="language-bash"># 连接目标 Java 进程；生产环境应通过受控主机或容器入口执行
+java -jar arthas-boot.jar
+
+# 查看 JVM 概况、内存区域、GC 和线程情况
+dashboard
+jvm
+memory
+thread -n 5
+
+# 查看某个类加载自哪个 jar，避免同名类或多 ClassLoader 判断错误
+sc -d com.example.order.OrderService
+</code></pre>
+<blockquote>
+<p><code>dashboard</code> 用于快速建立“CPU、堆、GC、线程”全局视图；<code>thread -n 5</code> 可列出 CPU 占用最高的线程，并给出当前堆栈。若看到 GC 线程占比异常，要回到 GC 次数、暂停时间与分配速率判断，不能把业务线程当成唯一方向。</p>
+</blockquote>
+<p>当链路已经缩小到一个类或方法时，再使用方法级命令：</p>
+<pre><code class="language-bash"># 查看方法调用耗时、异常和返回值；先从有限次数开始
+watch com.example.order.OrderService createOrder '{params, returnObj, throwExp}' -x 2 -n 3
+
+# 每 5 秒输出一次调用统计，识别慢方法和异常比例
+monitor -c 5 com.example.order.OrderService createOrder
+
+# 仅追踪耗时超过 200ms 的调用路径，避免输出过多
+trace com.example.order.OrderService createOrder '#cost &gt; 200' -n 5
+
+# 查看活跃线程的调用栈采样，用于判断热点路径
+profiler start
+# 等待一段有代表性的业务流量后
+profiler stop --format html --file /tmp/order-cpu.html
+</code></pre>
+<p><code>watch</code> 会暴露参数、返回值或异常，<code>trace</code> 会打印调用树，二者都可能带来性能开销或泄露敏感业务数据。因此线上应遵守几个边界：先限定类、方法、条件与 <code>-n</code> 次数；不要把密码、令牌、身份证号等写进观察表达式；高流量路径优先用采样和短时间窗口；将导出的火焰图或堆转储按敏感数据处理。问题复现或证据收集完成后及时退出 Arthas 并清理临时文件。</p>
+<p>如果怀疑类加载、连接池或缓存对象异常，也可以先看对象数量再决定是否导出堆：</p>
+<pre><code class="language-bash"># 抽样查看某类实例及字段；结果只是当下快照
+vmtool --action getInstances --className com.example.cache.LocalCache --limit 10
+
+# 导出堆前确认磁盘空间、脱敏与上传路径；优先在从实例或隔离环境执行
+heapdump /tmp/service-heap.hprof
+</code></pre>
+<p>注意：<code>vmtool</code> 获取实例和 <code>heapdump</code> 都可能影响线上服务，并且 heap dump 常包含用户数据。它们应是有审批、可回滚、已确认磁盘容量后的动作；<code>vmtool</code> 的少量样本也不能代表全部对象分布。多数场景先用 GC 指标、类直方图和 Arthas 的轻量观察缩小范围。</p>
+<h3 id="heading">可观测性：让排障从“登录机器”变成“沿请求找证据”</h3>
+<p>可观测性不是把指标、日志和链路追踪分别装上就结束，而是让三类数据能用同一个请求、实例、版本和时间窗口关联。实践中可以以四个黄金信号组织看板和告警：</p>
+<table>
+<thead>
+<tr>
+<th>信号</th>
+<th>重点指标</th>
+<th>排障时要问的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>延迟（Latency）</td>
+<td>P50/P95/P99、下游调用耗时</td>
+<td>慢的是全部请求，还是某个接口、租户或依赖？</td>
+</tr>
+<tr>
+<td>流量（Traffic）</td>
+<td>QPS、消费速率、队列积压</td>
+<td>是突发流量、重试风暴，还是流量下降造成的假象？</td>
+</tr>
+<tr>
+<td>错误（Errors）</td>
+<td>5xx、业务失败码、超时、异常类型</td>
+<td>错误集中在哪个版本、可用区、下游或参数组合？</td>
+</tr>
+<tr>
+<td>饱和度（Saturation）</td>
+<td>CPU、堆、GC、线程池、连接池、磁盘与队列利用率</td>
+<td>哪个有限资源先被打满，排队发生在哪里？</td>
+</tr>
+</tbody>
+</table>
+<p>指标系统（如 Prometheus + Grafana）适合发现趋势、分实例比较和告警；日志系统（如 ELK/OpenSearch）适合检索错误上下文；链路追踪系统（如 SkyWalking、Jaeger、Tempo 或 OpenTelemetry 生态）适合把一次慢请求拆到服务、SQL、缓存和 RPC 调用。选型可以不同，但应统一服务名、环境、区域、实例、版本等标签，避免同一个服务在三套系统中名称不一致。</p>
+<p>日志至少应包含 <code>timestamp</code>、<code>level</code>、<code>service</code>、<code>env</code>、<code>instance</code>、<code>traceId</code>、<code>spanId</code>、<code>requestPath</code>、<code>costMs</code>、<code>errorCode</code> 等可检索字段。入口层生成或透传 <code>traceId</code>，并写入日志 MDC；异步线程、消息队列消费和 RPC 调用也要显式传递上下文。这样看到 P99 升高时，可以从异常或慢请求的 traceId 进入链路，再回到对应实例和时间范围检索日志，而不是在海量日志中猜关键词。</p>
+<h3 id="heading-1">一次慢请求的实战排查路径</h3>
+<p>假设告警显示“下单接口 P99 从 300ms 升到 4s，5xx 未明显上升”，可以按下面顺序处理：</p>
+<ol>
+<li><strong>定边界</strong>：确认开始时间、影响比例、接口、地域、版本与实例。对比正常实例和异常实例，避免把全站平均值当作结论。</li>
+<li><strong>看信号关联</strong>：在同一时间窗口查看 QPS、错误率、CPU、GC、线程池活跃数/队列长度、数据库连接池和下游延迟。若 QPS 平稳但某个下游 span 变慢，优先查依赖；若线程池队列增长，查阻塞位置和池配置。</li>
+<li><strong>沿 trace 下钻</strong>：挑选慢请求的 trace，定位耗时最长的 span；查看它关联的结构化日志和错误码。对数据库调用同时确认慢 SQL、锁等待与连接池等待，不能只看应用总耗时。</li>
+<li><strong>用 Arthas 验证</strong>：在一台异常实例短时间执行 <code>thread -n 5</code>、<code>trace</code> 或 <code>monitor</code>，验证热点是否与链路判断一致。观察次数要小，避免在所有实例上同时执行重命令。</li>
+<li><strong>止损与修复</strong>：根据证据选择扩容、摘除异常实例、限流/降级、回滚或切流。止损动作之后继续观察同一组 SLI，确认 P99、错误率和饱和度同时恢复；随后修复根因并补回归测试、告警和运行手册。</li>
+</ol>
+<p>这一流程的关键是“假设—证据—结论”：例如“数据库慢”不能只凭接口慢就下结论，至少应有 trace 中的 SQL span、数据库慢查询/锁等待或连接池等待等证据相互印证。</p>
 <ol start="4">
 <li>修复与验证</li>
 </ol>
@@ -334,6 +421,7 @@
 <p>内存管理：通过设置合理的 JVM 参数和使用工具如 JVisualVM、Prometheus 等对应用的内存使用情况进行监控，提前发现潜在问题。还可以引入内存池等机制来管理大对象。</p>
 <p>监控与报警：借助 APM 工具（如 Skywalking、Prometheus 等），实时监控 CPU 和内存的使用情况，设置预警阈值，确保在问题恶化之前就能处理。</p>
 </blockquote>
+<p>可观测性还应成为日常交付的一部分：为关键接口定义 SLI/SLO（例如可用性、P99 延迟与错误率），告警优先围绕用户影响和错误预算，而非只对 CPU 设单一阈值；每次发布给指标和日志带上版本标签，保留发布事件；为数据库、缓存、消息队列、线程池和连接池配置容量看板；演练一次从告警到 trace、日志、实例诊断再到回滚的流程。这样告警响起时，值班人员拿到的是可执行的排障入口，而不只是“机器负载高”。</p>
 <p>实际处理顺序可以固定为：先止损并保留现场，再确认现象，随后用多份证据定位。CPU 看进程、线程和连续堆栈；内存看 GC 趋势、对象分布和堆转储；死锁看线程等待关系。修复后用相同指标验证效果，并补上能更早发现同类问题的告警。</p>
 
   </div>
