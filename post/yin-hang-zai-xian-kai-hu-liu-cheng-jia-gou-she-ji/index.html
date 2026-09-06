@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<style>
+  .hero-section--text {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 260px;
+    background-color: var(--color-bg);
+  }
+  .hero-section--text .hero-content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  .hero-section--text .hero-title {
+    color: var(--color-text-primary);
+  }
+  .hero-section--text .hero-subtitle {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .hero-section--text {
+      min-height: 220px;
+    }
+    .hero-section--text .hero-content {
+      padding: 48px 16px;
+    }
+  }
+</style>
+
+
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+
+
+<style>:root { --heatmap-color: #39d353; }</style>
+
+
+
+
+<style>
+  :root { --color-accent-hover: #FFFF00; }
+  :root.theme-light {
+    --color-accent-hover: #765800;
+    --color-accent-hover: color-mix(in srgb, #FFFF00 45%, #000000);
+  }
+</style>
+
+
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('flavor-theme');
+      var theme = saved || 'light';
+      if (theme === 'light') {
+        document.documentElement.classList.add('theme-light');
+      }
+    } catch (e) { }
+  })();
+</script>
+
+  <meta name="generator" content="Gridea Pro 1.2.2">
+  <title>银行在线开户流程架构设计：API-Led、状态机与异步风控 | 0707&#39;s Blog</title>
+  
+<meta name="description" content="在线开户不是一条同步接口：用户可以在 Web 或 Mobile 上分多次填资料，身份核验和风控又依赖外部系统，最终的账户开立还必须防止重复。若把这些动作塞进一次 HTTP 请求，超时、重复提交和外部依赖抖动很快会让流程失控。 本文设计一套以 Java 和 MongoDB 为主的参考实现。这里的 EAPI 指 Experience API：它面向 Web 和 Mobile 提供渠道友好的接口；开户本身作为一个独立的 application 被持久化，并由状态机持续推进。文中名称和规则均为泛化示例，不代表任何银行的真实开户政策。">
+<link rel="canonical" href="https://windrunner0707.tech/post/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"银行在线开户流程架构设计：API-Led、状态机与异步风控","url":"https://windrunner0707.tech/post/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji/","description":"在线开户不是一条同步接口：用户可以在 Web 或 Mobile 上分多次填资料，身份核验和风控又依赖外部系统，最终的账户开立还必须防止重复。若把这些动作塞进一次 HTTP 请求，超时、重复提交和外部依赖抖动很快会让流程失控。 本文设计一套以 Java 和 MongoDB 为主的参考实现。这里的 EAPI 指 Experience API：它面向 Web 和 Mobile 提供渠道友好的接口；开户本身作为一个独立的 application 被持久化，并由状态机持续推进。文中名称和规则均为泛化示例，不代表任何银行的真实开户政策。","image":"/post-images/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji.webp","datePublished":"2026-09-06T00:00:00+08:00","dateModified":"2026-09-06T22:10:02+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji/","name":"银行在线开户流程架构设计：API-Led、状态机与异步风控","position":2}]}</script>
+<meta property="og:title" content="银行在线开户流程架构设计：API-Led、状态机与异步风控">
+<meta property="og:description" content="在线开户不是一条同步接口：用户可以在 Web 或 Mobile 上分多次填资料，身份核验和风控又依赖外部系统，最终的账户开立还必须防止重复。若把这些动作塞进一次 HTTP 请求，超时、重复提交和外部依赖抖动很快会让流程失控。 本文设计一套以 Java 和 MongoDB 为主的参考实现。这里的 EAPI 指 Experience API：它面向 Web 和 Mobile 提供渠道友好的接口；开户本身作为一个独立的 application 被持久化，并由状态机持续推进。文中名称和规则均为泛化示例，不代表任何银行的真实开户政策。">
+<meta property="og:url" content="https://windrunner0707.tech/post/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="0707's Blog">
+<meta property="og:image" content="/post-images/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://windrunner0707.tech/post/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji/">
+<meta name="twitter:title" content="银行在线开户流程架构设计：API-Led、状态机与异步风控">
+<meta name="twitter:description" content="在线开户不是一条同步接口：用户可以在 Web 或 Mobile 上分多次填资料，身份核验和风控又依赖外部系统，最终的账户开立还必须防止重复。若把这些动作塞进一次 HTTP 请求，超时、重复提交和外部依赖抖动很快会让流程失控。 本文设计一套以 Java 和 MongoDB 为主的参考实现。这里的 EAPI 指 Experience API：它面向 Web 和 Mobile 提供渠道友好的接口；开户本身作为一个独立的 application 被持久化，并由状态机持续推进。文中名称和规则均为泛化示例，不代表任何银行的真实开户政策。">
+<meta name="twitter:image" content="/post-images/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji.webp">
+</head>
+<body class="flavor-theme">
+
+  <header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <div class="top-bar">
+
+      
+      <div class="top-bar__left">
+        
+        <a href="https://windrunner0707.tech" class="site-avatar-link" aria-label="返回首页">
+          <img class="site-avatar" src="/images/avatar.png" alt="0707&#39;s Blog" />
+        </a>
+        
+        
+        <a href="https://windrunner0707.tech" class="site-name-link">0707&#39;s Blog</a>
+        
+      </div>
+
+      
+      <nav class="top-bar__nav" id="sectionBar">
+        
+        
+        <a class="nav-item" href="/">首页</a>
+        
+        <a class="nav-item" href="/category/tech/">技术</a>
+        
+        <a class="nav-item" href="/category/life/">生活</a>
+        
+        <a class="nav-item" href="/memos">闪念</a>
+        
+        <a class="nav-item" href="/archives">归档</a>
+        
+        <a class="nav-item" href="/tags">标签</a>
+        
+        <a class="nav-item" href="/links">友链</a>
+        
+        <a class="nav-item" href="/post/about">关于</a>
+        
+        
+      </nav>
+
+      
+      <div class="top-bar__right">
+        <button class="btn-icon btn-search search-btn" id="btnSearch" type="button" aria-label="搜索">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-sun" id="themeToggleSun" type="button"
+          aria-label="切换到浅色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"></path>
+            <path d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"></path>
+            <path d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"></path>
+            <path d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"></path>
+            <path d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"></path>
+            <path d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"></path>
+            <path d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"></path>
+            <path d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon theme-toggle theme-toggle-moon" id="themeToggleMoon" type="button"
+          aria-label="切换到深色模式">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"></path>
+            <path d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"></path>
+          </svg>
+        </button>
+        <button class="btn-icon btn-nav-toggle mobile-only" id="btnNavToggle" type="button" aria-label="切换导航">
+          <div class="hamburger" id="hamburger">
+            <span class="hamburger__line hamburger__line--top"></span>
+            <span class="hamburger__line hamburger__line--bottom"></span>
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+<div class="header-spacer"></div>
+
+<script>
+(function(){
+  var btn = document.getElementById('btnNavToggle');
+  var nav = document.getElementById('sectionBar');
+  var hamburger = document.getElementById('hamburger');
+  if (btn && nav) {
+    btn.addEventListener('click', function(){
+      nav.classList.toggle('top-bar__nav--open');
+      if (hamburger) hamburger.classList.toggle('is-active');
+    });
+    nav.querySelectorAll('.nav-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        nav.classList.remove('top-bar__nav--open');
+        if (hamburger) hamburger.classList.remove('is-active');
+      });
+    });
+  }
+
+  var root = document.documentElement;
+  var applyTheme = function(theme, persist){
+    if (theme === 'light') {
+      root.classList.add('theme-light');
+    } else {
+      root.classList.remove('theme-light');
+    }
+    if (persist) {
+      try { localStorage.setItem('flavor-theme', theme); } catch (e) {}
+    }
+  };
+  document.querySelectorAll('.theme-toggle').forEach(function(el){
+    el.addEventListener('click', function(){
+      applyTheme(root.classList.contains('theme-light') ? 'dark' : 'light', true);
+    });
+  });
+})();
+</script>
+
+
+  <main class="site-main" role="main">
+    
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="readingProgressBar"></span></div>
+<article class="article-container">
+  <header class="article-header">
+    <h1 class="article-title">银行在线开户流程架构设计：API-Led、状态机与异步风控</h1>
+    <div class="article-meta">
+      
+      
+      <a href="/category/tech/" class="article-meta__category">技术</a>
+      
+      
+      <span class="article-meta__sep">·</span>
+      
+      <span class="article-meta__item">2026-09-06</span>
+      
+      <span class="article-meta__sep">·</span>
+      <span class="article-meta__item">18 分钟阅读</span>
+      
+    </div>
+    
+    <div class="article-header__tags">
+      
+      <a href="/tag/api/" class="tag-pill tag-pill--sm">API</a>
+      
+      <a href="/tag/jia-gou-she-ji/" class="tag-pill tag-pill--sm">架构设计</a>
+      
+      <a href="/tag/java/" class="tag-pill tag-pill--sm">Java</a>
+      
+      <a href="/tag/shu-ju-ku/" class="tag-pill tag-pill--sm">数据库</a>
+      
+      <a href="/tag/fen-bu-shi-xi-tong/" class="tag-pill tag-pill--sm">分布式系统</a>
+      
+    </div>
+    
+  </header>
+
+  
+  <div class="article-feature">
+    <img src="/post-images/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji.webp" alt="银行在线开户流程架构设计：API-Led、状态机与异步风控" decoding="async" fetchpriority="high" />
+  </div>
+  
+
+  <nav class="article-toc" id="articleToc" aria-label="文章目录" hidden>
+    <details class="article-toc__details">
+      <summary class="article-toc__summary">文章目录</summary>
+      <ol class="article-toc__list" id="articleTocList"></ol>
+    </details>
+  </nav>
+
+  <div class="article-content">
+    <p>在线开户不是一条同步接口：用户可以在 Web 或 Mobile 上分多次填资料，身份核验和风控又依赖外部系统，最终的账户开立还必须防止重复。若把这些动作塞进一次 HTTP 请求，超时、重复提交和外部依赖抖动很快会让流程失控。</p>
+<p>本文设计一套以 Java 和 MongoDB 为主的参考实现。这里的 EAPI 指 Experience API：它面向 Web 和 Mobile 提供渠道友好的接口；开户本身作为一个独立的 <code>application</code> 被持久化，并由状态机持续推进。文中名称和规则均为泛化示例，不代表任何银行的真实开户政策。</p>
+<!-- more -->
+<h2 id="heading">一、目标与边界</h2>
+<p>这套流程需要同时满足四个目标：</p>
+<ul>
+<li>用户可保存草稿、断点续填，前端能随时查询当前进度和待补材料；</li>
+<li>提交资料后，身份、人脸、联系方式和反欺诈等检查可以异步执行、失败重试；</li>
+<li>任一检查的回调重复到达，或用户反复点击提交，都不能多开账户；</li>
+<li>每次状态变化都能追溯到触发来源、规则版本和关联请求，便于运营处理和审计。</li>
+</ul>
+<p>账户的最终账务归属仍应在银行核心系统。本文的开户服务只负责申请编排、风险决策以及向核心系统发起“创建客户/账户”的受控请求，不把 MongoDB 当作账务数据库。</p>
+<h2 id="-api-led">二、为什么开户场景适合 API-Led</h2>
+<p>银行线上开户通常同时连接渠道、客户主数据、身份认证、人脸与证件服务、反欺诈、征信、风控和核心账户系统。这些系统的协议、可用性和变更节奏各不相同；如果 Web/Mobile 直接拼接它们的接口，某一个供应商字段或核心系统报文的变化，就会牵动所有渠道。</p>
+<p>API-Led 的核心不是把每个接口机械地拆成三层，而是按变化原因划分职责：底层系统能力由 System API 封装，跨系统的开户流程由 Process API 编排，渠道展示与交互差异由 Experience API（EAPI）承担。这样既能复用同一套开户流程，也能把遗留核心系统和第三方供应商的复杂性留在边界内。</p>
+<p>在本例中，可以这样理解三层：</p>
+<ul>
+<li><strong>System API</strong>：提供“提交人脸核验”“查询征信”“创建核心账户”等稳定能力，并负责供应商协议、鉴权、超时和字段转换；</li>
+<li><strong>Process API</strong>：拥有 <code>application</code>、状态机、检查编排和决策矩阵，决定申请下一步该做什么；</li>
+<li><strong>EAPI</strong>：服务 Web/Mobile，例如把进度和待办项组织为适合页面显示的 DTO，而不暴露风控供应商的原始结果。</li>
+</ul>
+<h2 id="-api-led-">三、总体架构：按 API-Led 划清职责</h2>
+<pre><code class="language-text">Web / Mobile
+       |
+       v
+API Gateway（认证、限流、请求追踪）
+       |
+       v
+EAPI / Experience API
+  - 渠道 DTO、会话、页面进度、错误提示
+       |
+       v
+开户 Process API（Java）
+  - Application 聚合、状态机、编排、幂等控制
+       |----------------------|
+       v                      v
+System API               任务/事件基础设施
+  - Application MongoDB      - 延迟任务扫描器或任务队列
+  - KYC/人脸供应商           - Outbox 事件发布器
+  - 风控/反欺诈              - 回调消费与重试
+  - 核心客户/账户系统
+</code></pre>
+<p>EAPI 不直接读取 MongoDB，也不让 Web/Mobile 理解外部供应商的状态。它只把渠道请求转换为稳定的开户契约，例如“保存身份证资料”“提交申请”“获取待办项”。这样将来替换 App 页面、增加合作伙伴渠道，或迁移人脸供应商时，变化被限制在对应的一层。</p>
+<p>Process API 才是业务事实的拥有者。它判断资料是否齐全、当前状态能否迁移，并创建后续检查任务；System API 封装外部系统协议、鉴权和字段映射，避免核心系统的复杂性泄漏到开户流程中。</p>
+<h2 id="heading-1">四、银行线上开户的一般流程</h2>
+<p>不同地区、产品和监管要求会改变具体材料与检查项，但一条典型的线上开户旅程可以按下面的顺序组织。本文将候选客户标识命名为 <code>prospectId</code>：它用于将用户的登录会话、草稿和后续申请关联起来，并支持中断后继续。</p>
+<pre><code class="language-text">创建申请与网银登录凭据
+  -&gt; 设置 PIN 码
+  -&gt; 生成并绑定 prospectId（可恢复会话）
+  -&gt; 人脸活体与证件识别：第一轮 KYC/反欺诈检查
+  -&gt; 补充个人收入、职业、税务居民身份、住址等资料
+  -&gt; 提交申请，触发状态机
+  -&gt; 异步调用风控、征信及其他合规检查
+  -&gt; 决策矩阵：通过 / 补件 / 人工审核 / 拒绝
+  -&gt; 创建核心账户并激活网银账号
+</code></pre>
+<p>“新建网银账号”应理解为创建线上访问身份或预注册凭据，而不是立即建立可用的银行账户。PIN 只能交给专用身份认证系统或 HSM 处理、保存为不可逆的受保护凭据；开户申请与 MongoDB 中不保存 PIN 明文、可逆密文或日志副本。最终的账户开立成功后，再将网银身份绑定到客户和账户并激活使用权限。</p>
+<p><code>prospectId</code> 不应只放在浏览器内存中。服务端将它映射到 <code>applicationId</code>、用户身份和有效期；客户端可安全保存短期恢复令牌。用户重新登录或更换设备时，EAPI 根据身份与恢复令牌查询同一申请，返回当前状态和待办项。恢复令牌被撤销、过期或身份不匹配时，必须重新认证，而不是仅凭一个 URL 参数继续。</p>
+<h2 id="heading-2">五、把开户申请建模为聚合</h2>
+<p>每位用户发起开户时创建一条 <code>applications</code> 记录。不要因为资料还不完整就等到提交时才创建：草稿本身也是要恢复、限流和审计的业务对象。</p>
+<p>新客开户时，线上登录主体、候选客户与核心客户不是同一个概念：<code>ownerSubjectId</code> 是身份认证系统中的登录主体，<code>prospectId</code> 是开户过程中的候选客户标识，而 <code>coreCustomerId</code> 只在核心客户创建完成后才有值。显式区分它们，可以避免把“已注册网银”误当成“已在核心系统建客户”。</p>
+<pre><code class="language-json">{
+  &quot;_id&quot;: &quot;app_01J...&quot;,
+  &quot;ownerSubjectId&quot;: &quot;iam-subject_123&quot;,
+  &quot;prospectId&quot;: &quot;pro_01J...&quot;,
+  &quot;coreCustomerId&quot;: null,
+  &quot;channel&quot;: &quot;MOBILE&quot;,
+  &quot;status&quot;: &quot;DRAFT&quot;,
+  &quot;onlineBanking&quot;: { &quot;identityId&quot;: &quot;iam_789&quot;, &quot;activation&quot;: &quot;PENDING&quot; },
+  &quot;version&quot;: 7,
+  &quot;profile&quot;: {
+    &quot;name&quot;: &quot;张三&quot;,
+    &quot;identity&quot;: { &quot;numberCiphertext&quot;: &quot;...&quot;, &quot;verified&quot;: false },
+    &quot;email&quot;: &quot;masked-or-encrypted-value&quot;,
+    &quot;phone&quot;: &quot;masked-or-encrypted-value&quot;
+  },
+  &quot;evidence&quot;: {
+    &quot;faceSessionId&quot;: &quot;face_456&quot;,
+    &quot;faceResult&quot;: null
+  },
+  &quot;checks&quot;: {
+    &quot;identity&quot;: { &quot;status&quot;: &quot;PENDING&quot;, &quot;attempt&quot;: 0 },
+    &quot;contact&quot;: { &quot;status&quot;: &quot;PENDING&quot;, &quot;attempt&quot;: 0 },
+    &quot;face&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;attempt&quot;: 0 },
+    &quot;document&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;attempt&quot;: 0 },
+    &quot;risk&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;attempt&quot;: 0 },
+    &quot;credit&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;attempt&quot;: 0 }
+  },
+  &quot;account&quot;: { &quot;accountId&quot;: null, &quot;openRequestId&quot;: null },
+  &quot;workflow&quot;: {
+    &quot;provider&quot;: &quot;AWS_STEP_FUNCTIONS&quot;,
+    &quot;executionArn&quot;: &quot;arn:aws:states:...:execution:onboarding:app_01J...&quot;,
+    &quot;lastAppliedEventId&quot;: &quot;evt_01J...&quot;,
+    &quot;reconciliationStatus&quot;: &quot;IN_SYNC&quot;
+  },
+  &quot;submittedAt&quot;: null,
+  &quot;nextActionAt&quot;: null,
+  &quot;createdAt&quot;: &quot;2026-09-06T02:00:00Z&quot;,
+  &quot;updatedAt&quot;: &quot;2026-09-06T02:03:00Z&quot;
+}
+</code></pre>
+<p>敏感字段不应以明文出现在日志、事件或普通索引中。身份证件影像、人脸模板等高敏材料更适合存到受控的对象存储或专用 KYC 系统，MongoDB 只保存受控引用、摘要和核验结果。常用索引至少包括 <code>{ ownerSubjectId, status }</code>、<code>{ prospectId }</code>、<code>{ status, nextActionAt }</code>，以及核心开户请求的唯一索引；身份证号等受监管字段是否可检索，应通过令牌化或确定性加密结合合规要求设计。</p>
+<h2 id="heading-3">六、状态机：状态表达业务阶段，检查表达细节</h2>
+<p>申请的主状态不需要为每一个供应商调用都增加一个枚举。主状态描述用户和运营最关心的阶段；<code>checks</code> 记录各项检查的细粒度结果。</p>
+<pre><code class="language-text">DRAFT
+  -&gt; IDENTITY_CHECKING         人脸与证件的第一轮检查
+  -&gt; COLLECTING_FINANCIAL_INFO 收集收入、地址等资料
+  -&gt; READY_TO_SUBMIT           资料完整
+  -&gt; SUBMITTED                用户确认提交
+  -&gt; WAITING_CHECKS           等待身份/联系方式/人脸结果
+  -&gt; RISK_REVIEW               基础检查通过，执行风控
+  -&gt; OPENING_ACCOUNT           风控通过，调用核心系统
+  -&gt; ACCOUNT_OPENED            核心系统确认成功
+
+任意可处理状态 -&gt; NEEDS_INFORMATION  缺少资料或可补正失败
+任意检查阶段     -&gt; MANUAL_REVIEW      命中人工审核规则
+任意终态前阶段   -&gt; REJECTED           不可接受的核验/风控结论
+OPENING_ACCOUNT  -&gt; OPEN_FAILED        可恢复的技术失败，等待重试或人工处理
+</code></pre>
+<p>状态迁移要集中在一个组件内，而不是散落在 Controller、回调处理器和定时任务中。每次迁移同时写入 <code>application_events</code> 审计记录，内容至少包含 <code>eventId</code>、<code>fromStatus</code>、<code>toStatus</code>、原因码、操作者/系统名、关联请求 ID 与规则版本。为 <code>{ applicationId, eventId }</code> 建唯一索引；重复回调或工作流重放先按它去重，再决定是否更新状态。</p>
+<pre><code class="language-java">public void transition(Application app, ApplicationStatus target, TransitionContext ctx) {
+    if (!stateMachine.canMove(app.status(), target, ctx)) {
+        throw new IllegalStateException(&quot;invalid application transition&quot;);
+    }
+    applicationRepository.compareAndSetStatus(
+        app.id(), app.version(), app.status(), target, ctx.eventId(), ctx.now());
+    eventRepository.append(ApplicationEvent.transition(app, target, ctx));
+}
+</code></pre>
+<p>示例中的 <code>compareAndSetStatus</code> 以 <code>_id + version + 当前状态</code> 为条件更新，并原子记录 <code>lastAppliedEventId</code>。它避免两个并发回调都认为自己赢得了状态迁移；更新失败的一方重新读取申请，再根据当前状态和事件 ID 判断该回调是否已经被处理。</p>
+<h2 id="heading-4">七、从填写到开户的一条完整链路</h2>
+<h3 id="1-">1. 创建申请、网银身份与可恢复会话</h3>
+<p><code>POST /v1/onboarding/applications</code> 创建 <code>DRAFT</code>、候选客户 <code>prospectId</code> 和待激活的网银身份；设置 PIN 的请求直接交给身份认证 System API。各页面使用 <code>PATCH /v1/onboarding/applications/{id}</code> 写入资料或人脸会话引用。写操作携带 <code>Idempotency-Key</code>，服务端将“请求键—请求摘要—响应”保存一段时间，网络重试会返回原响应而不是制造多条申请。</p>
+<p>第一轮先执行证件 OCR、证件真实性与人脸活体/比对；通过后进入收入、职业、地址等资料采集。每次保存后由 Process API 计算资料完整度。完整时迁移至 <code>READY_TO_SUBMIT</code>，否则返回明确的 <code>missingItems</code>，例如 <code>PHONE_OTP</code>、<code>FACE_LIVENESS</code> 或 <code>RESIDENTIAL_ADDRESS</code>。前端只依据这份待办清单渲染，不自行复制资格规则。</p>
+<h3 id="2-">2. 用户提交：先固化，再异步启动</h3>
+<p><code>POST /v1/onboarding/applications/{id}/submit</code> 只接受 <code>READY_TO_SUBMIT</code> 状态。它在一个 MongoDB 事务中完成三件事：将状态改为 <code>SUBMITTED</code>、冻结本次核验所需的资料快照、写入待发布的 outbox 事件。事务提交后立刻返回 <code>202 Accepted</code> 与申请 ID，客户端再通过查询或推送获取进度。</p>
+<pre><code class="language-text">submit
+  -&gt; SUBMITTED + outbox: ApplicationSubmitted
+  -&gt; WAITING_CHECKS
+  -&gt; identity/contact/face 检查任务
+  -&gt; 所有基础检查通过
+  -&gt; RISK_REVIEW
+  -&gt; 风控通过
+  -&gt; OPENING_ACCOUNT
+  -&gt; 核心账户系统
+  -&gt; ACCOUNT_OPENED
+</code></pre>
+<p>Outbox 使“数据库已经显示已提交，但消息没有发出去”不再依赖侥幸。发布器持续读取未投递事件并发布到消息系统；消费者必须按 <code>eventId</code> 去重，即使消息系统提供至少一次投递也不会重复推进状态。</p>
+<h3 id="3-">3. 延迟等待与检查结果</h3>
+<p>资料提交后的等待时间不要用 JVM 内存里的 <code>ScheduledExecutorService</code> 作为唯一机制：应用重启、扩容或任务执行期间故障都会丢失计时。提交时写入 <code>nextActionAt = submittedAt + waitWindow</code>，由持久化任务系统在到期后投递 <code>StartRiskAssessment</code>；也可以用一个带 <code>{ status, nextActionAt }</code> 索引的扫描器领取到期任务。</p>
+<p>领取必须是原子的，例如以 <code>findOneAndUpdate</code> 将任务从 <code>READY</code> 改为 <code>RUNNING</code> 并设置租约。工作节点崩溃后，租约到期的任务回到可领取状态。等待窗口内，身份、人脸或联系方式回调可提前更新 <code>checks</code>；到期任务依据聚合结果决定继续风控、补件、人工审核或拒绝，而不是假设每项检查都一定完成。</p>
+<h3 id="4-">4. 风控与账户开立</h3>
+<p>风控调用使用申请 ID 作为业务关联号，并保存供应商版本、输入快照摘要、决策码和原始响应的受控引用。规则拒绝转 <code>REJECTED</code>；不确定或需要人工判断的结果转 <code>MANUAL_REVIEW</code>，不要为了自动化强行作出拒绝结论。</p>
+<p>进入 <code>OPENING_ACCOUNT</code> 时先生成不可变的 <code>openRequestId</code>。对核心账户 System API 的每次重试都带同一个请求号，核心侧也应以此实现幂等：同一请求要么返回原账户号，要么表明仍在处理中，绝不能创建第二个账户。只有收到核心侧的最终成功确认后，申请才迁移到 <code>ACCOUNT_OPENED</code>。</p>
+<h2 id="heading-5">八、决策矩阵：把检查结果变成可审计的决定</h2>
+<p>风控、征信和 KYC 的返回值往往不止“成功/失败”。不要把这些条件写成散乱的 <code>if/else</code>，而应由 Process API 将检查结果归一化，再交给版本化的 Decision Matrix（可实现为规则表、DMN 决策表或受控规则服务）给出动作。规则输入只包含必要的事实与原因码，不直接向前端暴露供应商原始响应。</p>
+<table>
+<thead>
+<tr>
+<th>条件示例</th>
+<th>决策</th>
+<th>状态机动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>证件、人脸、联系人、风控和征信均通过</td>
+<td>通过</td>
+<td><code>OPENING_ACCOUNT</code></td>
+</tr>
+<tr>
+<td>人脸清晰度不足、地址缺失等可补正问题</td>
+<td>补件</td>
+<td><code>NEEDS_INFORMATION</code></td>
+</tr>
+<tr>
+<td>风险分数处于灰度区间、征信结果需解释</td>
+<td>人工介入</td>
+<td><code>MANUAL_REVIEW</code></td>
+</tr>
+<tr>
+<td>证件失效、活体失败或明确命中拒绝规则</td>
+<td>拒绝</td>
+<td><code>REJECTED</code></td>
+</tr>
+<tr>
+<td>供应商超时或返回不确定</td>
+<td>延迟决定</td>
+<td>保持检查中并重试/查询</td>
+</tr>
+</tbody>
+</table>
+<p>每次执行都要保存 <code>decisionVersion</code>、使用到的输入摘要、命中的规则 ID、原因码与最终动作。这样规则调整后，才能解释某个历史申请为什么进入人工审核，也能用历史样本回放评估新规则，而不会重跑第三方核验。</p>
+<h2 id="aws-step-functions--lambda">九、托管状态机方案：AWS Step Functions 与 Lambda</h2>
+<p>如果系统部署在 AWS，状态机不必完全自行实现。可以使用 <strong>AWS Step Functions Standard</strong> 保存长流程的执行进度：<code>Task</code> 状态调用 Lambda 或 Java 服务适配器，<code>Choice</code> 根据归一化检查结果和决策矩阵分支，<code>Wait</code> 表达提交后的等待窗口，<code>Retry</code>/<code>Catch</code> 统一处理可重试与异常路径。对需要等待供应商异步回调的步骤，可使用任务令牌模式：启动检查后暂停执行，回调经受认证的入口恢复对应执行。</p>
+<pre><code class="language-text">Step Functions Standard
+  -&gt; Lambda：启动 KYC / 保存检查引用
+  -&gt; 回调任务令牌：等待人脸、证件结果
+  -&gt; Lambda 或 Java Process API：收集收入、地址资料状态
+  -&gt; Wait：提交后的等待窗口
+  -&gt; 并行 Task：风控、征信、反欺诈
+  -&gt; Lambda：执行 Decision Matrix
+  -&gt; Choice：开户 / 补件 / 人工审核 / 拒绝
+  -&gt; Task：调用核心账户 System API 并激活网银身份
+</code></pre>
+<p>托管编排并不替代业务数据模型：MongoDB 中的 <code>application</code> 仍是对外查询和审计的业务事实，每一个 Step Functions 状态变化也应通过 Process API 以乐观锁写入申请及事件记录。Lambda 与核心账户、征信等有副作用的接口仍必须携带 <code>applicationId</code>、<code>openRequestId</code> 和幂等键；工作流重试或人工重新驱动时，不能依赖“状态机只会运行一次”来避免重复开户。</p>
+<p>工作流的输入、输出和任务令牌载荷只应传递 <code>applicationId</code>、受控对象引用、状态及无敏感含义的原因码；身份证号、影像、人脸结果、详细住址和收入资料仍由 Process API 按需读取。Standard Workflow 的执行历史会保存状态输入和输出，CloudWatch 日志也可以记录执行数据，因此生产环境应按最小权限配置访问，采用客户管理 KMS 密钥，并将日志的 <code>includeExecutionData</code> 设为 <code>false</code> 或只记录已脱敏内容。官方文档对<a href="https://docs.aws.amazon.com/step-functions/latest/dg/cw-logs.html">执行历史和日志</a>、<a href="https://docs.aws.amazon.com/step-functions/latest/dg/encryption-at-rest.html">数据静态加密</a>和<a href="https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html">任务令牌回调</a>有具体说明。</p>
+<h3 id="heading-6">工作流与申请状态的恢复和对账</h3>
+<p>Step Functions 的执行状态与 MongoDB 的申请状态分别持久化，二者不能假设天然一致。启动工作流使用确定性的执行名称（例如 <code>applicationId</code>），并立即将返回的 <code>executionArn</code> 写入申请；写入失败时，对账任务可按该名称定位执行。每个任务完成时，由 Process API 以 <code>eventId + version</code> 原子写入申请和审计事件。对于“工作流已推进但数据库更新失败”或“数据库已更新但工作流超时”的情况，定期对账任务按 <code>executionArn</code> 查询执行结果、比对申请的 <code>lastAppliedEventId</code> 与状态，并以同一事件 ID 安全补偿或标记人工处理。人工重驱动也必须复用原有的 <code>openRequestId</code>，而非创建新的开户请求。</p>
+<p>当流程仅包含短任务、无需长期等待且团队已有消息平台时，Java 服务内的状态机与持久化任务也完全可行。选择 Step Functions 的主要理由是减少长等待、重试、可视化追踪和失败恢复的基础设施维护，而不是改变上述领域边界。</p>
+<h2 id="heading-7">十、失败、重试与人工介入</h2>
+<p>外部调用失败不等于业务失败。建议把结果分为三类：</p>
+<ul>
+<li><strong>业务终态</strong>：证件无效、活体失败、风险拒绝，记录原因码并转 <code>REJECTED</code> 或 <code>NEEDS_INFORMATION</code>；</li>
+<li><strong>可重试技术错误</strong>：超时、限流、5xx，按指数退避重试，并保留最大次数与下一次执行时间；</li>
+<li><strong>不确定结果</strong>：请求超时但供应商可能已受理，先用关联号查询结果；无法确认时转人工队列，不能直接重发一个会产生副作用的开户请求。</li>
+</ul>
+<p>运营后台应能查看状态历史、检查摘要、失败原因、下次重试时间和人工处理意见。人工批准/拒绝也必须走状态机并留下操作者与理由；直接修改 MongoDB 文档会破坏审计链。</p>
+<h2 id="heading-8">十一、接口、可观测性与安全要点</h2>
+<p>对外可以保持一组很小的接口：创建申请、保存资料、启动/提交人脸会话、提交申请、查询申请、查询待办项。所有响应带 <code>applicationId</code>、主状态、检查摘要和对前端安全的下一步动作；供应商错误、风控规则细节和账户系统报文不应直接下发。</p>
+<p>每次请求和异步任务都携带 <code>correlationId</code> 与 <code>applicationId</code>。监控中至少关注申请从提交到开户的耗时、各检查通过率、任务积压、回调重复率、状态迁移失败率、工作流与申请状态不一致数量，以及核心开户不确定结果数量。日志采用脱敏字段；访问申请详情需按最小权限控制，并对高敏读取单独审计。对于 Step Functions，执行历史、控制台查看权限、CloudWatch 日志和 KMS 解密权限也应作为同一套敏感数据访问边界治理。</p>
+<h2 id="heading-9">十二、落地时最容易踩的坑</h2>
+<ol>
+<li><strong>把状态机当作前端流程图。</strong> 前端可以显示步骤，但最终迁移只能由服务端依据持久化状态决定。</li>
+<li><strong>只靠消息顺序保证正确性。</strong> 回调和消息可能重复、乱序或延迟，消费者必须依据版本、状态和事件 ID 判断是否仍有效。</li>
+<li><strong>提交后同步等待所有检查。</strong> HTTP 超时会把正常的异步工作误判成失败，也会占满应用线程。</li>
+<li><strong>把“开户成功”写在调用核心系统之前。</strong> 必须以核心侧可查询的最终结果为准，并用请求号保障幂等。</li>
+<li><strong>让 MongoDB 承担账务。</strong> MongoDB 很适合申请聚合、进度和审计索引；余额、分录和账户权威状态仍应由核心账务域负责。</li>
+<li><strong>把 PII 放进工作流载荷。</strong> 工作流编排只传申请标识和受控引用；否则执行历史、日志和调试界面都会扩大敏感数据的暴露面。</li>
+</ol>
+<h2 id="heading-10">结语</h2>
+<p>这套设计的重点不是引入更多中间件，而是把三个事实保持一致：申请的持久化状态、异步任务的执行状态，以及核心系统的账户状态。API-Led 划分了集成边界，状态机约束了业务演进，持久化任务、Outbox 和幂等键则让流程能承受超时、重试和重复消息。</p>
+<p>当这些基础能力具备后，新增一项检查通常只是扩展 <code>checks</code>、任务和迁移规则，而不需要重写整个开户接口。这也是把开户建模为长期运行的业务流程，而不是“一次提交表单”的价值所在。</p>
+
+  </div>
+
+  
+  <nav class="post-nav">
+    
+    <div class="post-nav-card post-nav-card--empty">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">上一篇</span>
+        <span class="post-nav-card__empty-text">没有上一篇了~</span>
+      </div>
+    </div>
+    
+    
+    <a href="/post/vibe-coding-gong-ju-lian-tan-suo/" class="post-nav-card post-nav-card--next">
+      <div class="post-nav-card__body">
+        <span class="post-nav-card__label meta-text">下一篇</span>
+        <span class="post-nav-card__title">Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch</span>
+      </div>
+      
+      <div class="post-nav-card__img">
+        <img src="/post-images/vibe-coding-gong-ju-lian-tan-suo.jpg" alt="Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch" loading="lazy" />
+      </div>
+      
+      <span class="post-nav-card__arrow">&rarr;</span>
+    </a>
+    
+  </nav>
+
+  
+  
+
+
+</article>
+
+<div class="image-zoom-modal" id="imageZoomModal" role="dialog" aria-modal="true" aria-label="图片查看器" hidden>
+  <div class="image-zoom-toolbar">
+    <button type="button" data-zoom-action="out" aria-label="缩小图片">−</button>
+    <output id="imageZoomLevel" aria-live="polite">100%</output>
+    <button type="button" data-zoom-action="in" aria-label="放大图片">＋</button>
+    <button type="button" data-zoom-action="reset">重置</button>
+    <button type="button" data-zoom-action="close" aria-label="关闭图片查看器">关闭</button>
+  </div>
+  <div class="image-zoom-stage">
+    <img class="image-zoom-target" alt="" draggable="false" />
+  </div>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-inner">
+
+    
+    
+    <nav class="footer-nav" aria-label="页脚导航">
+      
+      <a class="footer-nav__link" href="/">首页</a>
+      
+      <a class="footer-nav__link" href="/category/tech/">技术</a>
+      
+      <a class="footer-nav__link" href="/category/life/">生活</a>
+      
+      <a class="footer-nav__link" href="/memos">闪念</a>
+      
+      <a class="footer-nav__link" href="/archives">归档</a>
+      
+      <a class="footer-nav__link" href="/tags">标签</a>
+      
+      <a class="footer-nav__link" href="/links">友链</a>
+      
+      <a class="footer-nav__link" href="/post/about">关于</a>
+      
+    </nav>
+    
+
+    
+    <div class="footer-social">
+      
+      <a class="footer-social__link" href="https://github.com/windrunner0707" target="_blank" rel="noopener noreferrer"
+        aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+        </svg>
+      </a>
+      
+      
+      
+      <a class="footer-social__link" href="/feed.xml" aria-label="RSS">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.18 15.64a2.18 2.18 0 110 4.36 2.18 2.18 0 010-4.36zM4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44zm0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+        </svg>
+      </a>
+    </div>
+
+    
+    <div class="footer-copyright">
+      <p>&copy; 2026 0707&#39;s Blog. All rights reserved.</p>
+    </div>
+
+    
+    
+    <div class="footer-custom">
+      Powered by Gridea Pro
+    </div>
+    
+
+    
+    <div class="footer-powered">
+      <span>Powered by <a href="https://gridea.pro" target="_blank" rel="noopener noreferrer">Gridea Pro</a></span>
+    </div>
+
+  </div>
+</footer>
+
+  
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle"
+  aria-hidden="true" style="display:none;">
+  <div class="search-modal">
+    <h2 class="sr-only" id="searchTitle">站内搜索</h2>
+    <div class="search-header">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="searchResults" />
+      <span class="search-kbd">&#8984;K</span>
+      <button class="search-close" id="searchClose" type="button" aria-label="关闭搜索">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="/scripts/search.js"></script>
+
+  
+
+  
+<script src="/scripts/image-zoom.js"></script>
+<script src="/scripts/article-enhancements.js"></script>
+
+
+  
+
+  
+
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: flavor-theme v1.0.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+</html>
