@@ -96,13 +96,13 @@
       <guid isPermaLink="true">https://windrunner0707.tech/post/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji/</guid>
       <pubDate>Sun, 06 Sep 2026 00:00:00 +0800</pubDate>
       <description><![CDATA[<p>在线开户不是一条同步接口：用户可以在 Web 或 Mobile 上分多次填资料，身份核验和风控又依赖外部系统，最终的账户开立还必须防止重复。若把这些动作塞进一次 HTTP 请求，超时、重复提交和外部依赖抖动很快会让流程失控。</p>
-<p>本文设计一套以 Java 和 MongoDB 为主的参考实现。这里的 EAPI 指 Experience API：它面向 Web 和 Mobile 提供渠道友好的接口；开户本身作为一个独立的 <code>application</code> 被持久化，并由状态机持续推进。文中名称和规则均为泛化示例，不代表任何银行的真实开户政策。</p>
+<p>本文设计一套以 Java、MongoDB 和 AWS Step Functions Standard 为主的参考实现。EAPI（Experience API）面向 Web 和 Mobile 提供接口；开户服务在用户提交前管理资料采集和首轮核验，提交后启动云工作流，完成后续检查、决策、核心开户和网银激活。每次申请以 <code>application</code> 持久化。文中规则用于说明设计，具体检查项由产品和适用政策决定。</p>
 <!-- more -->
 <h2 id="heading">一、目标与边界</h2>
 <p>这套流程需要同时满足四个目标：</p>
 <ul>
 <li>用户可保存草稿、断点续填，前端能随时查询当前进度和待补材料；</li>
-<li>提交资料后，身份、人脸、联系方式和反欺诈等检查可以异步执行、失败重试；</li>
+<li>提交资料后，风控、反欺诈及产品要求的征信检查可以异步执行、失败重试；</li>
 <li>任一检查的回调重复到达，或用户反复点击提交，都不能多开账户；</li>
 <li>每次状态变化都能追溯到触发来源、规则版本和关联请求，便于运营处理和审计。</li>
 </ul>
@@ -128,30 +128,33 @@ EAPI / Experience API
        |
        v
 开户 Process API（Java）
-  - Application 聚合、状态机、编排、幂等控制
-       |----------------------|
-       v                      v
-System API               任务/事件基础设施
-  - Application MongoDB      - 延迟任务扫描器或任务队列
-  - KYC/人脸供应商           - Outbox 事件发布器
-  - 风控/反欺诈              - 回调消费与重试
-  - 核心客户/账户系统
+  - Application 聚合、业务迁移规则、决策矩阵
+       |-- MongoDB：申请、快照、事件、Outbox
+       |-- System API：身份认证、KYC、风控/征信、核心银行
+       |
+       +-- Outbox 发布器 -&gt; Step Functions Standard
+                              |
+                              v
+                         Lambda 任务适配器
+                              |
+                              +-&gt; 调用 Process API 执行业务命令
 </code></pre>
 <p>EAPI 不直接读取 MongoDB，也不让 Web/Mobile 理解外部供应商的状态。它只把渠道请求转换为稳定的开户契约，例如“保存身份证资料”“提交申请”“获取待办项”。这样将来替换 App 页面、增加合作伙伴渠道，或迁移人脸供应商时，变化被限制在对应的一层。</p>
 <p>Process API 才是业务事实的拥有者。它判断资料是否齐全、当前状态能否迁移，并创建后续检查任务；System API 封装外部系统协议、鉴权和字段映射，避免核心系统的复杂性泄漏到开户流程中。</p>
+<p>申请数据库归开户服务所有，Repository 与 MongoDB 事务位于该服务内部。System API 封装外部系统能力，不额外包装一层通用数据库 CRUD 服务。Step Functions 负责调度、等待和重试；Java 领域逻辑负责校验业务迁移、保存结果和作出决策。Lambda 只承担调用适配，避免再维护一套决策规则。</p>
 <h2 id="heading-1">四、银行线上开户的一般流程</h2>
 <p>不同地区、产品和监管要求会改变具体材料与检查项，但一条典型的线上开户旅程可以按下面的顺序组织。本文将候选客户标识命名为 <code>prospectId</code>：它用于将用户的登录会话、草稿和后续申请关联起来，并支持中断后继续。</p>
-<pre><code class="language-text">创建申请与网银登录凭据
+<pre><code class="language-text">创建申请、prospectId 与网银登录凭据
   -&gt; 设置 PIN 码
-  -&gt; 生成并绑定 prospectId（可恢复会话）
+  -&gt; 绑定可恢复的登录会话
   -&gt; 人脸活体与证件识别：第一轮 KYC/反欺诈检查
   -&gt; 补充个人收入、职业、税务居民身份、住址等资料
-  -&gt; 提交申请，触发状态机
+  -&gt; 提交申请，启动本轮 Step Functions 工作流
   -&gt; 异步调用风控、征信及其他合规检查
   -&gt; 决策矩阵：通过 / 补件 / 人工审核 / 拒绝
   -&gt; 创建核心账户并激活网银账号
 </code></pre>
-<p>“新建网银账号”应理解为创建线上访问身份或预注册凭据，而不是立即建立可用的银行账户。PIN 只能交给专用身份认证系统或 HSM 处理、保存为不可逆的受保护凭据；开户申请与 MongoDB 中不保存 PIN 明文、可逆密文或日志副本。最终的账户开立成功后，再将网银身份绑定到客户和账户并激活使用权限。</p>
+<p>流程开始时创建的是线上访问身份或预注册凭据。这里的 PIN 指网银登录凭据，由身份认证系统负责验证和保护，开户数据库及日志不保存其内容；银行卡交易 PIN 属于另一套凭据体系。最终的账户开立成功后，再将网银身份绑定到客户和账户并激活使用权限。</p>
 <p><code>prospectId</code> 不应只放在浏览器内存中。服务端将它映射到 <code>applicationId</code>、用户身份和有效期；客户端可安全保存短期恢复令牌。用户重新登录或更换设备时，EAPI 根据身份与恢复令牌查询同一申请，返回当前状态和待办项。恢复令牌被撤销、过期或身份不匹配时，必须重新认证，而不是仅凭一个 URL 参数继续。</p>
 <h2 id="heading-2">五、把开户申请建模为聚合</h2>
 <p>每位用户发起开户时创建一条 <code>applications</code> 记录。不要因为资料还不完整就等到提交时才创建：草稿本身也是要恢复、限流和审计的业务对象。</p>
@@ -162,41 +165,45 @@ System API               任务/事件基础设施
   &quot;prospectId&quot;: &quot;pro_01J...&quot;,
   &quot;coreCustomerId&quot;: null,
   &quot;channel&quot;: &quot;MOBILE&quot;,
-  &quot;status&quot;: &quot;DRAFT&quot;,
+  &quot;status&quot;: &quot;SUBMITTED&quot;,
   &quot;onlineBanking&quot;: { &quot;identityId&quot;: &quot;iam_789&quot;, &quot;activation&quot;: &quot;PENDING&quot; },
   &quot;version&quot;: 7,
+  &quot;submissionVersion&quot;: 1,
+  &quot;assessmentRunId&quot;: &quot;run_001&quot;,
+  &quot;snapshotRef&quot;: &quot;snapshot_001&quot;,
   &quot;profile&quot;: {
     &quot;name&quot;: &quot;张三&quot;,
-    &quot;identity&quot;: { &quot;numberCiphertext&quot;: &quot;...&quot;, &quot;verified&quot;: false },
+    &quot;identity&quot;: { &quot;numberCiphertext&quot;: &quot;...&quot; },
     &quot;email&quot;: &quot;masked-or-encrypted-value&quot;,
-    &quot;phone&quot;: &quot;masked-or-encrypted-value&quot;
+    &quot;phone&quot;: &quot;encrypted-value&quot;,
+    &quot;incomeRef&quot;: &quot;income_001&quot;,
+    &quot;addressRef&quot;: &quot;address_001&quot;
   },
   &quot;evidence&quot;: {
     &quot;faceSessionId&quot;: &quot;face_456&quot;,
-    &quot;faceResult&quot;: null
+    &quot;faceResultRef&quot;: &quot;face-result_456&quot;
   },
   &quot;checks&quot;: {
-    &quot;identity&quot;: { &quot;status&quot;: &quot;PENDING&quot;, &quot;attempt&quot;: 0 },
-    &quot;contact&quot;: { &quot;status&quot;: &quot;PENDING&quot;, &quot;attempt&quot;: 0 },
-    &quot;face&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;attempt&quot;: 0 },
-    &quot;document&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;attempt&quot;: 0 },
-    &quot;risk&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;attempt&quot;: 0 },
-    &quot;credit&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;attempt&quot;: 0 }
+    &quot;contact&quot;: { &quot;status&quot;: &quot;PASS&quot;, &quot;resultRef&quot;: &quot;contact_001&quot; },
+    &quot;face&quot;: { &quot;status&quot;: &quot;PASS&quot;, &quot;resultRef&quot;: &quot;face-result_456&quot; },
+    &quot;document&quot;: { &quot;status&quot;: &quot;PASS&quot;, &quot;resultRef&quot;: &quot;document_001&quot; },
+    &quot;risk&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;runId&quot;: &quot;run_001&quot;, &quot;attempt&quot;: 0 },
+    &quot;credit&quot;: { &quot;status&quot;: &quot;NOT_STARTED&quot;, &quot;runId&quot;: &quot;run_001&quot;, &quot;attempt&quot;: 0 }
   },
   &quot;account&quot;: { &quot;accountId&quot;: null, &quot;openRequestId&quot;: null },
   &quot;workflow&quot;: {
     &quot;provider&quot;: &quot;AWS_STEP_FUNCTIONS&quot;,
-    &quot;executionArn&quot;: &quot;arn:aws:states:...:execution:onboarding:app_01J...&quot;,
-    &quot;lastAppliedEventId&quot;: &quot;evt_01J...&quot;,
-    &quot;reconciliationStatus&quot;: &quot;IN_SYNC&quot;
+    &quot;executionName&quot;: &quot;app_01J-run_001&quot;,
+    &quot;executionArn&quot;: null,
+    &quot;reconciliationStatus&quot;: &quot;START_PENDING&quot;
   },
-  &quot;submittedAt&quot;: null,
-  &quot;nextActionAt&quot;: null,
+  &quot;submittedAt&quot;: &quot;2026-09-06T02:03:00Z&quot;,
   &quot;createdAt&quot;: &quot;2026-09-06T02:00:00Z&quot;,
   &quot;updatedAt&quot;: &quot;2026-09-06T02:03:00Z&quot;
 }
 </code></pre>
-<p>敏感字段不应以明文出现在日志、事件或普通索引中。身份证件影像、人脸模板等高敏材料更适合存到受控的对象存储或专用 KYC 系统，MongoDB 只保存受控引用、摘要和核验结果。常用索引至少包括 <code>{ ownerSubjectId, status }</code>、<code>{ prospectId }</code>、<code>{ status, nextActionAt }</code>，以及核心开户请求的唯一索引；身份证号等受监管字段是否可检索，应通过令牌化或确定性加密结合合规要求设计。</p>
+<p>示例表示刚提交、等待工作流启动的申请。<code>version</code> 用于并发更新；<code>submissionVersion</code> 标识不可变的资料快照；<code>assessmentRunId</code> 标识一次评估执行。同一份资料因检查过期可以启动新一轮评估，技术重试则继续使用原轮次。每个完整检查记录还应保存输入摘要、结果时间和有效期。</p>
+<p>身份证影像和人脸材料保存在受控系统中，申请只持有引用。常用查询索引包括 <code>{ ownerSubjectId, status }</code> 和 <code>{ prospectId }</code>；<code>openRequestId</code> 使用只覆盖有效字符串值的部分唯一索引，避免多条尚未开户的申请因 <code>null</code> 值冲突。</p>
 <h2 id="heading-3">六、状态机：状态表达业务阶段，检查表达细节</h2>
 <p>申请的主状态不需要为每一个供应商调用都增加一个枚举。主状态描述用户和运营最关心的阶段；<code>checks</code> 记录各项检查的细粒度结果。</p>
 <pre><code class="language-text">DRAFT
@@ -204,119 +211,152 @@ System API               任务/事件基础设施
   -&gt; COLLECTING_FINANCIAL_INFO 收集收入、地址等资料
   -&gt; READY_TO_SUBMIT           资料完整
   -&gt; SUBMITTED                用户确认提交
-  -&gt; WAITING_CHECKS           等待身份/联系方式/人脸结果
-  -&gt; RISK_REVIEW               基础检查通过，执行风控
-  -&gt; OPENING_ACCOUNT           风控通过，调用核心系统
-  -&gt; ACCOUNT_OPENED            核心系统确认成功
+  -&gt; WAITING_CHECKS            并行执行后续检查并等待结果
+  -&gt; DECIDING                  校验结果并执行决策矩阵
+  -&gt; OPENING_ACCOUNT           决策通过，调用核心系统
+  -&gt; ACCOUNT_OPENED            已确认核心账户号
+  -&gt; ACTIVATING_ONLINE_BANKING 绑定并激活网银身份
+  -&gt; COMPLETED                 线上开户流程完成
 
-任意可处理状态 -&gt; NEEDS_INFORMATION  缺少资料或可补正失败
-任意检查阶段     -&gt; MANUAL_REVIEW      命中人工审核规则
-任意终态前阶段   -&gt; REJECTED           不可接受的核验/风控结论
-OPENING_ACCOUNT  -&gt; OPEN_FAILED        可恢复的技术失败，等待重试或人工处理
+DECIDING -&gt; NEEDS_INFORMATION / MANUAL_REVIEW / REJECTED
+NEEDS_INFORMATION -&gt; 相关资料采集或核验步骤 -&gt; READY_TO_SUBMIT
+MANUAL_REVIEW -&gt; DECIDING / NEEDS_INFORMATION / REJECTED
 </code></pre>
+<p>提交前的状态由开户服务随用户操作推进，提交后的异步步骤由 Step Functions 调度。首轮核验失败也按规则进入补件或拒绝。技术故障保留当前业务阶段，在任务记录中写入错误与重试状态；核心调用结果不确定时尤其不能直接转为“拒绝”或重新创建账户。</p>
+<p>补件会产生新的资料快照和评估轮次。系统根据字段依赖使相关检查失效：修改证件需重做关联身份核验，修改收入需重跑依赖收入的检查；未受影响且仍在有效期内的结果可以复用，但要记录复用来源。回调必须匹配检查请求号和当前轮次，旧轮次结果仅保留审计，不能更新当前决策。</p>
+<p>人工审核意见绑定资料版本，批准后回到 <code>DECIDING</code>，重新确认必要检查完整且未过期，再允许开户。审核超时进入运营待办；补件后原工作流结束，新提交启动新轮次，避免两轮同时有权推进申请。</p>
 <p>状态迁移要集中在一个组件内，而不是散落在 Controller、回调处理器和定时任务中。每次迁移同时写入 <code>application_events</code> 审计记录，内容至少包含 <code>eventId</code>、<code>fromStatus</code>、<code>toStatus</code>、原因码、操作者/系统名、关联请求 ID 与规则版本。为 <code>{ applicationId, eventId }</code> 建唯一索引；重复回调或工作流重放先按它去重，再决定是否更新状态。</p>
-<pre><code class="language-java">public void transition(Application app, ApplicationStatus target, TransitionContext ctx) {
-    if (!stateMachine.canMove(app.status(), target, ctx)) {
-        throw new IllegalStateException(&quot;invalid application transition&quot;);
-    }
-    applicationRepository.compareAndSetStatus(
-        app.id(), app.version(), app.status(), target, ctx.eventId(), ctx.now());
-    eventRepository.append(ApplicationEvent.transition(app, target, ctx));
+<pre><code class="language-java">// 伪代码：所有 Repository 使用同一 MongoDB 事务会话。
+public TransitionResult transition(TransitionCommand cmd) {
+    return mongoTransaction.execute(() -&gt; {
+        var prior = eventRepository.find(cmd.applicationId(), cmd.eventId());
+        if (prior != null) {
+            prior.requireSameCommand(cmd); // 同一个事件 ID 不接受不同内容
+            return prior.result();
+        }
+        var app = applicationRepository.get(cmd.applicationId());
+        app.requireCurrentRun(cmd.runId());
+        stateMachine.requireAllowed(app, cmd.target());
+        boolean changed = applicationRepository.compareAndSet(
+            app.id(), app.version(), app.status(), cmd.target());
+        if (!changed) throw new ConcurrentTransitionException();
+        var result = TransitionResult.of(cmd.target(), app.version() + 1);
+        eventRepository.insert(cmd, result);
+        if (cmd.requiresFollowUp()) outboxRepository.insert(cmd.followUpEvent());
+        return result;
+    });
 }
 </code></pre>
-<p>示例中的 <code>compareAndSetStatus</code> 以 <code>_id + version + 当前状态</code> 为条件更新，并原子记录 <code>lastAppliedEventId</code>。它避免两个并发回调都认为自己赢得了状态迁移；更新失败的一方重新读取申请，再根据当前状态和事件 ID 判断该回调是否已经被处理。</p>
+<p>条件更新以 <code>_id + version + 当前状态</code> 为条件，并递增版本。去重、状态更新、审计和必要的 Outbox 写入一起提交；任意一步失败都回滚。事件唯一键冲突或可重试的事务冲突发生时，调用方在事务外有界重试整段操作，并重新查询已提交事件。去重依靠事件记录，不能只检查“最后一个事件 ID”。这里要求配置 MongoDB 事务管理及共享会话，并部署在支持多文档事务的副本集或分片集群上。参见 <a href="https://www.mongodb.com/docs/manual/core/transactions/">MongoDB 事务文档</a>。</p>
 <h2 id="heading-4">七、从填写到开户的一条完整链路</h2>
 <h3 id="1-">1. 创建申请、网银身份与可恢复会话</h3>
 <p><code>POST /v1/onboarding/applications</code> 创建 <code>DRAFT</code>、候选客户 <code>prospectId</code> 和待激活的网银身份；设置 PIN 的请求直接交给身份认证 System API。各页面使用 <code>PATCH /v1/onboarding/applications/{id}</code> 写入资料或人脸会话引用。写操作携带 <code>Idempotency-Key</code>，服务端将“请求键—请求摘要—响应”保存一段时间，网络重试会返回原响应而不是制造多条申请。</p>
 <p>第一轮先执行证件 OCR、证件真实性与人脸活体/比对；通过后进入收入、职业、地址等资料采集。每次保存后由 Process API 计算资料完整度。完整时迁移至 <code>READY_TO_SUBMIT</code>，否则返回明确的 <code>missingItems</code>，例如 <code>PHONE_OTP</code>、<code>FACE_LIVENESS</code> 或 <code>RESIDENTIAL_ADDRESS</code>。前端只依据这份待办清单渲染，不自行复制资格规则。</p>
 <h3 id="2-">2. 用户提交：先固化，再异步启动</h3>
-<p><code>POST /v1/onboarding/applications/{id}/submit</code> 只接受 <code>READY_TO_SUBMIT</code> 状态。它在一个 MongoDB 事务中完成三件事：将状态改为 <code>SUBMITTED</code>、冻结本次核验所需的资料快照、写入待发布的 outbox 事件。事务提交后立刻返回 <code>202 Accepted</code> 与申请 ID，客户端再通过查询或推送获取进度。</p>
+<p><code>POST /v1/onboarding/applications/{id}/submit</code> 先检查幂等请求记录，新请求只接受 <code>READY_TO_SUBMIT</code> 状态。在同一 MongoDB 事务中冻结资料快照、生成评估轮次、将状态改为 <code>SUBMITTED</code>，并写入审计事件、幂等响应及 <code>ApplicationSubmitted</code> Outbox 事件。重复请求返回原结果；同一幂等键携带不同内容则拒绝。事务提交后返回 <code>202 Accepted</code>，客户端查询进度。</p>
 <pre><code class="language-text">submit
   -&gt; SUBMITTED + outbox: ApplicationSubmitted
-  -&gt; WAITING_CHECKS
-  -&gt; identity/contact/face 检查任务
-  -&gt; 所有基础检查通过
-  -&gt; RISK_REVIEW
-  -&gt; 风控通过
+  -&gt; 启动本轮 Step Functions，验证首轮核验仍然有效
+  -&gt; WAITING_CHECKS：并行风控、反欺诈和适用的征信检查
+  -&gt; DECIDING：汇总结果，执行决策矩阵
+  -&gt; 决策通过
   -&gt; OPENING_ACCOUNT
   -&gt; 核心账户系统
   -&gt; ACCOUNT_OPENED
+  -&gt; ACTIVATING_ONLINE_BANKING
+  -&gt; COMPLETED
 </code></pre>
-<p>Outbox 使“数据库已经显示已提交，但消息没有发出去”不再依赖侥幸。发布器持续读取未投递事件并发布到消息系统；消费者必须按 <code>eventId</code> 去重，即使消息系统提供至少一次投递也不会重复推进状态。</p>
-<h3 id="3-">3. 延迟等待与检查结果</h3>
-<p>资料提交后的等待时间不要用 JVM 内存里的 <code>ScheduledExecutorService</code> 作为唯一机制：应用重启、扩容或任务执行期间故障都会丢失计时。提交时写入 <code>nextActionAt = submittedAt + waitWindow</code>，由持久化任务系统在到期后投递 <code>StartRiskAssessment</code>；也可以用一个带 <code>{ status, nextActionAt }</code> 索引的扫描器领取到期任务。</p>
-<p>领取必须是原子的，例如以 <code>findOneAndUpdate</code> 将任务从 <code>READY</code> 改为 <code>RUNNING</code> 并设置租约。工作节点崩溃后，租约到期的任务回到可领取状态。等待窗口内，身份、人脸或联系方式回调可提前更新 <code>checks</code>；到期任务依据聚合结果决定继续风控、补件、人工审核或拒绝，而不是假设每项检查都一定完成。</p>
+<p>Outbox 发布器读取未完成的提交事件并启动工作流，成功记录执行关联后再确认事件。启动请求可以重复，因此还需要确定性的执行名称和固定输入，具体恢复方式见第九节。首轮核验结果有效时直接复用，不在提交后无条件重做人脸和证件识别。</p>
+<h3 id="3-">3. 等待结果，而不是等待固定时长</h3>
+<p>用户看到的等待时间主要来自异步检查。无依赖的检查并行执行，需要回调的分支等待供应商结果；全部分支结束后才汇总决策。<code>Parallel</code> 会等待分支完成，预期的供应商超时应在分支内通过 <code>Retry</code>/<code>Catch</code> 转为明确的 <code>UNKNOWN</code> 结果，避免一个未处理错误使整个并行步骤失败。参见 <a href="https://docs.aws.amazon.com/step-functions/latest/dg/state-parallel.html">AWS Parallel 文档</a>。</p>
+<p>只有业务明确要求延迟、供应商要求稍后查询时才使用 <code>Wait</code>。到期只表示可以再次检查，不意味着风控通过。每个任务有超时和重试上限，耗尽后进入人工处理或受控恢复流程；不得无限等待，也不得把缺失结果当作通过。</p>
 <h3 id="4-">4. 风控与账户开立</h3>
 <p>风控调用使用申请 ID 作为业务关联号，并保存供应商版本、输入快照摘要、决策码和原始响应的受控引用。规则拒绝转 <code>REJECTED</code>；不确定或需要人工判断的结果转 <code>MANUAL_REVIEW</code>，不要为了自动化强行作出拒绝结论。</p>
-<p>进入 <code>OPENING_ACCOUNT</code> 时先生成不可变的 <code>openRequestId</code>。对核心账户 System API 的每次重试都带同一个请求号，核心侧也应以此实现幂等：同一请求要么返回原账户号，要么表明仍在处理中，绝不能创建第二个账户。只有收到核心侧的最终成功确认后，申请才迁移到 <code>ACCOUNT_OPENED</code>。</p>
+<p>进入 <code>OPENING_ACCOUNT</code> 时先持久化不可变的 <code>openRequestId</code>。创建核心客户和创建账户分别使用稳定的操作键，并保存每一步的返回标识；任何重试都先复用已有结果。若核心接口不支持幂等，必须提供按业务请求号查询及重复请求控制，不能仅靠本地超时重发。</p>
+<p>确认核心账户号后进入 <code>ACCOUNT_OPENED</code>，再转 <code>ACTIVATING_ONLINE_BANKING</code>，使用独立的激活操作键绑定网银身份。只有激活也成功才标记 <code>COMPLETED</code>。开户和激活无法放入一个本地事务，激活失败时保留账户号，只恢复激活操作。</p>
 <h2 id="heading-5">八、决策矩阵：把检查结果变成可审计的决定</h2>
 <p>风控、征信和 KYC 的返回值往往不止“成功/失败”。不要把这些条件写成散乱的 <code>if/else</code>，而应由 Process API 将检查结果归一化，再交给版本化的 Decision Matrix（可实现为规则表、DMN 决策表或受控规则服务）给出动作。规则输入只包含必要的事实与原因码，不直接向前端暴露供应商原始响应。</p>
+<p>决策前验证结果属于当前轮次，或具有有效的复用记录；过期、来源无法确认的结果不能参与批准。以下示例按从上到下首次命中执行，实际优先级由业务确认。</p>
 <table>
 <thead>
 <tr>
-<th>条件示例</th>
-<th>决策</th>
-<th>状态机动作</th>
+<th>优先级</th>
+<th>条件</th>
+<th>决策与动作</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>证件、人脸、联系人、风控和征信均通过</td>
-<td>通过</td>
-<td><code>OPENING_ACCOUNT</code></td>
+<td>1</td>
+<td>有有效证据命中不可豁免的拒绝规则</td>
+<td><code>REJECTED</code>，其他检查超时不覆盖拒绝</td>
 </tr>
 <tr>
-<td>人脸清晰度不足、地址缺失等可补正问题</td>
-<td>补件</td>
+<td>2</td>
+<td>材料缺失、不可读或需用户补正</td>
 <td><code>NEEDS_INFORMATION</code></td>
 </tr>
 <tr>
-<td>风险分数处于灰度区间、征信结果需解释</td>
-<td>人工介入</td>
+<td>3</td>
+<td>必要检查缺失、过期或为 <code>UNKNOWN</code></td>
+<td>有重试额度则回到 <code>WAITING_CHECKS</code>；否则 <code>MANUAL_REVIEW</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>命中可人工判断的灰区，尚无本版本有效审核意见</td>
 <td><code>MANUAL_REVIEW</code></td>
 </tr>
 <tr>
-<td>证件失效、活体失败或明确命中拒绝规则</td>
-<td>拒绝</td>
-<td><code>REJECTED</code></td>
+<td>5</td>
+<td>必要检查齐全有效，全部满足批准条件（含允许的人工处置）</td>
+<td><code>OPENING_ACCOUNT</code></td>
 </tr>
 <tr>
-<td>供应商超时或返回不确定</td>
-<td>延迟决定</td>
-<td>保持检查中并重试/查询</td>
+<td>默认</td>
+<td>未匹配规则或结果组合无法解释</td>
+<td><code>MANUAL_REVIEW</code>，不自动批准</td>
 </tr>
 </tbody>
 </table>
-<p>每次执行都要保存 <code>decisionVersion</code>、使用到的输入摘要、命中的规则 ID、原因码与最终动作。这样规则调整后，才能解释某个历史申请为什么进入人工审核，也能用历史样本回放评估新规则，而不会重跑第三方核验。</p>
+<p>必要检查由产品配置决定，征信不是所有存款账户都必需。人工意见只能处理授权范围内的灰区，不能覆盖不可豁免拒绝规则或缺失的必要检查。</p>
+<p>每次决策保存规则版本、资料版本、评估轮次、命中规则、原因码和输入快照引用。摘要用于校验一致性；历史回放需要受控保存的实际输入快照，仅有摘要无法恢复输入。回放在隔离评估模式中执行，不触发真实开户。</p>
 <h2 id="aws-step-functions--lambda">九、托管状态机方案：AWS Step Functions 与 Lambda</h2>
-<p>如果系统部署在 AWS，状态机不必完全自行实现。可以使用 <strong>AWS Step Functions Standard</strong> 保存长流程的执行进度：<code>Task</code> 状态调用 Lambda 或 Java 服务适配器，<code>Choice</code> 根据归一化检查结果和决策矩阵分支，<code>Wait</code> 表达提交后的等待窗口，<code>Retry</code>/<code>Catch</code> 统一处理可重试与异常路径。对需要等待供应商异步回调的步骤，可使用任务令牌模式：启动检查后暂停执行，回调经受认证的入口恢复对应执行。</p>
+<p>本文以 <strong>AWS Step Functions Standard</strong> 承担提交后的编排：<code>Task</code> 通过 Lambda 调用 Java Process API，<code>Choice</code> 根据决策结果分支，<code>Retry</code>/<code>Catch</code> 处理技术错误，<code>Wait</code> 用于明确的延迟查询。需要等待供应商或人工审核时采用任务令牌回调。Java 服务负责业务迁移校验，工作流不能绕过它直接修改 MongoDB。</p>
 <pre><code class="language-text">Step Functions Standard
-  -&gt; Lambda：启动 KYC / 保存检查引用
-  -&gt; 回调任务令牌：等待人脸、证件结果
-  -&gt; Lambda 或 Java Process API：收集收入、地址资料状态
-  -&gt; Wait：提交后的等待窗口
-  -&gt; 并行 Task：风控、征信、反欺诈
-  -&gt; Lambda：执行 Decision Matrix
-  -&gt; Choice：开户 / 补件 / 人工审核 / 拒绝
-  -&gt; Task：调用核心账户 System API 并激活网银身份
+  -&gt; 验证本轮快照与首轮结果的有效性
+  -&gt; Parallel：风控、反欺诈、适用的征信检查
+       各分支：发起请求 -&gt; 等待回调或查询 -&gt; 保存结果
+  -&gt; 调用 Process API：执行 Decision Matrix
+  -&gt; Choice
+       通过：创建/确认核心客户 -&gt; 创建/确认账户 -&gt; 激活网银 -&gt; COMPLETED
+       补件：保存 NEEDS_INFORMATION，结束本轮；重提后启动新轮次
+       人工：等待审核 -&gt; 重新校验并决策
+       拒绝：保存 REJECTED，结束本轮
+       可重试缺失：重跑受影响检查 -&gt; 再次决策
 </code></pre>
-<p>托管编排并不替代业务数据模型：MongoDB 中的 <code>application</code> 仍是对外查询和审计的业务事实，每一个 Step Functions 状态变化也应通过 Process API 以乐观锁写入申请及事件记录。Lambda 与核心账户、征信等有副作用的接口仍必须携带 <code>applicationId</code>、<code>openRequestId</code> 和幂等键；工作流重试或人工重新驱动时，不能依赖“状态机只会运行一次”来避免重复开户。</p>
+<p>业务阶段变化由 Process API 写入申请及审计记录。<code>Wait</code>、分支进入等编排细节保留在工作流历史中，不必逐一映射成申请主状态。供应商回调先验证签名、请求号和轮次，持久化结果及待发送的恢复通知，再由内部服务提交任务令牌；令牌不暴露给浏览器。恢复通知可重试，过期令牌不能唤醒新的检查任务。</p>
 <p>工作流的输入、输出和任务令牌载荷只应传递 <code>applicationId</code>、受控对象引用、状态及无敏感含义的原因码；身份证号、影像、人脸结果、详细住址和收入资料仍由 Process API 按需读取。Standard Workflow 的执行历史会保存状态输入和输出，CloudWatch 日志也可以记录执行数据，因此生产环境应按最小权限配置访问，采用客户管理 KMS 密钥，并将日志的 <code>includeExecutionData</code> 设为 <code>false</code> 或只记录已脱敏内容。官方文档对<a href="https://docs.aws.amazon.com/step-functions/latest/dg/cw-logs.html">执行历史和日志</a>、<a href="https://docs.aws.amazon.com/step-functions/latest/dg/encryption-at-rest.html">数据静态加密</a>和<a href="https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html">任务令牌回调</a>有具体说明。</p>
 <h3 id="heading-6">工作流与申请状态的恢复和对账</h3>
-<p>Step Functions 的执行状态与 MongoDB 的申请状态分别持久化，二者不能假设天然一致。启动工作流使用确定性的执行名称（例如 <code>applicationId</code>），并立即将返回的 <code>executionArn</code> 写入申请；写入失败时，对账任务可按该名称定位执行。每个任务完成时，由 Process API 以 <code>eventId + version</code> 原子写入申请和审计事件。对于“工作流已推进但数据库更新失败”或“数据库已更新但工作流超时”的情况，定期对账任务按 <code>executionArn</code> 查询执行结果、比对申请的 <code>lastAppliedEventId</code> 与状态，并以同一事件 ID 安全补偿或标记人工处理。人工重驱动也必须复用原有的 <code>openRequestId</code>，而非创建新的开户请求。</p>
-<p>当流程仅包含短任务、无需长期等待且团队已有消息平台时，Java 服务内的状态机与持久化任务也完全可行。选择 Step Functions 的主要理由是减少长等待、重试、可视化追踪和失败恢复的基础设施维护，而不是改变上述领域边界。</p>
+<p>每轮评估先持久化执行名称（<code>applicationId + assessmentRunId</code>）、固定输入和工作流版本，再通过 Outbox 启动并记录 <code>executionArn</code>。Standard 的启动幂等适用于同名、同输入且仍在运行的执行；已结束执行会返回 <code>ExecutionAlreadyExists</code>，发布器应查询已有执行并关联，不能改名再启动。参见 <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_StartExecution.html">StartExecution 文档</a>。补件产生新轮次和新名称；技术重试继续使用原业务操作键。</p>
+<p>每个业务步骤采用稳定的 <code>operationId</code>，由轮次、步骤和逻辑操作序号组成；重试时不随机生成事件 ID。Process API 只有在事务提交后才返回成功。数据库已提交但响应丢失时，重试从去重记录取回原结果；任务尚未提交成功时，工作流不能进入依赖它的下一步。</p>
+<p>对账按执行记录和各步骤操作记录进行，不拿单个“最后事件”判断并行分支是否完成。缺少执行关联时补写 ARN；工作流中断而业务步骤已完成时，恢复调度并复用已存结果；涉及核心账户未知结果时，先按 <code>openRequestId</code> 查询核心系统。工作流显示成功却没有对应业务提交记录属于异常，需要告警和核查，不能据此直接把申请改为成功。</p>
+<p>已有消息平台的团队也可以用 Java 状态机配合持久化任务、租约和调度器替代 Step Functions。它是另一种编排实现；本文主方案不同时维护一套扫描器来推动同一业务步骤。</p>
 <h2 id="heading-7">十、失败、重试与人工介入</h2>
 <p>外部调用失败不等于业务失败。建议把结果分为三类：</p>
 <ul>
-<li><strong>业务终态</strong>：证件无效、活体失败、风险拒绝，记录原因码并转 <code>REJECTED</code> 或 <code>NEEDS_INFORMATION</code>；</li>
+<li><strong>业务结果</strong>：按规则区分可补正材料问题与明确拒绝，分别转 <code>NEEDS_INFORMATION</code> 或 <code>REJECTED</code>；</li>
 <li><strong>可重试技术错误</strong>：超时、限流、5xx，按指数退避重试，并保留最大次数与下一次执行时间；</li>
 <li><strong>不确定结果</strong>：请求超时但供应商可能已受理，先用关联号查询结果；无法确认时转人工队列，不能直接重发一个会产生副作用的开户请求。</li>
 </ul>
 <p>运营后台应能查看状态历史、检查摘要、失败原因、下次重试时间和人工处理意见。人工批准/拒绝也必须走状态机并留下操作者与理由；直接修改 MongoDB 文档会破坏审计链。</p>
-<h2 id="heading-8">十一、接口、可观测性与安全要点</h2>
+<h3 id="heading-8">一个恢复实例：账户已开立，网银激活超时</h3>
+<p>假设申请 A 的必要检查全部通过，核心系统返回账户号 B，开户服务将其与 <code>openRequestId</code> 一起保存，随后进入 <code>ACTIVATING_ONLINE_BANKING</code>。激活调用超时，既可能未执行，也可能已经生效但响应丢失。</p>
+<p>此时申请显示“账户已开立，网银激活处理中”。恢复任务先查询身份系统的绑定状态；已激活就补记 <code>COMPLETED</code>，未激活则使用原激活操作键重试。超过重试上限交给运营，保留账户 B 和当前阶段，不再调用开户接口。即使整段任务被重新驱动，开户步骤也返回先前保存的账户 B。</p>
+<p>这个例子同样适用于核心开户本身超时：先查询业务请求号，再决定是否重试。只有业务结果明确，才能推进申请状态。</p>
+<h2 id="heading-9">十一、接口、可观测性与安全要点</h2>
 <p>对外可以保持一组很小的接口：创建申请、保存资料、启动/提交人脸会话、提交申请、查询申请、查询待办项。所有响应带 <code>applicationId</code>、主状态、检查摘要和对前端安全的下一步动作；供应商错误、风控规则细节和账户系统报文不应直接下发。</p>
 <p>每次请求和异步任务都携带 <code>correlationId</code> 与 <code>applicationId</code>。监控中至少关注申请从提交到开户的耗时、各检查通过率、任务积压、回调重复率、状态迁移失败率、工作流与申请状态不一致数量，以及核心开户不确定结果数量。日志采用脱敏字段；访问申请详情需按最小权限控制，并对高敏读取单独审计。对于 Step Functions，执行历史、控制台查看权限、CloudWatch 日志和 KMS 解密权限也应作为同一套敏感数据访问边界治理。</p>
-<h2 id="heading-9">十二、落地时最容易踩的坑</h2>
+<h2 id="heading-10">十二、落地时最容易踩的坑</h2>
 <ol>
 <li><strong>把状态机当作前端流程图。</strong> 前端可以显示步骤，但最终迁移只能由服务端依据持久化状态决定。</li>
 <li><strong>只靠消息顺序保证正确性。</strong> 回调和消息可能重复、乱序或延迟，消费者必须依据版本、状态和事件 ID 判断是否仍有效。</li>
@@ -325,7 +365,7 @@ OPENING_ACCOUNT  -&gt; OPEN_FAILED        可恢复的技术失败，等待重�
 <li><strong>让 MongoDB 承担账务。</strong> MongoDB 很适合申请聚合、进度和审计索引；余额、分录和账户权威状态仍应由核心账务域负责。</li>
 <li><strong>把 PII 放进工作流载荷。</strong> 工作流编排只传申请标识和受控引用；否则执行历史、日志和调试界面都会扩大敏感数据的暴露面。</li>
 </ol>
-<h2 id="heading-10">结语</h2>
+<h2 id="heading-11">结语</h2>
 <p>这套设计的重点不是引入更多中间件，而是把三个事实保持一致：申请的持久化状态、异步任务的执行状态，以及核心系统的账户状态。API-Led 划分了集成边界，状态机约束了业务演进，持久化任务、Outbox 和幂等键则让流程能承受超时、重试和重复消息。</p>
 <p>当这些基础能力具备后，新增一项检查通常只是扩展 <code>checks</code>、任务和迁移规则，而不需要重写整个开户接口。这也是把开户建模为长期运行的业务流程，而不是“一次提交表单”的价值所在。</p>
 ]]></description>
