@@ -9,6 +9,131 @@
     <lastBuildDate>Sun, 12 Jul 2026 13:49:20 +0800</lastBuildDate>
     <atom:link href="https://windrunner0707.tech/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <item>
+      <title>AI 时代，后端工程师为什么应该学习前端</title>
+      <link>https://windrunner0707.tech/post/ai-shi-dai-hou-duan-gong-cheng-shi-wei-shi-me-ying-gai-xue-xi-qian-duan/</link>
+      <guid isPermaLink="true">https://windrunner0707.tech/post/ai-shi-dai-hou-duan-gong-cheng-shi-wei-shi-me-ying-gai-xue-xi-qian-duan/</guid>
+      <pubDate>Thu, 24 Sep 2026 00:00:00 +0800</pubDate>
+      <description><![CDATA[<p>最近我开始系统学习 React。</p>
+<p>刚接触前端时，我仍然带着后端工程师常见的分工思维：页面负责展示，后端负责业务。只要接口定义清楚，前端自然会完成剩下的工作。真正动手以后，我发现今天的前端早已不是在 HTML 中放几个输入框，再提交一张表单。一个普通的业务页面可能同时包含搜索、分页、弹窗、表单校验、权限控制、局部刷新和错误恢复。页面本身就是一个有状态的应用。</p>
+<p>与此同时，AI 正在改变学习一门新技术的成本。过去需要反复查找的语法、配置和框架 API，现在可以边做边问；设计稿也可以直接成为代码生成的上下文。对有经验的后端工程师来说，跨到前端不再意味着把所有细节重新背一遍。</p>
+<p>这让我重新思考一个问题：AI 时代的资深后端工程师，是否还应该把自己的能力边界严格停留在服务端？</p>
+<p>我的答案是，不应该。这里说的也不是放弃后端，或者要求每个人都成为前后端同等深入的专家，而是补上独立完成产品闭环所需的另一部分能力。</p>
+<!-- more -->
+<h2 id="ai-">一、AI 缩小了哪一部分差距</h2>
+<p>以前跨技术栈学习，最耗时间的是大量零散细节。</p>
+<p>学习前端，需要熟悉 JavaScript 和 TypeScript，知道 CSS 怎样布局，理解浏览器 API，还要搞清 React、路由、状态管理和构建工具。即使已经写了多年后端代码，刚进入这套工具链时，仍然会有一种重新做初级工程师的感觉。</p>
+<p>AI 缩短了这个阶段。它可以解释陌生代码、生成组件、补充类型、修改样式，也能根据编译错误继续排查。遇到一个不熟悉的 API，不必先翻半小时文档才能开始写第一行代码。</p>
+<p>但我不认同“语法和框架细节已经不重要”这种说法。</p>
+<p>AI 缩小的是信息检索、语法记忆和样板代码上的差距。它没有消除语言运行机制、框架设计思想、性能、安全和可维护性问题。AI 可以生成一个 <code>useEffect</code>，却未必知道这个副作用是否真的需要存在；可以写出并发请求代码，却可能漏掉重复提交、过期响应和组件卸载；也可以生成一张漂亮的登录页面，但忘记加载状态、键盘操作和错误提示。</p>
+<p>过去，工程师需要同时记忆和理解。现在，记忆的重要性下降了，理解和验证更重要了。因为 AI 让代码来得太快，工程师必须更快地判断它是否正确。</p>
+<h2 id="typescript--java">二、TypeScript 降低了入门门槛，但它不是 Java</h2>
+<p>TypeScript 对 Java 工程师确实友好。接口、泛型、类型检查和编辑器提示都很熟悉。阅读一个类型定义清楚的 TypeScript 项目，通常也比直接进入动态 JavaScript 项目轻松。</p>
+<p>这降低了理解代码结构的门槛，却不等于没有学习成本。TypeScript 最终仍然转换成 JavaScript，类型信息通常不会留在运行时。<a href="https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-oop.html">TypeScript 官方文档</a>也专门提醒 Java 和 C# 开发者：两者的类型系统与运行方式存在差异，不能简单套用传统面向对象语言的经验。</p>
+<p>后端工程师仍然要理解 JavaScript 的闭包、模块、异步模型和事件循环，也需要了解浏览器怎样处理网络请求、渲染页面和响应用户操作。TypeScript 能告诉我们某个值的静态类型，却不能替我们理解代码在浏览器里怎样运行。</p>
+<p>因此，我更愿意把 TypeScript 看成一座桥。它让后端工程师更容易进入现代前端项目，但过桥以后，仍然需要认真学习 JavaScript 和浏览器环境。</p>
+<h2 id="-react-">三、我为什么开始理解 React 出现的必要性</h2>
+<p>早期的服务端渲染页面中，JSP、Thymeleaf 一类模板技术很实用。服务端取得数据，生成 HTML，再把完整页面返回给浏览器。对于内容展示、简单查询和普通表单，这种模式现在也没有过时。</p>
+<p>问题出现在页面交互变复杂以后。</p>
+<p>假设一个订单页面同时包含商品搜索、动态表单、价格试算、库存检查、审批状态和多个弹窗。用户修改数量后，总价要变化，库存提示也要更新；切换客户后，折扣、地址和可选商品可能一起变化。此时，页面已经不只是后端数据的一个展示模板，而是在维护一组相互关联的状态。</p>
+<p>如果继续手工查找 DOM、绑定事件和修改页面内容，状态很容易散落在各个地方。开发者会逐渐说不清当前页面的真实状态在哪里，某个区域为什么更新，以及两个组件为什么显示出不一致的数据。</p>
+<p>React 用组件、props、state 和单向数据流组织这些关系。<a href="https://react.dev/learn/thinking-in-react">React 官方教程</a>在讲解应用设计时，也是先拆分组件层级，再寻找最小状态，最后确定状态应该由谁持有。理解这套思路，比先记住多少个 Hook 更重要。</p>
+<p><img src="https://windrunner0707.tech/post-images/react-component-hierarchy.webp" alt="React 将界面拆分为组件层级" /></p>
+<blockquote>
+<p>React 官方教程中的组件拆分示例。不同颜色的边框对应搜索区域、表格、分类行和商品行。图片来源：<a href="https://react.dev/learn/thinking-in-react">Thinking in React</a>。</p>
+</blockquote>
+<p>从后端视角看，它并不陌生：组件要有清楚的职责边界，状态要有明确的所有者，数据变化应当可以追踪。这和后端的模块划分、领域边界有相通的地方，只是处理对象从服务端业务状态变成了用户界面状态。</p>
+<p>React 也不是所有页面的标准答案。简单内容页未必需要复杂的客户端框架，服务端渲染、静态生成和局部增强仍然有效。学习 React 的价值，是理解现代交互界面怎样组织复杂状态，而不是把每个网站都改造成 SPA。</p>
+<h2 id="-npmviteajax--spa-">四、把 npm、Vite、Ajax 和 SPA 放回各自的位置</h2>
+<p>我刚开始学习前端工具链时，也容易把几个概念混在一起。它们经常同时出现在一个 React 项目中，但解决的不是同一类问题。</p>
+<pre><code class="language-text">npm / pnpm
+    管理依赖、版本和项目脚本
+
+Vite
+    提供开发服务器、模块转换、热更新和生产构建
+
+React
+    组织组件、界面状态和更新过程
+
+fetch / HTTP Client
+    调用后端 API，与服务端交换数据
+
+SPA
+    一种主要在浏览器中完成路由和界面更新的应用形态
+</code></pre>
+<p>Ajax 或 <code>fetch</code> 解决的是页面如何在不整体刷新的情况下请求数据。SPA 进一步把大量路由和界面状态放到了浏览器端。npm 是包管理体系，而 <a href="https://vite.dev/guide/">Vite</a> 负责开发和构建流程。现代前端工程还会加入 TypeScript 检查、Lint、测试、资源压缩和部署配置。</p>
+<p>这与后端工程并没有本质区别。Java 项目不会把源代码和一堆 JAR 手工复制到服务器，前端项目也不能长期依靠几个脚本文件拼接。两边都需要依赖管理、开发环境、自动检查和可重复构建。</p>
+<p>不过，前端应用并没有单向演进成 SPA。首屏速度、搜索引擎收录、交互强度和部署条件不同，适合的渲染方式也不同。今天的应用经常混合使用服务端渲染、静态生成和客户端交互。工程化的目的不是追随某种形态，而是让开发、检查、构建和发布过程可以重复。</p>
+<h2 id="-api-">五、前后端通过 API 协作，不等于只需要一份接口文档</h2>
+<p>前后端分离后，API 是重要边界。后端不应依赖某个页面的内部实现，前端也不应读取后端数据库。但一个真实产品需要的契约，比请求地址和 JSON 字段多得多。</p>
+<p>例如，列表接口要约定分页和排序；写接口要考虑重复提交；认证失败、业务校验失败和系统异常需要有不同的处理方式；长时间任务要决定同步等待，还是提交后查询进度。接口升级后，还要考虑旧页面是否能够继续运行。</p>
+<p>这些问题无法靠一句“前端调 API”解决。</p>
+<p>完整的产品链路更接近下面这样：</p>
+<pre><code class="language-text">用户操作
+  -&gt; 组件更新本地状态
+  -&gt; 前端发起请求
+  -&gt; 后端完成认证和业务处理
+  -&gt; 数据库或外部系统改变状态
+  -&gt; 前端解释响应并反馈给用户
+</code></pre>
+<p>只看后端时，我们容易把 HTTP 200 当成任务结束。站在用户侧看，接口成功只是链路中的一段。按钮有没有及时反馈，错误能不能看懂，网络超时后能否重试，刷新页面会不会丢失状态，这些都会影响产品是否真的可用。</p>
+<p>后端工程师亲手完成一次前端页面以后，再设计 API 时会自然多想一步：这个响应到了页面上，用户接下来能做什么？</p>
+<h2 id="figma--ai-">六、Figma 和 AI 能生成页面，但不能直接生成完整产品</h2>
+<p>设计工具也在进入 AI 工作流。Figma Dev Mode 可以通过代码生成插件扩展原生代码片段，也能把设计上下文交给开发工具。选中一个设计区域后，AI 已经可以生成 JSX、CSS 或组件库代码。<a href="https://developers.figma.com/docs/plugins/api/figma-codegen/">Figma Codegen API</a>本身就为不同语言和框架的代码生成留出了扩展入口。</p>
+<p>这类能力很适合做第一版页面，尤其是内部工具、管理后台和产品原型。过去需要花很多时间调整的颜色、间距、圆角和布局，现在可以快速得到一个接近设计稿的初稿。</p>
+<p><img src="https://windrunner0707.tech/post-images/figma-mcp-react-code.webp" alt="Figma 设计上下文生成 React 和 Tailwind 代码" /></p>
+<blockquote>
+<p>Figma MCP 根据设计上下文提供 React 和 Tailwind 代码表示。图片来源：<a href="https://www.figma.com/blog/introducing-figma-mcp-server/">Figma 官方博客</a>。</p>
+</blockquote>
+<p>但设计稿通常只表达几个静态画面。它很少完整描述加载中、无数据、请求失败、权限不足和网络超时，也未必说明窗口变窄后怎样排列，组件是否复用，以及表单如何校验。生成的 JSX 能呈现页面，不代表它已经形成了合理的组件边界和状态模型。</p>
+<p>CSS 也没有变成不需要理解的零碎知识。AI 可以代写属性，工程师仍然要知道 Flexbox 和 Grid 怎样分配空间，层叠和优先级为什么生效，响应式布局为何在某个尺寸下溢出。否则页面一旦偏离生成时的理想输入，就只能继续碰运气式地修改提示词。</p>
+<p>AI 改变的是工作方式。我们可以从手工拼每一个像素，转向描述目标、生成初稿、检查结果并持续修正。最终能否进入生产环境，仍然取决于人对交互、代码结构和异常路径的判断。</p>
+<h2 id="heading">七、资深工程师应该理解完整的产品链路</h2>
+<p>工作年限增长以后，如果竞争力仍然只来自熟悉某个后端框架，能力边界会越来越窄。</p>
+<p>这不是说后端深度不再重要。交易一致性、数据模型、并发控制和分布式系统仍然需要长期积累。问题在于，资深工程师不能只对自己负责的服务有判断，却对用户怎样使用产品、其他模块为什么这样设计一无所知。</p>
+<p>学习前端以后，一些原本模糊的问题会变得具体：</p>
+<ul>
+<li>一个耗时任务应该让页面同步等待，还是提交后展示进度？</li>
+<li>多次点击提交按钮时，前端禁用按钮以后，后端是否仍然需要幂等？</li>
+<li>接口失败时，应该返回技术异常，还是用户能够采取行动的信息？</li>
+<li>列表数据变化以后，分页、筛选条件和缓存怎样保持一致？</li>
+<li>权限控制如何同时落实在页面入口和服务端校验中？</li>
+</ul>
+<p>这些都不是某一端可以独立解决的问题。它们属于产品本身。</p>
+<p>我理解的全栈，也不是一个人精通所有技术，而是能够沿着用户操作一路追到数据落库，知道每个环节的责任边界；需要做出取舍时，可以判断问题应该在哪一层解决。</p>
+<h2 id="ai--1">八、AI 没有让资深工程师的任务变轻</h2>
+<p>AI 可以在很短时间内生成大量代码，于是一个人有机会负责更大的范围。</p>
+<p>以前，一名后端工程师可能只需要实现几个接口。现在，他可能还要澄清需求、设计数据模型、拆分任务、生成前后端代码、配置部署，再检查产品的实际运行效果。逐行编码的时间减少了，需要做出的决定却更多了。</p>
+<p>AI 生成的代码还有一个麻烦：它通常看起来很像正确答案。代码能够编译，页面也能打开，但异常流程、安全边界或者数据一致性可能存在问题。资深工程师必须为最终结果负责，不能把责任交给提示词。</p>
+<p>因此，Vibe Coding 的熟练程度不能只用“生成代码有多快”衡量。更完整的工作过程应该是：</p>
+<pre><code class="language-text">理解用户问题
+  -&gt; 明确范围与验收标准
+  -&gt; 选择足够简单的架构
+  -&gt; 让 AI 辅助实现
+  -&gt; 运行测试并检查异常路径
+  -&gt; 放到真实使用场景中验证
+</code></pre>
+<p>如果缺少前面的需求判断和后面的验证，Vibe Coding 只是更快地积累代码。</p>
+<h2 id="heading-1">九、后端工程师应该把前端学到什么程度</h2>
+<p>我不打算把目标设成“熟练掌握所有前端框架”。对后端工程师来说，更现实的学习范围是能够独立完成一个中等复杂度的产品闭环。</p>
+<p>第一步是补齐浏览器基础，包括 HTML、CSS、JavaScript、网络请求和事件循环。接着学习 TypeScript，用类型描述组件输入、接口响应和业务数据。再通过 React 理解组件拆分、状态归属、表单、路由和副作用。最后把构建、测试、部署和 API 联调连起来。</p>
+<p>判断是否学会，不是看记住了多少 Hook，而是能否回答这些问题：页面状态应该放在哪里？请求失败后怎样恢复？组件为什么重新渲染？前端能做哪些权限提示，哪些校验必须由后端保证？构建产物最后怎样部署？</p>
+<p>做到这一步，未必能替代长期从事前端的工程师，但已经可以独立验证产品想法，也能和前端、产品及设计进行更具体的讨论。</p>
+<h2 id="heading-2">总结</h2>
+<p>AI 时代，后端工程师学习前端，不是因为后端已经没有价值，也不是因为所有人都必须换成“全栈工程师”的职位名称。</p>
+<p>真正的变化是，跨技术栈的启动成本降低了。一个有经验的后端工程师，现在可以借助 AI 更快地完成页面、接入接口并验证想法。原来需要多人配合才能看到结果的构思，可以先由一个人做出能够运行的版本。</p>
+<p>与此同时，资深工程师的责任范围也在扩大。未来更有价值的能力，包括理解产品为什么值得做，设计不过度复杂的架构，熟练使用 AI 推进实现，以及验证生成结果并承担交付责任。</p>
+<p>我学习 React，并不是准备放弃后端，而是想补上过去看不到的那部分产品链路。后端经验让我知道数据和业务规则应该怎样落地，前端知识则让我看到用户如何真正接触这些能力。</p>
+<p>AI 可以帮我们跨过语法、配置和样板代码的障碍。从一个想法走到一个可以使用的产品，仍然需要工程师理解问题、做出取舍，并把整条链路接起来。</p>
+<blockquote>
+<p>封面图片：<a href="https://www.pexels.com/photo/crop-faceless-developer-working-on-software-code-on-laptop-5926382/">Sora Shimazaki / Pexels</a>，依据 <a href="https://www.pexels.com/license/">Pexels License</a> 使用。</p>
+</blockquote>
+]]></description>
+      <category>人工智能</category>
+      <category>TypeScript</category>
+      <category>架构设计</category>
+      <enclosure url="https://windrunner0707.tech/post-images/ai-shi-dai-hou-duan-gong-cheng-shi-wei-shi-me-ying-gai-xue-xi-qian-duan.webp" length="0" type="image/webp"></enclosure>
+    </item>
+    <item>
       <title>全屋定制怎么选：板材、封边、五金与报价的实用功课</title>
       <link>https://windrunner0707.tech/post/quan-wu-ding-zhi-cong-ban-cai-dao-bao-jia-de-yi-ci-gong-ke/</link>
       <guid isPermaLink="true">https://windrunner0707.tech/post/quan-wu-ding-zhi-cong-ban-cai-dao-bao-jia-de-yi-ci-gong-ke/</guid>
@@ -117,119 +242,6 @@
 <p><em>封面照片：<a href="https://www.pexels.com/photo/spacious-wardrobe-in-bedroom-7214465/">Max Vakhtbovych / Pexels</a>。</em></p>
 ]]></description>
       <enclosure url="https://windrunner0707.tech/post-images/quan-wu-ding-zhi-cover.avif" length="0" type="image/jpeg"></enclosure>
-    </item>
-    <item>
-      <title>万智牌入门：从五色颜色轮到一张牌的想象力</title>
-      <link>https://windrunner0707.tech/post/wan-zhi-pai-ru-men-wu-se-yan-se-lun-yu-ka-pai-mei-xue/</link>
-      <guid isPermaLink="true">https://windrunner0707.tech/post/wan-zhi-pai-ru-men-wu-se-yan-se-lun-yu-ka-pai-mei-xue/</guid>
-      <pubDate>Sun, 06 Sep 2026 00:00:00 +0800</pubDate>
-      <description><![CDATA[<p>第一次听说《万智牌》（Magic: The Gathering，常简称 MTG）时，我以为它只是“有插画的集换式卡牌游戏”。真正翻过几张牌、看过牌面之间如何配合以后，才发现它最迷人的地方，是把规则、世界观和美术放进了同一套语言里：你既在计算资源和节奏，也像在挑选自己想成为的魔法师。</p>
-<p>如果你正好对卡牌游戏感兴趣，这篇文章想从我觉得最有新意的设计讲起，再给出两条不容易踩坑的入门路径。</p>
-<!-- more -->
-<h2 id="heading">五色颜色轮：不是配色，而是一套性格系统</h2>
-<p>万智牌将法术与生物的力量划分为白、蓝、黑、红、绿五种颜色。它们并不只是牌框的颜色，更各自代表一组价值观、做事方式和擅长的策略。于是，一张牌的效果往往在你读完之前，就已经能从颜色里猜到几分它的性格。</p>
-<table>
-<thead>
-<tr>
-<th>颜色</th>
-<th>常见信念</th>
-<th>牌桌上的感觉</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>白色</td>
-<td>秩序、群体、保护、公平</td>
-<td>建立防线、强化同伴、用规则限制对手</td>
-</tr>
-<tr>
-<td>蓝色</td>
-<td>知识、理性、变化、掌控</td>
-<td>抽牌、预知、反制，在关键时刻改写计划</td>
-</tr>
-<tr>
-<td>黑色</td>
-<td>野心、代价、个人意志、死亡</td>
-<td>用生命或资源交换力量，从墓地与牺牲中获利</td>
-</tr>
-<tr>
-<td>红色</td>
-<td>情感、自由、冲动、火焰</td>
-<td>快速进攻、直接伤害、让局面立刻沸腾</td>
-</tr>
-<tr>
-<td>绿色</td>
-<td>生命、自然、传统、成长</td>
-<td>加速资源、召唤巨大生物，用体型压过对手</td>
-</tr>
-</tbody>
-</table>
-<p>这套设计最妙的是，它没有把任何一种价值简单写成“善”或“恶”。白色的秩序可以是守护弱者，也可能变成僵化控制；黑色追求力量，既可能冷酷，也可能坦诚地承认欲望与代价。红色的冲动有时鲁莽，有时又是拒绝伪装的真诚。</p>
-<p>颜色之间还有天然的亲疏关系：相邻颜色更容易在理念上找到共同点，相对颜色则常常冲突。把两种或更多颜色放进同一套牌，像是在让几种处世哲学谈判。比如蓝白倾向于控制与秩序，红绿更愿意直接用生物和力量解决问题；黑绿则会把死亡看成生命循环的一部分。即使不熟悉规则，光从这些组合出发，也很容易记住不同套牌的气质。</p>
-<p><img src="https://windrunner0707.tech/post-images/wan-zhi-pai-color-pie.png" alt="万智牌五色颜色轮" /></p>
-<p><em>五色颜色轮示意图。图片来源：<a href="https://aetherhub.com/Article/How-To-Play-Magic-The-Gathering---Ultimate-Guide">AetherHub</a>。</em></p>
-<h2 id="heading-1">一张牌也是一扇世界的窗</h2>
-<p>万智牌的牌面美术并不只是“给效果配一张图”。它要在很小的画幅里，交代生物的种族、法术发生的瞬间、一个位面的风土，甚至角色正在面对的抉择。</p>
-<p>有些牌是宏大的：巨龙越过城墙、风暴吞没海面、军团在旷野集结；也有些画面特别克制：旅人站在异世界的街口，炼金师低头处理一支药剂，一只小小的精怪藏在树叶之间。很多时候，你还没理解卡牌文字，就已经从光线、构图和角色姿态感受到它属于哪个世界。</p>
-<p>这种美术与机制互相呼应的感觉很特别。绿色生物往往有繁茂、野性和重量感；蓝色法术则常带有水流、星空、实验室或幻象。它不是硬性的规定，但长期积累下来，会让一套牌拥有很完整的视觉记忆。对只想收藏或欣赏插画的人来说，单卡也完全可以是独立的小型艺术品。</p>
-<h3 id="heading-2">五色各挑一张：从牌面读出它的性格</h3>
-<p>下面这五张都是实际印刷过的卡牌。它们未必是每种颜色最强的代表，却很适合放在一起看：从天使、法术到精灵，画面与规则文字共同完成了角色塑造。</p>
-<div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start;">
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/fdn/740/serra-angel" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-serra-angel.jpg" alt="Serra Angel，白色卡牌" loading="lazy"></a>
-    <figcaption><strong>白：Serra Angel</strong><br>洁白的羽翼、庄严的盔甲与警戒异能，让“守护”变得一眼可见。</figcaption>
-  </figure>
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/dsc/114/counterspell" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-counterspell.jpg" alt="Counterspell，蓝色卡牌" loading="lazy"></a>
-    <figcaption><strong>蓝：Counterspell</strong><br>只用两个字就取消一个法术，是蓝色“掌控与反应”的经典表达。</figcaption>
-  </figure>
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/cmm/150/demonic-tutor" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-demonic-tutor.jpg" alt="Demonic Tutor，黑色卡牌" loading="lazy"></a>
-    <figcaption><strong>黑：Demonic Tutor</strong><br>以恶魔交易换取所求之物，把野心与代价写在同一张牌上。</figcaption>
-  </figure>
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/msc/806/lightning-bolt" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-lightning-bolt.jpg" alt="Lightning Bolt，红色卡牌" loading="lazy"></a>
-    <figcaption><strong>红：Lightning Bolt</strong><br>闪电直击目标；直接、迅速而不讲道理，正是红色的节奏。</figcaption>
-  </figure>
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/fdn/227/llanowar-elves" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-llanowar-elves.jpg" alt="Llanowar Elves，绿色卡牌" loading="lazy"></a>
-    <figcaption><strong>绿：Llanowar Elves</strong><br>小小的精灵连接自然与资源，为后续的大生物生长蓄力。</figcaption>
-  </figure>
-</div>
-<p><em>牌图与牌面资料由 <a href="https://scryfall.com/">Scryfall</a> 提供；万智牌及相关卡图版权归 Wizards of the Coast 所有。</em></p>
-<h2 id="-ip-">与热门 IP 联动，让熟悉的角色进入牌桌</h2>
-<p>近年的《Universes Beyond》系列让万智牌和许多热门 IP 产生联动。无论是《指环王》里的中土冒险、《战锤 40,000》的宇宙战争、《辐射》的废土，还是《最终幻想》等作品，都曾以万智牌的规则语言重新呈现。</p>
-<p>联动吸引人的地方不只是“角色上了卡”。设计师会尝试把原作最有辨识度的东西翻译成游戏机制：例如把远征、阵营、装备、同伴或宿命做成可互动的牌桌体验。熟悉原作的人能发现彩蛋；没接触过原作的人，也能借由一张卡进入一个新世界。</p>
-<p>当然，联动产品很容易让人产生“每套都想买”的冲动。把它们当作喜欢的主题或收藏方向会更轻松，不必把跟上所有产品当成入门门槛。</p>
-<h2 id="heading-3">新手先抓住三个概念就够了</h2>
-<p>万智牌的规则很深，但第一局并不需要背完。先理解下面三件事，已经足够开始玩：</p>
-<ol>
-<li><strong>地牌提供法术力。</strong> 大多数牌需要支付对应颜色的法术力才能使用，地牌通常就是资源来源。</li>
-<li><strong>生物会进攻与阻挡。</strong> 生物右下角的数字一般表示力量与防御力；进攻方宣告攻击，防守方选择是否阻挡。</li>
-<li><strong>每回合都在做取舍。</strong> 是先展开生物、留资源应对对手，还是把一张强力法术留到更合适的时机？这种取舍正是游戏的核心乐趣。</li>
-</ol>
-<p>先用现成套牌多打几局，比一开始钻进所有时序细节更有效。遇到规则问题再查，记忆会牢得多。</p>
-<h2 id="-mtga">入门怎么选：线上用 MTGA，线下从成套产品或单卡开始</h2>
-<h3 id="-mtg-arena-">想低成本熟悉规则：从 MTG Arena 开始</h3>
-<p>如果还不确定自己是否喜欢，最推荐先玩 <strong>MTG Arena（MTGA）</strong>。它会自动处理许多规则与结算，教程和对局也能帮助你很快理解回合流程、法术力与战斗。更重要的是，线上试错的成本低：你可以多换几种颜色和策略，不必一开始就为实体卡作大额投入。</p>
-<p><img src="https://windrunner0707.tech/post-images/mtg-arena-gameplay.jpg" alt="MTG Arena 对局界面" /></p>
-<p><em>MTG Arena 对局界面。图片来源：<a href="https://minireview.io/ccg/magic-the-gathering-arena">MiniReview</a>。</em></p>
-<p>刚入门时不必急着组“最强套牌”。先挑一套看起来顺眼、打法直观的预组或新手套牌，连续玩十几局，慢慢体会什么时候该铺场、什么时候该保留手牌。知道自己喜欢快攻、控制、大生物还是组合技之后，再投入资源会更准确。</p>
-<h3 id="heading-4">想和朋友线下休闲：优先买单卡或预组套牌</h3>
-<p>线下的乐趣和线上不同：洗牌的手感、桌面上逐渐铺开的画面、朋友围着一局牌讨论，都是实体卡难以替代的部分。</p>
-<p>如果目标是休闲玩，比较实用的做法有两种：</p>
-<ul>
-<li><strong>买现成预组套牌。</strong> 它能让你开盒就玩，牌之间已有基本配合，特别适合和朋友约一局、或尝试某个主题。多人休闲常见的指挥官预组也是很方便的入口。</li>
-<li><strong>直接买单卡来组牌。</strong> 当你已经知道喜欢的主题或卡表时，买单卡通常比反复开补充包更可控：预算花在真正会用到、也真正喜欢的牌上。</li>
-</ul>
-<p>补充包当然有拆卡的惊喜，也很适合轮抽、现开等玩法；但如果目的只是凑齐一副可玩的实体套牌，它并不是最高效的途径。和固定朋友群一起玩时，还可以先约好预算与强度范围，让每个人的体验更接近。</p>
-<p><img src="https://windrunner0707.tech/post-images/wan-zhi-pai-foundations-tabletop.jpg" alt="Magic Foundations 产品宣传图" /></p>
-<p><em>适合新手认识产品风格的 Foundations 宣传图。图片来源：<a href="https://bardsandcards.com/products/fri-12-6-2024-6-pm-friday-night-magic-foundations-draft">Bards &amp; Cards</a>。</em></p>
-<h2 id="heading-5">从一副喜欢的牌开始</h2>
-<p>万智牌有足够深的规则，让人花很多年研究；也有足够多的美术、世界观和主题，让人只把它当作一项轻松的爱好。无需一开始就记住所有系列、格式和术语。</p>
-<p>选一种让你有感觉的颜色，找一张愿意反复看的插画，或从喜欢的联动 IP 入门都可以。等你第一次发现两张牌恰好能形成漂亮配合，或者看到自己喜欢的角色在牌桌上完成一次戏剧性的逆转，就会明白它为什么能让这么多人一直玩下去。</p>
-]]></description>
-      <enclosure url="https://windrunner0707.tech/post-images/wan-zhi-pai-foundations-cover.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
       <title>银行在线开户流程架构设计：API-Led、状态机与异步风控</title>
@@ -516,6 +528,119 @@ public TransitionResult transition(TransitionCommand cmd) {
       <category>数据库</category>
       <category>分布式系统</category>
       <enclosure url="https://windrunner0707.tech/post-images/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji.webp" length="0" type="image/webp"></enclosure>
+    </item>
+    <item>
+      <title>万智牌入门：从五色颜色轮到一张牌的想象力</title>
+      <link>https://windrunner0707.tech/post/wan-zhi-pai-ru-men-wu-se-yan-se-lun-yu-ka-pai-mei-xue/</link>
+      <guid isPermaLink="true">https://windrunner0707.tech/post/wan-zhi-pai-ru-men-wu-se-yan-se-lun-yu-ka-pai-mei-xue/</guid>
+      <pubDate>Sun, 06 Sep 2026 00:00:00 +0800</pubDate>
+      <description><![CDATA[<p>第一次听说《万智牌》（Magic: The Gathering，常简称 MTG）时，我以为它只是“有插画的集换式卡牌游戏”。真正翻过几张牌、看过牌面之间如何配合以后，才发现它最迷人的地方，是把规则、世界观和美术放进了同一套语言里：你既在计算资源和节奏，也像在挑选自己想成为的魔法师。</p>
+<p>如果你正好对卡牌游戏感兴趣，这篇文章想从我觉得最有新意的设计讲起，再给出两条不容易踩坑的入门路径。</p>
+<!-- more -->
+<h2 id="heading">五色颜色轮：不是配色，而是一套性格系统</h2>
+<p>万智牌将法术与生物的力量划分为白、蓝、黑、红、绿五种颜色。它们并不只是牌框的颜色，更各自代表一组价值观、做事方式和擅长的策略。于是，一张牌的效果往往在你读完之前，就已经能从颜色里猜到几分它的性格。</p>
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>常见信念</th>
+<th>牌桌上的感觉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>白色</td>
+<td>秩序、群体、保护、公平</td>
+<td>建立防线、强化同伴、用规则限制对手</td>
+</tr>
+<tr>
+<td>蓝色</td>
+<td>知识、理性、变化、掌控</td>
+<td>抽牌、预知、反制，在关键时刻改写计划</td>
+</tr>
+<tr>
+<td>黑色</td>
+<td>野心、代价、个人意志、死亡</td>
+<td>用生命或资源交换力量，从墓地与牺牲中获利</td>
+</tr>
+<tr>
+<td>红色</td>
+<td>情感、自由、冲动、火焰</td>
+<td>快速进攻、直接伤害、让局面立刻沸腾</td>
+</tr>
+<tr>
+<td>绿色</td>
+<td>生命、自然、传统、成长</td>
+<td>加速资源、召唤巨大生物，用体型压过对手</td>
+</tr>
+</tbody>
+</table>
+<p>这套设计最妙的是，它没有把任何一种价值简单写成“善”或“恶”。白色的秩序可以是守护弱者，也可能变成僵化控制；黑色追求力量，既可能冷酷，也可能坦诚地承认欲望与代价。红色的冲动有时鲁莽，有时又是拒绝伪装的真诚。</p>
+<p>颜色之间还有天然的亲疏关系：相邻颜色更容易在理念上找到共同点，相对颜色则常常冲突。把两种或更多颜色放进同一套牌，像是在让几种处世哲学谈判。比如蓝白倾向于控制与秩序，红绿更愿意直接用生物和力量解决问题；黑绿则会把死亡看成生命循环的一部分。即使不熟悉规则，光从这些组合出发，也很容易记住不同套牌的气质。</p>
+<p><img src="https://windrunner0707.tech/post-images/wan-zhi-pai-color-pie.png" alt="万智牌五色颜色轮" /></p>
+<p><em>五色颜色轮示意图。图片来源：<a href="https://aetherhub.com/Article/How-To-Play-Magic-The-Gathering---Ultimate-Guide">AetherHub</a>。</em></p>
+<h2 id="heading-1">一张牌也是一扇世界的窗</h2>
+<p>万智牌的牌面美术并不只是“给效果配一张图”。它要在很小的画幅里，交代生物的种族、法术发生的瞬间、一个位面的风土，甚至角色正在面对的抉择。</p>
+<p>有些牌是宏大的：巨龙越过城墙、风暴吞没海面、军团在旷野集结；也有些画面特别克制：旅人站在异世界的街口，炼金师低头处理一支药剂，一只小小的精怪藏在树叶之间。很多时候，你还没理解卡牌文字，就已经从光线、构图和角色姿态感受到它属于哪个世界。</p>
+<p>这种美术与机制互相呼应的感觉很特别。绿色生物往往有繁茂、野性和重量感；蓝色法术则常带有水流、星空、实验室或幻象。它不是硬性的规定，但长期积累下来，会让一套牌拥有很完整的视觉记忆。对只想收藏或欣赏插画的人来说，单卡也完全可以是独立的小型艺术品。</p>
+<h3 id="heading-2">五色各挑一张：从牌面读出它的性格</h3>
+<p>下面这五张都是实际印刷过的卡牌。它们未必是每种颜色最强的代表，却很适合放在一起看：从天使、法术到精灵，画面与规则文字共同完成了角色塑造。</p>
+<div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start;">
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/fdn/740/serra-angel" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-serra-angel.jpg" alt="Serra Angel，白色卡牌" loading="lazy"></a>
+    <figcaption><strong>白：Serra Angel</strong><br>洁白的羽翼、庄严的盔甲与警戒异能，让“守护”变得一眼可见。</figcaption>
+  </figure>
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/dsc/114/counterspell" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-counterspell.jpg" alt="Counterspell，蓝色卡牌" loading="lazy"></a>
+    <figcaption><strong>蓝：Counterspell</strong><br>只用两个字就取消一个法术，是蓝色“掌控与反应”的经典表达。</figcaption>
+  </figure>
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/cmm/150/demonic-tutor" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-demonic-tutor.jpg" alt="Demonic Tutor，黑色卡牌" loading="lazy"></a>
+    <figcaption><strong>黑：Demonic Tutor</strong><br>以恶魔交易换取所求之物，把野心与代价写在同一张牌上。</figcaption>
+  </figure>
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/msc/806/lightning-bolt" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-lightning-bolt.jpg" alt="Lightning Bolt，红色卡牌" loading="lazy"></a>
+    <figcaption><strong>红：Lightning Bolt</strong><br>闪电直击目标；直接、迅速而不讲道理，正是红色的节奏。</figcaption>
+  </figure>
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/fdn/227/llanowar-elves" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-llanowar-elves.jpg" alt="Llanowar Elves，绿色卡牌" loading="lazy"></a>
+    <figcaption><strong>绿：Llanowar Elves</strong><br>小小的精灵连接自然与资源，为后续的大生物生长蓄力。</figcaption>
+  </figure>
+</div>
+<p><em>牌图与牌面资料由 <a href="https://scryfall.com/">Scryfall</a> 提供；万智牌及相关卡图版权归 Wizards of the Coast 所有。</em></p>
+<h2 id="-ip-">与热门 IP 联动，让熟悉的角色进入牌桌</h2>
+<p>近年的《Universes Beyond》系列让万智牌和许多热门 IP 产生联动。无论是《指环王》里的中土冒险、《战锤 40,000》的宇宙战争、《辐射》的废土，还是《最终幻想》等作品，都曾以万智牌的规则语言重新呈现。</p>
+<p>联动吸引人的地方不只是“角色上了卡”。设计师会尝试把原作最有辨识度的东西翻译成游戏机制：例如把远征、阵营、装备、同伴或宿命做成可互动的牌桌体验。熟悉原作的人能发现彩蛋；没接触过原作的人，也能借由一张卡进入一个新世界。</p>
+<p>当然，联动产品很容易让人产生“每套都想买”的冲动。把它们当作喜欢的主题或收藏方向会更轻松，不必把跟上所有产品当成入门门槛。</p>
+<h2 id="heading-3">新手先抓住三个概念就够了</h2>
+<p>万智牌的规则很深，但第一局并不需要背完。先理解下面三件事，已经足够开始玩：</p>
+<ol>
+<li><strong>地牌提供法术力。</strong> 大多数牌需要支付对应颜色的法术力才能使用，地牌通常就是资源来源。</li>
+<li><strong>生物会进攻与阻挡。</strong> 生物右下角的数字一般表示力量与防御力；进攻方宣告攻击，防守方选择是否阻挡。</li>
+<li><strong>每回合都在做取舍。</strong> 是先展开生物、留资源应对对手，还是把一张强力法术留到更合适的时机？这种取舍正是游戏的核心乐趣。</li>
+</ol>
+<p>先用现成套牌多打几局，比一开始钻进所有时序细节更有效。遇到规则问题再查，记忆会牢得多。</p>
+<h2 id="-mtga">入门怎么选：线上用 MTGA，线下从成套产品或单卡开始</h2>
+<h3 id="-mtg-arena-">想低成本熟悉规则：从 MTG Arena 开始</h3>
+<p>如果还不确定自己是否喜欢，最推荐先玩 <strong>MTG Arena（MTGA）</strong>。它会自动处理许多规则与结算，教程和对局也能帮助你很快理解回合流程、法术力与战斗。更重要的是，线上试错的成本低：你可以多换几种颜色和策略，不必一开始就为实体卡作大额投入。</p>
+<p><img src="https://windrunner0707.tech/post-images/mtg-arena-gameplay.jpg" alt="MTG Arena 对局界面" /></p>
+<p><em>MTG Arena 对局界面。图片来源：<a href="https://minireview.io/ccg/magic-the-gathering-arena">MiniReview</a>。</em></p>
+<p>刚入门时不必急着组“最强套牌”。先挑一套看起来顺眼、打法直观的预组或新手套牌，连续玩十几局，慢慢体会什么时候该铺场、什么时候该保留手牌。知道自己喜欢快攻、控制、大生物还是组合技之后，再投入资源会更准确。</p>
+<h3 id="heading-4">想和朋友线下休闲：优先买单卡或预组套牌</h3>
+<p>线下的乐趣和线上不同：洗牌的手感、桌面上逐渐铺开的画面、朋友围着一局牌讨论，都是实体卡难以替代的部分。</p>
+<p>如果目标是休闲玩，比较实用的做法有两种：</p>
+<ul>
+<li><strong>买现成预组套牌。</strong> 它能让你开盒就玩，牌之间已有基本配合，特别适合和朋友约一局、或尝试某个主题。多人休闲常见的指挥官预组也是很方便的入口。</li>
+<li><strong>直接买单卡来组牌。</strong> 当你已经知道喜欢的主题或卡表时，买单卡通常比反复开补充包更可控：预算花在真正会用到、也真正喜欢的牌上。</li>
+</ul>
+<p>补充包当然有拆卡的惊喜，也很适合轮抽、现开等玩法；但如果目的只是凑齐一副可玩的实体套牌，它并不是最高效的途径。和固定朋友群一起玩时，还可以先约好预算与强度范围，让每个人的体验更接近。</p>
+<p><img src="https://windrunner0707.tech/post-images/wan-zhi-pai-foundations-tabletop.jpg" alt="Magic Foundations 产品宣传图" /></p>
+<p><em>适合新手认识产品风格的 Foundations 宣传图。图片来源：<a href="https://bardsandcards.com/products/fri-12-6-2024-6-pm-friday-night-magic-foundations-draft">Bards &amp; Cards</a>。</em></p>
+<h2 id="heading-5">从一副喜欢的牌开始</h2>
+<p>万智牌有足够深的规则，让人花很多年研究；也有足够多的美术、世界观和主题，让人只把它当作一项轻松的爱好。无需一开始就记住所有系列、格式和术语。</p>
+<p>选一种让你有感觉的颜色，找一张愿意反复看的插画，或从喜欢的联动 IP 入门都可以。等你第一次发现两张牌恰好能形成漂亮配合，或者看到自己喜欢的角色在牌桌上完成一次戏剧性的逆转，就会明白它为什么能让这么多人一直玩下去。</p>
+]]></description>
+      <enclosure url="https://windrunner0707.tech/post-images/wan-zhi-pai-foundations-cover.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
       <title>Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch</title>
@@ -1600,181 +1725,6 @@ WHERE stock_key = :stockKey
 ]]></description>
       <category>路由器</category>
       <enclosure url="https://windrunner0707.tech/post-images/lu-you-qi-li-mian-de-yi-xie-ru-men-gai-nian.webp" length="0" type="image/webp"></enclosure>
-    </item>
-    <item>
-      <title>日麻入门：从牌型、向听到牌效率</title>
-      <link>https://windrunner0707.tech/post/riichi-mahjong-basics-tile-efficiency/</link>
-      <guid isPermaLink="true">https://windrunner0707.tech/post/riichi-mahjong-basics-tile-efficiency/</guid>
-      <pubDate>Wed, 25 Feb 2026 00:00:00 +0800</pubDate>
-      <description><![CDATA[<p>日麻常被误解成一种主要靠“运气”的游戏。单局当然会受牌山影响，但竞技麻将真正比较的，是玩家能否在大量对局里持续做出更高期望的选择：更快组成好形、更准确地判断进攻与防守，并接受正确选择偶尔也会得到坏结果。</p>
-<p>这篇文章整理了我学习日麻时做的思维导图，从牌的组成、和牌结构、搭子质量、向听数和听牌选择说起。重点不是一次背完所有规则，而是先建立一套能指导每次摸切的牌效率框架。</p>
-<!-- more -->
-<figure class="mindmap-figure">
-  <button class="zoomable-image-trigger" type="button" data-zoom-src="https://windrunner0707.tech/post-images/riichi-mahjong-basics-mindmap.webp" aria-label="放大查看日麻基础思维导图">
-    <img src="https://windrunner0707.tech/post-images/riichi-mahjong-basics-mindmap.webp" alt="日麻基础与牌效率思维导图" loading="lazy">
-    <span>点击图片放大查看</span>
-  </button>
-  <figcaption>日麻基础思维导图（支持放大、缩小和拖动）</figcaption>
-</figure>
-<h2 id="heading">一、先建立正确的竞技观</h2>
-<p>麻将既不是纯粹的运气游戏，也不是每一局都能靠技术获胜。我们无法决定下一张摸到什么，却能决定保留哪些牌、打出哪张牌、是否鸣牌，以及什么时候停止进攻。</p>
-<p>因此，评价一次决策时，应当把“选择是否合理”和“结果是否成功”分开：</p>
-<ul>
-<li>好选择可能因为牌山和对手的行动而失败；</li>
-<li>坏选择也可能偶然和牌；</li>
-<li>一次输赢无法证明打法优劣，长期结果才更接近真实水平。</li>
-</ul>
-<p>所谓“运气”更像尚未观察到结果的随机过程。竞技日麻要做的是在信息不完整时提高选择质量，并控制失败时的损失。</p>
-<h2 id="heading-1">二、认识一副日麻牌</h2>
-<p>日麻通常使用 136 张牌，每种牌各 4 张。</p>
-<h3 id="1-">1. 数牌</h3>
-<p>数牌分为三门，每门从 1 到 9：</p>
-<ul>
-<li><strong>万子（m）</strong>：一万到九万；</li>
-<li><strong>筒子（p）</strong>：一筒到九筒；</li>
-<li><strong>索子（s）</strong>：一索到九索。</li>
-</ul>
-<p>记谱时常把同一门写在一起。例如 <code>345m</code> 表示三万、四万、五万，<code>68p</code> 表示六筒和八筒。</p>
-<h3 id="2-">2. 字牌</h3>
-<p>字牌共 7 种：</p>
-<ul>
-<li>风牌：东、南、西、北；</li>
-<li>三元牌：白、发、中。</li>
-</ul>
-<p>数牌能够组成顺子，字牌不能组成顺子，只能做对子或刻子。这一点直接决定了它们的组合效率。</p>
-<h2 id="heading-2">三、和牌的基本结构</h2>
-<p>最常见的和牌结构是 <strong>四组面子加一组雀头</strong>，即常说的“四面子一雀头”。</p>
-<ul>
-<li><strong>顺子</strong>：同一门连续三张数牌，如 <code>345m</code>；</li>
-<li><strong>刻子</strong>：三张相同的牌，如 <code>777p</code>；</li>
-<li><strong>杠子</strong>：四张相同的牌，结构上作为一组面子；</li>
-<li><strong>雀头</strong>：两张相同的牌，也就是对子。</li>
-</ul>
-<p>除此之外，还有七对子、国士无双等特殊结构。入门阶段可以先以四面子一雀头为主，因为大多数牌局都沿着这条路线发展。</p>
-<p>还要特别注意：<strong>日麻和牌不仅要完成牌型，还必须至少有一个役。</strong> “牌已经凑齐”和“规则允许和牌”不是同一件事。立直、断幺九、役牌、平和等役种，需要在学习牌效率之后继续补上。</p>
-<h2 id="heading-3">四、搭子决定进张效率</h2>
-<p>两张牌中，已经相同的两张叫对子；有机会补成顺子的两张叫搭子。搭子的质量，决定了牌手能用多少种牌把手牌推进一步。</p>
-<table>
-<thead>
-<tr>
-<th>搭子</th>
-<th>示例</th>
-<th>可完成的牌</th>
-<th>未见相关牌时的剩余枚数</th>
-<th>特点</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>两面</td>
-<td><code>34s</code></td>
-<td><code>2s</code>、<code>5s</code></td>
-<td>最多 8 枚</td>
-<td>进张最宽，通常是最好形</td>
-</tr>
-<tr>
-<td>嵌张</td>
-<td><code>68p</code></td>
-<td><code>7p</code></td>
-<td>最多 4 枚</td>
-<td>只等中间一张</td>
-</tr>
-<tr>
-<td>边张</td>
-<td><code>12m</code></td>
-<td><code>3m</code></td>
-<td>最多 4 枚</td>
-<td>只等一侧，且改良空间有限</td>
-</tr>
-</tbody>
-</table>
-<p>这里的“枚数”要扣除自己手牌、牌河和副露中已经看见的牌。比如四张 <code>7p</code> 中已经出现两张，那么 <code>68p</code> 实际只剩两枚有效牌。</p>
-<h3 id="1--1">1. 为什么两面优先</h3>
-<p>两面同时接受两种牌，通常比嵌张和边张多一倍进张。例如 <code>34s</code> 摸到 <code>2s</code> 或 <code>5s</code> 都能成为顺子，而 <code>68p</code> 只能等 <code>7p</code>。如果两种搭子在其他条件上相近，应优先保留两面。</p>
-<h3 id="2--1">2. 复合形不要过早拆散</h3>
-<p>三张以上的连续或相邻数牌，经常同时包含多个搭子。例如 <code>344s</code> 既保留对子，也包含 <code>34s</code> 的两面变化；<code>122m</code> 则同时具有对子与边张的性质。</p>
-<p>拆牌前不要只看眼前的两张，而要先问：</p>
-<ol>
-<li>这组牌能接受哪些进张？</li>
-<li>进张后会形成两面、对子还是愚形？</li>
-<li>拆掉其中一张，会不会同时损失多条变化路线？</li>
-</ol>
-<p>牌效率不是把手牌机械地切成若干组，而是保留彼此有联系的复合形。</p>
-<h2 id="heading-4">五、对子与雀头的价值会变化</h2>
-<p>对子既可能成为雀头，也可能摸到第三张后成为刻子。它的价值取决于整手牌中已有多少个对子：</p>
-<ul>
-<li><strong>没有对子</strong>：第一个对子很重要，因为标准形最终需要雀头；</li>
-<li><strong>只有一个对子</strong>：它通常是雀头候选，应谨慎拆除；</li>
-<li><strong>有两个对子</strong>：一个可以做雀头，另一个有机会发展为刻子，变化较丰富；</li>
-<li><strong>对子过多</strong>：标准形的顺子空间会被挤压，此时要比较继续做标准形、七对子或对对和等路线的距离与价值。</li>
-</ul>
-<p>对子并非固定的“好牌”或“坏牌”。同一组对子，在缺雀头时价值很高，在对子已经过剩时则可能成为阻碍。</p>
-<h2 id="heading-5">六、为什么中张通常比幺九牌灵活</h2>
-<p>数牌并不是位置越大越强。判断一张孤立牌的效率，要看它能参与多少种顺子。</p>
-<ul>
-<li>1 只能参与 <code>123</code>；</li>
-<li>2 可以参与 <code>123</code>、<code>234</code>；</li>
-<li>3 可以参与 <code>123</code>、<code>234</code>、<code>345</code>；</li>
-<li>4 至 6 各能参与四种顺子；</li>
-<li>7、8、9 与 3、2、1 对称。</li>
-</ul>
-<p>因此，在没有役种、打点和安全度等额外因素时，孤立数牌的组合效率大致可以记成：</p>
-<pre><code class="language-text">3～7 ＞ 2、8 ＞ 1、9 ＞ 无役价值的孤立字牌
-</code></pre>
-<p>这只是默认排序，不是绝对弃牌表。役牌对子、混一色路线、宝牌、场况和防守价值，都可能改变一张牌的实际优先级。</p>
-<h2 id="heading-6">七、用向听数衡量“离和牌还有多远”</h2>
-<p><strong>向听数</strong>表示一手牌距离听牌还差多少步：</p>
-<ul>
-<li>一向听：再一次有效进张就可能听牌；</li>
-<li>二向听：还需要两次有效进张；</li>
-<li>零向听：已经听牌。</li>
-</ul>
-<p>每次切牌时，最基本的目标是优先减少向听数；如果不同切法的向听数相同，再比较它们的 <strong>有效牌种类与剩余枚数</strong>，也就是常说的“受入”。</p>
-<p>可以把基本判断顺序概括为：</p>
-<pre><code class="language-text">先避免退向听
-    → 再比较有效牌数量
-    → 再比较进张后的形状
-    → 最后结合打点、役、安全度和场况
-</code></pre>
-<p>只数当前受入仍然不够。有的切法眼前有效牌很多，却会把手牌固定成大量嵌张和边张；另一些切法当前少一两枚，却能在后续改良成多个两面。真正高效的选择，需要同时看“现在能进什么”和“进张以后会变成什么”。</p>
-<h2 id="heading-7">八、鸣牌是速度工具，也有明确代价</h2>
-<p>吃、碰、杠可以缩短成牌距离，因此鸣牌本质上是一种用手牌自由度换速度的工具。它不是看到能鸣就鸣，也不是为了保持门清而一律不鸣。</p>
-<p>决定是否鸣牌前，至少检查四件事：</p>
-<ol>
-<li><strong>鸣牌后是否有役</strong>：没有役就无法和牌；</li>
-<li><strong>实际减少了多少向听</strong>：只是改变形状、没有提高速度的鸣牌价值有限；</li>
-<li><strong>打点损失是否可接受</strong>：鸣牌通常会失去立直、门前清自摸和一部分役种；</li>
-<li><strong>局面是否需要速度</strong>：领先时的局消化、末盘争一位、对手明显做大牌时，答案可能完全不同。</li>
-</ol>
-<p>鸣牌还会固定一部分牌形，让可调整空间与防守牌减少。竞技麻将追求的不是永远门清或永远速攻，而是让每次鸣牌都有清晰目的。</p>
-<h2 id="heading-8">九、听牌不只看“等几张”</h2>
-<p>听牌以后，仍然要比较听牌质量。两面通常优于嵌张、边张和单骑，但实际选择还应考虑：</p>
-<ul>
-<li>剩余枚数：等待的牌是否已经大量可见；</li>
-<li>和了率：是否容易被对手使用或打出；</li>
-<li>打点：改变听牌是否能增加役、宝牌或符数；</li>
-<li>振听：自己牌河中是否已经出现过所等待的牌；</li>
-<li>场况：巡目、点棒、亲家与否、对手攻势都会改变目标。</li>
-</ul>
-<p>牌效率解决的是“怎样更快、更好地组成手牌”，但它不是唯一目标。越接近实战后半段，安全度、押引判断与点数状况的权重就越高。</p>
-<h2 id="heading-9">十、一套可以直接练习的摸切流程</h2>
-<p>每次摸牌后，可以按下面的顺序快速检查：</p>
-<ol>
-<li>当前是几向听？</li>
-<li>哪些切法不会退向听？</li>
-<li>各切法分别有多少种、多少枚有效牌？</li>
-<li>有效牌进来后，是两面还是愚形？有没有继续改良的空间？</li>
-<li>手牌是否已有可靠的雀头与役？</li>
-<li>宝牌、打点和鸣牌计划是什么？</li>
-<li>牌桌上是否已经出现必须转入防守的信号？</li>
-</ol>
-<p>训练时可以先暂时忽略复杂点数，只练习“向听数、受入、好形”三件事。等基本判断形成直觉，再逐步加入役种、宝牌、场况与防守，学习负担会小得多。</p>
-<h2 id="heading-10">结语</h2>
-<p>日麻的竞技性，来自长期重复决策形成的差距。高手并不是每局都能摸到更好的牌，而是更少浪费有效进张、更少破坏复合形，也更清楚什么时候该用打点换速度、什么时候该放弃眼前的和牌机会。</p>
-<p>入门阶段先记住三点：<strong>先看向听，再数受入；同样受入，优先好形；评价决策，不被单局结果绑架。</strong> 当这些原则能自然地进入每一次摸切，牌效率才真正从知识变成能力。</p>
-]]></description>
-      <category>日麻</category>
-      <enclosure url="https://windrunner0707.tech/post-images/riichi-mahjong-basics-tile-efficiency.webp" length="0" type="image/webp"></enclosure>
     </item>
   </channel>
 </rss>
