@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="780" viewBox="0 0 1400 780" role="img" aria-labelledby="t d">
+  <title id="t">多范式软件设计</title>
+  <desc id="d">领域模型、函数式计算、状态机、事件驱动和副作用适配器在清晰边界内协作。</desc>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101827"/><stop offset="1" stop-color="#102b35"/></linearGradient><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0L9 3 0 6Z" fill="#64748b"/></marker></defs>
+  <rect width="1400" height="780" rx="28" fill="url(#bg)"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="70" y="78" fill="#f8fafc" font-size="34" font-weight="600">健壮的系统往往不只使用一种范式</text>
+    <text x="70" y="118" fill="#94a3b8" font-size="19">关键不是混用多少工具，而是谁维护状态、哪里发生副作用、边界是否清楚</text>
+    <g stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#a)"><path d="M385 295H505"/><path d="M895 295H1015"/><path d="M700 395V500"/><path d="M1100 390V500"/></g>
+    <g transform="translate(85 210)"><rect width="300" height="170" rx="24" fill="#183146" stroke="#2d6077"/><text x="150" y="48" text-anchor="middle" fill="#67e8f9" font-size="24" font-weight="600">DDD / OOP</text><text x="150" y="88" text-anchor="middle" fill="#e2e8f0" font-size="18">实体、值对象、聚合</text><text x="150" y="120" text-anchor="middle" fill="#94a3b8" font-size="17">维护身份、生命周期</text><text x="150" y="146" text-anchor="middle" fill="#94a3b8" font-size="17">与业务不变量</text></g>
+    <g transform="translate(505 210)"><rect width="390" height="185" rx="24" fill="#193b3b" stroke="#67e8f9" stroke-width="3"/><text x="195" y="50" text-anchor="middle" fill="#67e8f9" font-size="25" font-weight="600">FP 计算核心</text><text x="195" y="93" text-anchor="middle" fill="#e2e8f0" font-size="18">定价、校验、转换、聚合</text><text x="195" y="128" text-anchor="middle" fill="#94a3b8" font-size="17">纯函数 + 不可变值</text><text x="195" y="156" text-anchor="middle" fill="#94a3b8" font-size="17">便于测试与组合</text></g>
+    <g transform="translate(1015 210)"><rect width="300" height="180" rx="24" fill="#3b3020" stroke="#816328"/><text x="150" y="48" text-anchor="middle" fill="#fbbf24" font-size="24" font-weight="600">状态机</text><text x="150" y="90" text-anchor="middle" fill="#e2e8f0" font-size="18">订单、审批、工作流</text><text x="150" y="124" text-anchor="middle" fill="#94a3b8" font-size="17">约束允许的状态迁移</text></g>
+    <g transform="translate(505 500)"><rect width="390" height="170" rx="24" fill="#252c42" stroke="#66719a"/><text x="195" y="48" text-anchor="middle" fill="#c4b5fd" font-size="24" font-weight="600">事件驱动</text><text x="195" y="90" text-anchor="middle" fill="#e2e8f0" font-size="18">连接相对独立的业务流程</text><text x="195" y="124" text-anchor="middle" fill="#94a3b8" font-size="17">降低同步耦合</text></g>
+    <g transform="translate(1015 500)"><rect width="300" height="170" rx="24" fill="#3c2831" stroke="#8a5266"/><text x="150" y="48" text-anchor="middle" fill="#fda4af" font-size="24" font-weight="600">IO / 适配器</text><text x="150" y="90" text-anchor="middle" fill="#e2e8f0" font-size="18">数据库、网络、消息</text><text x="150" y="124" text-anchor="middle" fill="#94a3b8" font-size="17">集中管理副作用</text></g>
+    <text x="85" y="710" fill="#cbd5e1" font-size="19">清晰的职责与依赖方向，比“全项目统一成某一种风格”更能减少意外。</text>
+  </g>
+</svg>

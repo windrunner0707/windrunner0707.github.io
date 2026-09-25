@@ -9,6 +9,204 @@
     <lastBuildDate>Sun, 12 Jul 2026 13:49:20 +0800</lastBuildDate>
     <atom:link href="https://windrunner0707.tech/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <item>
+      <title>函数式编程：一种优雅但不必迷信的编程方式</title>
+      <link>https://windrunner0707.tech/post/han-shu-shi-bian-cheng-yi-zhong-you-ya-dan-bu-bi-mi-xin-de-bian-cheng-fang-shi/</link>
+      <guid isPermaLink="true">https://windrunner0707.tech/post/han-shu-shi-bian-cheng-yi-zhong-you-ya-dan-bu-bi-mi-xin-de-bian-cheng-fang-shi/</guid>
+      <pubDate>Fri, 25 Sep 2026 22:46:09 +0800</pubDate>
+      <description><![CDATA[<p>第一次接触函数式编程时，我最直接的感受是：代码还能这样写。</p>
+<p>它不急着描述“先修改这个变量，再更新那个状态”。数据从一个函数流向另一个函数，每一步接收输入、完成计算、产生输出。写得好的函数式代码像一条清晰的流水线，也有一点数学推导的工整感。</p>
+<p>不过，FP 并不等于 Lambda、链式调用和一堆陌生术语。理解它的关键，是看清函数、数据与副作用之间的关系。</p>
+<!-- more -->
+<h2 id="heading">函数式编程从哪里来</h2>
+<p>函数式编程的源头通常会追溯到 Alonzo Church 在 20 世纪 30 年代提出的 Lambda 演算。它用函数抽象、函数应用和变量替换描述计算。今天 Java、JavaScript 等语言中的 Lambda 表达式，名字就来自这里。</p>
+<p>命令式编程习惯把计算理解为一台机器不断改变内存状态；Lambda 演算提供了另一种视角：计算也可以是表达式的化简，以及函数之间的代入和组合。</p>
+<p>1958 年，John McCarthy 开始设计 Lisp。1960 年发表的论文 <a href="https://www-formal.stanford.edu/jmc/recursive.html">Recursive Functions of Symbolic Expressions and Their Computation by Machine</a> 描述了 Lisp 的基本思想。函数、递归和符号处理由此进入了一门真正可以运行的编程语言。</p>
+<p>Lisp 最醒目的语法是 S 表达式：</p>
+<pre><code class="language-lisp">(define (square x)
+  (* x x))
+
+(map square '(1 2 3 4))
+</code></pre>
+<p>这段 Scheme 代码把 <code>square</code> 作为参数传给 <code>map</code>，结果是 <code>(1 4 9 16)</code>。程序本身也使用列表结构表示，因此 Lisp 还发展出了“代码即数据”和宏系统。需要说明的是，Lisp 是一个语言家族，Common Lisp、Scheme、Clojure 的设计并不相同；它们有深厚的函数式传统，却不都要求程序保持纯函数。</p>
+<p>后来出现的 ML、Scheme 和 Haskell，又分别推动了类型推导、词法作用域、惰性求值与纯函数等方向。今天，FP 已经进入很多多范式语言：Java 有 Lambda 和 Stream，JavaScript 天生把函数当作值，Scala 则把 OOP 与 FP 放在同一门语言中。</p>
+<p><img src="https://windrunner0707.tech/post-images/functional-programming-history.svg" alt="函数式编程从 Lambda 演算、Lisp 到现代多范式语言的思想脉络" /></p>
+<p><em>函数式编程的思想从数学模型进入编程语言，又逐渐成为日常工程工具。</em></p>
+<h2 id="-fp-">把 FP 的核心概念放在一起看</h2>
+<p>很难用一条规则给所有函数式语言划出边界。Haskell 把纯函数放在语言核心，Lisp 允许直接修改状态，Scala 则是一门明确的多范式语言。它们的选择不同，但共享一些基本倾向：函数是一等公民，数据尽量不可变，计算通过函数组合完成，副作用被放进清楚的边界。</p>
+<p><img src="https://windrunner0707.tech/post-images/fp-core-concepts.svg" alt="函数式编程的一等函数、纯函数、不可变数据与组合关系" /></p>
+<h3 id="heading-1">一等函数与高阶函数</h3>
+<p>在函数式编程中，函数不只是依附于对象的方法。它可以像字符串和数字一样赋给变量、作为参数传入，也可以由另一个函数返回。</p>
+<pre><code class="language-ts">const withTax =
+  (rate: number) =&gt;
+  (price: number): number =&gt;
+    price * (1 + rate);
+
+const addVAT = withTax(0.13);
+const finalPrice = addVAT(100);
+</code></pre>
+<p><code>withTax</code> 接收税率，返回一个新的价格计算函数。这类接收函数或返回函数的函数叫高阶函数。<code>map</code>、<code>filter</code> 和 <code>reduce</code> 也是高阶函数，但 FP 不等于使用这三个 API。真正重要的是，我们可以把“如何计算”本身作为值传递。</p>
+<h3 id="heading-2">纯函数与引用透明</h3>
+<p>纯函数有两个常见特征：相同的输入总能得到相同的输出；执行时不会改变外部可观察状态。</p>
+<p>下面的函数表面上在计算价格，实际还读取全局配置、写日志并修改订单：</p>
+<pre><code class="language-java">BigDecimal calculatePrice(Order order) {
+    var rate = globalConfig.getDiscountRate();
+    auditLogger.log(order.getId());
+    order.setCalculated(true);
+    return order.getAmount().multiply(rate);
+}
+</code></pre>
+<p>只看函数签名，我们不知道它依赖哪些条件，也看不出调用它会改变什么。改成纯函数后，依赖被明确写进参数：</p>
+<pre><code class="language-java">BigDecimal calculatePrice(
+    BigDecimal amount,
+    BigDecimal discountRate
+) {
+    return amount.multiply(discountRate);
+}
+</code></pre>
+<p>纯函数通常具有引用透明性：一个函数调用可以被它的结果替换，而不改变程序含义。<code>calculatePrice(100, 0.8)</code> 如果总是得到 <code>80</code>，理解代码时就不必追查数据库、时间和全局变量。</p>
+<p>这也是纯函数容易测试的原因：</p>
+<pre><code class="language-java">@Test
+void shouldApplyDiscount() {
+    var result = calculatePrice(
+        new BigDecimal(&quot;100&quot;),
+        new BigDecimal(&quot;0.8&quot;)
+    );
+
+    assertEquals(new BigDecimal(&quot;80.0&quot;), result);
+}
+</code></pre>
+<p>测试不需要启动 Spring 容器，也不用准备数据库和日志组件。输入、规则和预期结果摆在同一个地方，失败后的排查范围自然更小。</p>
+<h3 id="heading-3">不可变数据</h3>
+<p>不可变数据不是说程序里的任何东西都不能变化，而是一次变化产生一个新值，旧值保持原样：</p>
+<pre><code class="language-ts">const rename = (user: User, name: string): User =&gt; ({
+  ...user,
+  name,
+});
+</code></pre>
+<p>如果不同模块都能随手修改同一个 <code>user</code>，排查问题时就要追问它在什么时候被谁改过。返回新值后，状态变化更容易追踪，也减少了共享数据在并发环境中互相干扰的机会。</p>
+<p>不可变并不免费。它可能产生中间对象，也需要语言运行时或持久化数据结构提供支持。在性能敏感的局部代码中，范围明确的可变状态有时更简单。FP 关注的是减少无法控制的共享修改，而不是为了纯粹拒绝一切赋值。</p>
+<h3 id="heading-4">函数组合与数据管道</h3>
+<p>小函数的价值在于组合。假设要处理一批订单，可以把过程写成连续的数据转换：</p>
+<pre><code class="language-ts">const total = orders
+  .filter(order =&gt; order.status === &quot;paid&quot;)
+  .map(order =&gt; convertToCNY(order.amount, order.currency))
+  .reduce((sum, amount) =&gt; sum + amount, 0);
+</code></pre>
+<p>这段代码描述的是“数据怎样变化”，而不是循环变量如何移动、临时集合何时写入。过滤、换算和汇总还能单独测试，并在其他流程中重新组合。</p>
+<p>不过，链式写法只是表象。下面的代码使用了 <code>map</code>，内部却在修改全局变量和访问数据库：</p>
+<pre><code class="language-ts">orders.map(order =&gt; {
+  globalTotal += order.amount;
+  database.save(order);
+  return order;
+});
+</code></pre>
+<p>它看起来像 FP，行为仍然很难推理。判断一段代码是否具有函数式价值，应该看依赖是否明确、数据是否被随意修改、每一步能否独立理解，而不是数一数出现了多少次 <code>map</code>。</p>
+<h3 id="heading-5">副作用与函数式核心</h3>
+<p>向数据库保存订单、发送消息、读取文件、获取当前时间，都是副作用。副作用不是错误。一个完全没有副作用的程序，也很难与现实世界交互。</p>
+<p>问题在于，副作用是否和业务计算搅在了一起。一个函数如果同时负责计算优惠、写数据库、发送通知和修改缓存，测试与排错都会变得笨重。</p>
+<p>一种实用的结构是“函数式核心，命令式外壳”：外层读取数据库和系统时间，把明确的数据交给纯函数计算，再把结果写回外部系统。</p>
+<p><img src="https://windrunner0707.tech/post-images/functional-core-imperative-shell.svg" alt="应用程序将数据库、时间和消息等副作用放在外壳，把领域计算放进纯函数核心" /></p>
+<pre><code class="language-java">var order = orderRepository.findById(command.orderId());
+var now = clock.instant();
+
+OrderResult result = calculateOrder(order, command, now, pricingRules);
+
+orderRepository.save(result.order());
+eventPublisher.publish(result.events());
+</code></pre>
+<p><code>calculateOrder</code> 只负责计算新状态和领域事件。读取、保存与发布仍然存在，但边界清楚了。核心逻辑可以快速进行单元测试，外层则通过集成测试确认数据库和消息系统是否连接正确。</p>
+<h2 id="monoid--monad">Monoid 与 Monad：两种关于组合的抽象</h2>
+<p>学习 FP 时很快会碰到 Functor、Applicative、Monoid 和 Monad。术语密度突然升高，是很多人觉得 FP 难学的原因。与其先背定义，不如先看它们在解决什么重复问题。</p>
+<h3 id="monoid">Monoid：可以稳定合并的值</h3>
+<p>Monoid 中文通常译作“幺半群”。它需要一组同类的值、一个合并运算和一个单位元。合并两个值后，结果仍属于同一类；单位元与任何值合并，都不会改变这个值。</p>
+<p>合并运算还需要满足结合律：</p>
+<pre><code class="language-text">(a &lt;&gt; b) &lt;&gt; c = a &lt;&gt; (b &lt;&gt; c)
+</code></pre>
+<p>列表是直观的例子。两个列表拼接后仍是列表，空列表 <code>[]</code> 是单位元，先拼左边还是先拼右边不影响结果。字符串与空字符串、整数加法与 <code>0</code>、整数乘法与 <code>1</code> 也有相同结构。</p>
+<p>结合法则并非数学装饰。它意味着大批数据可以被拆成小批分别汇总，最后再合并部分结果。统计聚合、日志拼接和 MapReduce 都能利用这种性质。同一种数据还可以有不同的 Monoid：整数在加法下以 <code>0</code> 为单位元，在乘法下则以 <code>1</code> 为单位元。</p>
+<h3 id="monad">Monad：组合带上下文的计算</h3>
+<p>Monad 中文通常译作“单子”。“盒子”或“流水线”的比喻能提供直觉，却无法覆盖所有 Monad。对业务开发来说，从 <code>Result</code> 这样的具体类型入手更容易。</p>
+<p>假设程序要把文本解析成用户编号，再查询用户。两步都可能失败：文本未必是整数，用户也可能不存在。</p>
+<pre><code class="language-ts">type Result&lt;T&gt; =
+  | { type: &quot;success&quot;; value: T }
+  | { type: &quot;failure&quot;; error: string };
+
+const result = flatMap(parseUserId(input), id =&gt; loadUser(id));
+</code></pre>
+<p>这里传递的不是普通 <code>number</code>，而是 <code>Result&lt;number&gt;</code>。<code>Result</code> 携带了“计算可能失败”的上下文。<code>flatMap</code> 约定：上一步成功，就取出值执行下一步；上一步失败，就保留错误并跳过后面的函数。</p>
+<p>用简化的类型签名表示：</p>
+<pre><code class="language-text">pure:    A -&gt; M&lt;A&gt;
+flatMap: M&lt;A&gt; -&gt; (A -&gt; M&lt;B&gt;) -&gt; M&lt;B&gt;
+</code></pre>
+<p><code>pure</code> 把普通值放进某种上下文，<code>flatMap</code> 让返回同类上下文的下一步计算接上来。<code>Result</code> 负责传递失败，<code>Option</code> 负责处理缺失，异步类型则负责等待。</p>
+<p><img src="https://windrunner0707.tech/post-images/monoid-monad-explained.svg" alt="Monoid 合并同类值与 Monad 串联带上下文计算的直观示意" /></p>
+<p><em>Monoid 组合值，Monad 组合带上下文的计算。名字相近，两者却不是上下级关系。</em></p>
+<p>严格来说，只有提供相应操作并满足 Monad 法则的类型才能称为 Monad。这些法则保证改变组合方式时，程序含义不会悄悄变化。入门阶段不必先背完法则，但也不要把所有链式调用都叫作 Monad。</p>
+<h2 id="-fp">不同语言里的 FP</h2>
+<h3 id="java-fp-">Java：可以实践，但不是围绕 FP 设计</h3>
+<p>Java 8 引入 Lambda、Stream 和函数式接口后，函数式风格进入了日常 Java 开发：</p>
+<pre><code class="language-java">var activeUserNames = users.stream()
+    .filter(User::isActive)
+    .map(User::getName)
+    .sorted()
+    .toList();
+</code></pre>
+<p>函数式接口也让函数可以作为参数传递。不过，Java 不会检查一个函数是否纯净，<code>Stream</code> 中的 Lambda 也完全可以修改外部变量。函数需要借助 <code>Function</code>、<code>Predicate</code> 等接口表达，复杂的类型组合容易变得笨重。</p>
+<p>Java 很适合用来实践纯函数、不可变值和数据转换，但它不会把开发者推向纯函数式设计。</p>
+<h3 id="typescript--scala">TypeScript 与 Scala</h3>
+<p>TypeScript 中的函数本来就是一等公民，联合类型还能自然地表达不同结果：</p>
+<pre><code class="language-ts">type PaymentResult =
+  | { type: &quot;success&quot;; transactionId: string }
+  | { type: &quot;failed&quot;; reason: string };
+</code></pre>
+<p>它适合“实用型 FP”：可以使用高阶函数、<code>readonly</code>、不可变更新和 <code>Result</code> 风格的类型，但语言不会强制纯度与深层不可变。<code>fp-ts</code>、Effect 等库能提供更完整的函数式工具，同时也会增加学习成本。</p>
+<p>Scala 的支持更深入。它有不可变集合、模式匹配和代数数据类型，类型系统也能表达更高级的抽象。Cats、Cats Effect 和 ZIO 等生态把错误、并发和副作用管理带进类型系统。Scala 同时保留类、对象和 Trait，因此它本身就是多范式设计的例子。</p>
+<p>如果想体验以纯函数为默认前提的语言，Haskell 更直接；如果目标是在现有业务项目中改善代码，Java 和 TypeScript 也足够开始。语言会影响表达成本，却不会替团队做出设计选择。</p>
+<h2 id="-fp-1">为什么数据处理特别适合 FP</h2>
+<p>数据处理通常就是一组连续的转换：读取、过滤、映射、分组、汇总。只要每个步骤依赖明确，整条流水线就容易拆分和组合。</p>
+<p>纯函数还减少了共享可变状态。如果几批数据之间互不修改对方，就更容易并行执行。MapReduce、Spark 和流处理系统中的 <code>map</code>、<code>filter</code>、<code>fold</code>，都带有明显的函数式思想。</p>
+<p>但并不是只有“大数据”才适合 FP。价格计算、表单校验、权限判断、编译器转换、前端状态更新，同样可以从纯函数和不可变数据中获益。判断标准不是行业，而是问题能否被表达为清楚的数据转换。</p>
+<h2 id="heading-6">怎样学习，才不容易被术语劝退</h2>
+<p>FP 的门槛不只来自概念多，还来自思考习惯的变化。过去我们可能会问：“下一步该修改哪个变量？”函数式的思路更常问：“当前数据经过什么变换，才能得到下一个值？”</p>
+<p>可以按下面的顺序练习：</p>
+<ol>
+<li>学会识别纯计算和副作用；</li>
+<li>把隐藏依赖改成显式参数；</li>
+<li>尽量使用不可变数据；</li>
+<li>用小函数组合数据处理流程；</li>
+<li>用 <code>Option</code>、<code>Either</code> 或 <code>Result</code> 表达缺失与失败；</li>
+<li>遇到反复出现的结构后，再研究 Monoid、Functor 和 Monad。</li>
+</ol>
+<p>《函数式编程图解》适合用来建立直觉。读完以后，可以选一段熟悉的业务代码，把计算逻辑和数据库、日志、时间等外部依赖拆开。这样的练习比先背 Monad 法则更容易形成手感。</p>
+<h2 id="heading-7">软件工程没有银弹</h2>
+<p>函数式编程有一种整洁的美，面向对象也有关于封装、职责和协作的深刻思考。实际系统没有必要在两者之间选边站。</p>
+<p>OOP 更适合描述有身份、状态和生命周期的对象。例如，一个订单从“待支付”变成“已支付”，再进入“已发货”。订单聚合需要保证已取消订单不能支付、已发货订单不能修改地址。这些规则与对象的生命周期紧密相关，放在领域对象中很自然。</p>
+<p>FP 更适合表达定价、优惠匹配、校验和汇总。输入明确、结果稳定的规则可以写成纯函数，不必把所有计算都变成修改对象状态的方法。</p>
+<p>在 DDD 项目中，两者可以这样分工：</p>
+<ul>
+<li>用统一语言和限界上下文划分业务边界；</li>
+<li>用实体、值对象和聚合维护身份、生命周期与业务不变量；</li>
+<li>用纯函数实现规则计算与数据转换；</li>
+<li>用状态机约束复杂流程的状态迁移；</li>
+<li>用应用服务、仓储和消息适配器管理副作用；</li>
+<li>用领域事件连接相对独立的业务流程。</li>
+</ul>
+<p><img src="https://windrunner0707.tech/post-images/multi-paradigm-software-design.svg" alt="DDD、OOP、FP、状态机与事件驱动在系统中的分工" /></p>
+<p>多范式也不能变成随意拼接。系统仍然要回答：谁拥有状态，哪里允许修改，副作用在哪里发生，失败如何表达，模块之间通过什么契约协作。边界说不清时，使用越多范式，代码反而越乱。</p>
+<p>健壮性并不来自某个术语，而来自可控的变化。领域对象保护业务不变量，纯函数降低计算的不确定性，类型表达可能的失败，状态机限制非法跳转，适配器隔离数据库和网络。当这些职责各自落在合适的位置，代码才更容易测试、理解和修改。</p>
+<p>FP 也有代价。抽象层次过高会增加阅读门槛，不可变数据可能带来额外分配，Effect 系统和复杂类型对团队能力有要求。有些局部算法用一段受控的可变循环，反而比层层函数组合更直接。</p>
+<p>所以，我更愿意把函数式编程看作一套管理复杂度的工具，而不是需要皈依的信仰。学习它的收获，不是把所有代码改写成 FP，而是在面对计算、状态和副作用时，多一种清楚的组织方式。</p>
+<blockquote>
+<p>封面图由 OpenAI 图像生成工具创作，用抽象的数据流、函数节点与领域对象表达多种编程范式的协作。</p>
+</blockquote>
+]]></description>
+      <category>函数式编程</category>
+      <category>Java</category>
+      <category>TypeScript</category>
+      <category>架构设计</category>
+      <enclosure url="https://windrunner0707.tech/post-images/han-shu-shi-bian-cheng-yi-zhong-you-ya-dan-bu-bi-mi-xin-de-bian-cheng-fang-shi.webp" length="0" type="image/webp"></enclosure>
+    </item>
+    <item>
       <title>AI 时代，后端工程师为什么应该学习前端</title>
       <link>https://windrunner0707.tech/post/ai-shi-dai-hou-duan-gong-cheng-shi-wei-shi-me-ying-gai-xue-xi-qian-duan/</link>
       <guid isPermaLink="true">https://windrunner0707.tech/post/ai-shi-dai-hou-duan-gong-cheng-shi-wei-shi-me-ying-gai-xue-xi-qian-duan/</guid>
@@ -131,120 +329,6 @@ SPA
       <category>人工智能</category>
       <category>TypeScript</category>
       <enclosure url="https://windrunner0707.tech/post-images/ai-shi-dai-hou-duan-gong-cheng-shi-wei-shi-me-ying-gai-xue-xi-qian-duan.webp" length="0" type="image/webp"></enclosure>
-    </item>
-    <item>
-      <title>万智牌入门：从五色颜色轮到一张牌的想象力</title>
-      <link>https://windrunner0707.tech/post/wan-zhi-pai-ru-men-wu-se-yan-se-lun-yu-ka-pai-mei-xue/</link>
-      <guid isPermaLink="true">https://windrunner0707.tech/post/wan-zhi-pai-ru-men-wu-se-yan-se-lun-yu-ka-pai-mei-xue/</guid>
-      <pubDate>Sun, 06 Sep 2026 00:00:00 +0800</pubDate>
-      <description><![CDATA[<p>第一次听说《万智牌》（Magic: The Gathering，常简称 MTG）时，我以为它只是“有插画的集换式卡牌游戏”。真正翻过几张牌、看过牌面之间如何配合以后，才发现它最迷人的地方，是把规则、世界观和美术放进了同一套语言里：你既在计算资源和节奏，也像在挑选自己想成为的魔法师。</p>
-<p>如果你正好对卡牌游戏感兴趣，这篇文章想从我觉得最有新意的设计讲起，再给出两条不容易踩坑的入门路径。</p>
-<!-- more -->
-<h2 id="heading">五色颜色轮：不是配色，而是一套性格系统</h2>
-<p>万智牌将法术与生物的力量划分为白、蓝、黑、红、绿五种颜色。它们并不只是牌框的颜色，更各自代表一组价值观、做事方式和擅长的策略。于是，一张牌的效果往往在你读完之前，就已经能从颜色里猜到几分它的性格。</p>
-<table>
-<thead>
-<tr>
-<th>颜色</th>
-<th>常见信念</th>
-<th>牌桌上的感觉</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>白色</td>
-<td>秩序、群体、保护、公平</td>
-<td>建立防线、强化同伴、用规则限制对手</td>
-</tr>
-<tr>
-<td>蓝色</td>
-<td>知识、理性、变化、掌控</td>
-<td>抽牌、预知、反制，在关键时刻改写计划</td>
-</tr>
-<tr>
-<td>黑色</td>
-<td>野心、代价、个人意志、死亡</td>
-<td>用生命或资源交换力量，从墓地与牺牲中获利</td>
-</tr>
-<tr>
-<td>红色</td>
-<td>情感、自由、冲动、火焰</td>
-<td>快速进攻、直接伤害、让局面立刻沸腾</td>
-</tr>
-<tr>
-<td>绿色</td>
-<td>生命、自然、传统、成长</td>
-<td>加速资源、召唤巨大生物，用体型压过对手</td>
-</tr>
-</tbody>
-</table>
-<p>这套设计最妙的是，它没有把任何一种价值简单写成“善”或“恶”。白色的秩序可以是守护弱者，也可能变成僵化控制；黑色追求力量，既可能冷酷，也可能坦诚地承认欲望与代价。红色的冲动有时鲁莽，有时又是拒绝伪装的真诚。</p>
-<p>颜色之间还有天然的亲疏关系：相邻颜色更容易在理念上找到共同点，相对颜色则常常冲突。把两种或更多颜色放进同一套牌，像是在让几种处世哲学谈判。比如蓝白倾向于控制与秩序，红绿更愿意直接用生物和力量解决问题；黑绿则会把死亡看成生命循环的一部分。即使不熟悉规则，光从这些组合出发，也很容易记住不同套牌的气质。</p>
-<p><img src="https://windrunner0707.tech/post-images/wan-zhi-pai-color-pie.png" alt="万智牌五色颜色轮" /></p>
-<p><em>五色颜色轮示意图。图片来源：<a href="https://aetherhub.com/Article/How-To-Play-Magic-The-Gathering---Ultimate-Guide">AetherHub</a>。</em></p>
-<h2 id="heading-1">一张牌也是一扇世界的窗</h2>
-<p>万智牌的牌面美术并不只是“给效果配一张图”。它要在很小的画幅里，交代生物的种族、法术发生的瞬间、一个位面的风土，甚至角色正在面对的抉择。</p>
-<p>有些牌是宏大的：巨龙越过城墙、风暴吞没海面、军团在旷野集结；也有些画面特别克制：旅人站在异世界的街口，炼金师低头处理一支药剂，一只小小的精怪藏在树叶之间。很多时候，你还没理解卡牌文字，就已经从光线、构图和角色姿态感受到它属于哪个世界。</p>
-<p>这种美术与机制互相呼应的感觉很特别。绿色生物往往有繁茂、野性和重量感；蓝色法术则常带有水流、星空、实验室或幻象。它不是硬性的规定，但长期积累下来，会让一套牌拥有很完整的视觉记忆。对只想收藏或欣赏插画的人来说，单卡也完全可以是独立的小型艺术品。</p>
-<h3 id="heading-2">五色各挑一张：从牌面读出它的性格</h3>
-<p>下面这五张都是实际印刷过的卡牌。它们未必是每种颜色最强的代表，却很适合放在一起看：从天使、法术到精灵，画面与规则文字共同完成了角色塑造。</p>
-<div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start;">
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/fdn/740/serra-angel" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-serra-angel.jpg" alt="Serra Angel，白色卡牌" loading="lazy"></a>
-    <figcaption><strong>白：Serra Angel</strong><br>洁白的羽翼、庄严的盔甲与警戒异能，让“守护”变得一眼可见。</figcaption>
-  </figure>
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/dsc/114/counterspell" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-counterspell.jpg" alt="Counterspell，蓝色卡牌" loading="lazy"></a>
-    <figcaption><strong>蓝：Counterspell</strong><br>只用两个字就取消一个法术，是蓝色“掌控与反应”的经典表达。</figcaption>
-  </figure>
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/cmm/150/demonic-tutor" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-demonic-tutor.jpg" alt="Demonic Tutor，黑色卡牌" loading="lazy"></a>
-    <figcaption><strong>黑：Demonic Tutor</strong><br>以恶魔交易换取所求之物，把野心与代价写在同一张牌上。</figcaption>
-  </figure>
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/msc/806/lightning-bolt" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-lightning-bolt.jpg" alt="Lightning Bolt，红色卡牌" loading="lazy"></a>
-    <figcaption><strong>红：Lightning Bolt</strong><br>闪电直击目标；直接、迅速而不讲道理，正是红色的节奏。</figcaption>
-  </figure>
-  <figure style="width:150px; margin:0;">
-    <a href="https://scryfall.com/card/fdn/227/llanowar-elves" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-llanowar-elves.jpg" alt="Llanowar Elves，绿色卡牌" loading="lazy"></a>
-    <figcaption><strong>绿：Llanowar Elves</strong><br>小小的精灵连接自然与资源，为后续的大生物生长蓄力。</figcaption>
-  </figure>
-</div>
-<p><em>牌图与牌面资料由 <a href="https://scryfall.com/">Scryfall</a> 提供；万智牌及相关卡图版权归 Wizards of the Coast 所有。</em></p>
-<h2 id="-ip-">与热门 IP 联动，让熟悉的角色进入牌桌</h2>
-<p>近年的《Universes Beyond》系列让万智牌和许多热门 IP 产生联动。无论是《指环王》里的中土冒险、《战锤 40,000》的宇宙战争、《辐射》的废土，还是《最终幻想》等作品，都曾以万智牌的规则语言重新呈现。</p>
-<p>联动吸引人的地方不只是“角色上了卡”。设计师会尝试把原作最有辨识度的东西翻译成游戏机制：例如把远征、阵营、装备、同伴或宿命做成可互动的牌桌体验。熟悉原作的人能发现彩蛋；没接触过原作的人，也能借由一张卡进入一个新世界。</p>
-<p>当然，联动产品很容易让人产生“每套都想买”的冲动。把它们当作喜欢的主题或收藏方向会更轻松，不必把跟上所有产品当成入门门槛。</p>
-<h2 id="heading-3">新手先抓住三个概念就够了</h2>
-<p>万智牌的规则很深，但第一局并不需要背完。先理解下面三件事，已经足够开始玩：</p>
-<ol>
-<li><strong>地牌提供法术力。</strong> 大多数牌需要支付对应颜色的法术力才能使用，地牌通常就是资源来源。</li>
-<li><strong>生物会进攻与阻挡。</strong> 生物右下角的数字一般表示力量与防御力；进攻方宣告攻击，防守方选择是否阻挡。</li>
-<li><strong>每回合都在做取舍。</strong> 是先展开生物、留资源应对对手，还是把一张强力法术留到更合适的时机？这种取舍正是游戏的核心乐趣。</li>
-</ol>
-<p>先用现成套牌多打几局，比一开始钻进所有时序细节更有效。遇到规则问题再查，记忆会牢得多。</p>
-<h2 id="-mtga">入门怎么选：线上用 MTGA，线下从成套产品或单卡开始</h2>
-<h3 id="-mtg-arena-">想低成本熟悉规则：从 MTG Arena 开始</h3>
-<p>如果还不确定自己是否喜欢，最推荐先玩 <strong>MTG Arena（MTGA）</strong>。它会自动处理许多规则与结算，教程和对局也能帮助你很快理解回合流程、法术力与战斗。更重要的是，线上试错的成本低：你可以多换几种颜色和策略，不必一开始就为实体卡作大额投入。</p>
-<p><img src="https://windrunner0707.tech/post-images/mtg-arena-gameplay.jpg" alt="MTG Arena 对局界面" /></p>
-<p><em>MTG Arena 对局界面。图片来源：<a href="https://minireview.io/ccg/magic-the-gathering-arena">MiniReview</a>。</em></p>
-<p>刚入门时不必急着组“最强套牌”。先挑一套看起来顺眼、打法直观的预组或新手套牌，连续玩十几局，慢慢体会什么时候该铺场、什么时候该保留手牌。知道自己喜欢快攻、控制、大生物还是组合技之后，再投入资源会更准确。</p>
-<h3 id="heading-4">想和朋友线下休闲：优先买单卡或预组套牌</h3>
-<p>线下的乐趣和线上不同：洗牌的手感、桌面上逐渐铺开的画面、朋友围着一局牌讨论，都是实体卡难以替代的部分。</p>
-<p>如果目标是休闲玩，比较实用的做法有两种：</p>
-<ul>
-<li><strong>买现成预组套牌。</strong> 它能让你开盒就玩，牌之间已有基本配合，特别适合和朋友约一局、或尝试某个主题。多人休闲常见的指挥官预组也是很方便的入口。</li>
-<li><strong>直接买单卡来组牌。</strong> 当你已经知道喜欢的主题或卡表时，买单卡通常比反复开补充包更可控：预算花在真正会用到、也真正喜欢的牌上。</li>
-</ul>
-<p>补充包当然有拆卡的惊喜，也很适合轮抽、现开等玩法；但如果目的只是凑齐一副可玩的实体套牌，它并不是最高效的途径。和固定朋友群一起玩时，还可以先约好预算与强度范围，让每个人的体验更接近。</p>
-<p><img src="https://windrunner0707.tech/post-images/wan-zhi-pai-foundations-tabletop.jpg" alt="Magic Foundations 产品宣传图" /></p>
-<p><em>适合新手认识产品风格的 Foundations 宣传图。图片来源：<a href="https://bardsandcards.com/products/fri-12-6-2024-6-pm-friday-night-magic-foundations-draft">Bards &amp; Cards</a>。</em></p>
-<h2 id="heading-5">从一副喜欢的牌开始</h2>
-<p>万智牌有足够深的规则，让人花很多年研究；也有足够多的美术、世界观和主题，让人只把它当作一项轻松的爱好。无需一开始就记住所有系列、格式和术语。</p>
-<p>选一种让你有感觉的颜色，找一张愿意反复看的插画，或从喜欢的联动 IP 入门都可以。等你第一次发现两张牌恰好能形成漂亮配合，或者看到自己喜欢的角色在牌桌上完成一次戏剧性的逆转，就会明白它为什么能让这么多人一直玩下去。</p>
-]]></description>
-      <category>万智牌</category>
-      <enclosure url="https://windrunner0707.tech/post-images/wan-zhi-pai-foundations-cover.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
       <title>银行在线开户流程架构设计：API-Led、状态机与异步风控</title>
@@ -532,6 +616,120 @@ public TransitionResult transition(TransitionCommand cmd) {
       <category>架构设计</category>
       <category>分布式系统</category>
       <enclosure url="https://windrunner0707.tech/post-images/yin-hang-zai-xian-kai-hu-liu-cheng-jia-gou-she-ji.webp" length="0" type="image/webp"></enclosure>
+    </item>
+    <item>
+      <title>万智牌入门：从五色颜色轮到一张牌的想象力</title>
+      <link>https://windrunner0707.tech/post/wan-zhi-pai-ru-men-wu-se-yan-se-lun-yu-ka-pai-mei-xue/</link>
+      <guid isPermaLink="true">https://windrunner0707.tech/post/wan-zhi-pai-ru-men-wu-se-yan-se-lun-yu-ka-pai-mei-xue/</guid>
+      <pubDate>Sun, 06 Sep 2026 00:00:00 +0800</pubDate>
+      <description><![CDATA[<p>第一次听说《万智牌》（Magic: The Gathering，常简称 MTG）时，我以为它只是“有插画的集换式卡牌游戏”。真正翻过几张牌、看过牌面之间如何配合以后，才发现它最迷人的地方，是把规则、世界观和美术放进了同一套语言里：你既在计算资源和节奏，也像在挑选自己想成为的魔法师。</p>
+<p>如果你正好对卡牌游戏感兴趣，这篇文章想从我觉得最有新意的设计讲起，再给出两条不容易踩坑的入门路径。</p>
+<!-- more -->
+<h2 id="heading">五色颜色轮：不是配色，而是一套性格系统</h2>
+<p>万智牌将法术与生物的力量划分为白、蓝、黑、红、绿五种颜色。它们并不只是牌框的颜色，更各自代表一组价值观、做事方式和擅长的策略。于是，一张牌的效果往往在你读完之前，就已经能从颜色里猜到几分它的性格。</p>
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>常见信念</th>
+<th>牌桌上的感觉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>白色</td>
+<td>秩序、群体、保护、公平</td>
+<td>建立防线、强化同伴、用规则限制对手</td>
+</tr>
+<tr>
+<td>蓝色</td>
+<td>知识、理性、变化、掌控</td>
+<td>抽牌、预知、反制，在关键时刻改写计划</td>
+</tr>
+<tr>
+<td>黑色</td>
+<td>野心、代价、个人意志、死亡</td>
+<td>用生命或资源交换力量，从墓地与牺牲中获利</td>
+</tr>
+<tr>
+<td>红色</td>
+<td>情感、自由、冲动、火焰</td>
+<td>快速进攻、直接伤害、让局面立刻沸腾</td>
+</tr>
+<tr>
+<td>绿色</td>
+<td>生命、自然、传统、成长</td>
+<td>加速资源、召唤巨大生物，用体型压过对手</td>
+</tr>
+</tbody>
+</table>
+<p>这套设计最妙的是，它没有把任何一种价值简单写成“善”或“恶”。白色的秩序可以是守护弱者，也可能变成僵化控制；黑色追求力量，既可能冷酷，也可能坦诚地承认欲望与代价。红色的冲动有时鲁莽，有时又是拒绝伪装的真诚。</p>
+<p>颜色之间还有天然的亲疏关系：相邻颜色更容易在理念上找到共同点，相对颜色则常常冲突。把两种或更多颜色放进同一套牌，像是在让几种处世哲学谈判。比如蓝白倾向于控制与秩序，红绿更愿意直接用生物和力量解决问题；黑绿则会把死亡看成生命循环的一部分。即使不熟悉规则，光从这些组合出发，也很容易记住不同套牌的气质。</p>
+<p><img src="https://windrunner0707.tech/post-images/wan-zhi-pai-color-pie.png" alt="万智牌五色颜色轮" /></p>
+<p><em>五色颜色轮示意图。图片来源：<a href="https://aetherhub.com/Article/How-To-Play-Magic-The-Gathering---Ultimate-Guide">AetherHub</a>。</em></p>
+<h2 id="heading-1">一张牌也是一扇世界的窗</h2>
+<p>万智牌的牌面美术并不只是“给效果配一张图”。它要在很小的画幅里，交代生物的种族、法术发生的瞬间、一个位面的风土，甚至角色正在面对的抉择。</p>
+<p>有些牌是宏大的：巨龙越过城墙、风暴吞没海面、军团在旷野集结；也有些画面特别克制：旅人站在异世界的街口，炼金师低头处理一支药剂，一只小小的精怪藏在树叶之间。很多时候，你还没理解卡牌文字，就已经从光线、构图和角色姿态感受到它属于哪个世界。</p>
+<p>这种美术与机制互相呼应的感觉很特别。绿色生物往往有繁茂、野性和重量感；蓝色法术则常带有水流、星空、实验室或幻象。它不是硬性的规定，但长期积累下来，会让一套牌拥有很完整的视觉记忆。对只想收藏或欣赏插画的人来说，单卡也完全可以是独立的小型艺术品。</p>
+<h3 id="heading-2">五色各挑一张：从牌面读出它的性格</h3>
+<p>下面这五张都是实际印刷过的卡牌。它们未必是每种颜色最强的代表，却很适合放在一起看：从天使、法术到精灵，画面与规则文字共同完成了角色塑造。</p>
+<div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start;">
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/fdn/740/serra-angel" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-serra-angel.jpg" alt="Serra Angel，白色卡牌" loading="lazy"></a>
+    <figcaption><strong>白：Serra Angel</strong><br>洁白的羽翼、庄严的盔甲与警戒异能，让“守护”变得一眼可见。</figcaption>
+  </figure>
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/dsc/114/counterspell" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-counterspell.jpg" alt="Counterspell，蓝色卡牌" loading="lazy"></a>
+    <figcaption><strong>蓝：Counterspell</strong><br>只用两个字就取消一个法术，是蓝色“掌控与反应”的经典表达。</figcaption>
+  </figure>
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/cmm/150/demonic-tutor" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-demonic-tutor.jpg" alt="Demonic Tutor，黑色卡牌" loading="lazy"></a>
+    <figcaption><strong>黑：Demonic Tutor</strong><br>以恶魔交易换取所求之物，把野心与代价写在同一张牌上。</figcaption>
+  </figure>
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/msc/806/lightning-bolt" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-lightning-bolt.jpg" alt="Lightning Bolt，红色卡牌" loading="lazy"></a>
+    <figcaption><strong>红：Lightning Bolt</strong><br>闪电直击目标；直接、迅速而不讲道理，正是红色的节奏。</figcaption>
+  </figure>
+  <figure style="width:150px; margin:0;">
+    <a href="https://scryfall.com/card/fdn/227/llanowar-elves" target="_blank" rel="noopener"><img src="https://windrunner0707.tech/post-images/mtg-llanowar-elves.jpg" alt="Llanowar Elves，绿色卡牌" loading="lazy"></a>
+    <figcaption><strong>绿：Llanowar Elves</strong><br>小小的精灵连接自然与资源，为后续的大生物生长蓄力。</figcaption>
+  </figure>
+</div>
+<p><em>牌图与牌面资料由 <a href="https://scryfall.com/">Scryfall</a> 提供；万智牌及相关卡图版权归 Wizards of the Coast 所有。</em></p>
+<h2 id="-ip-">与热门 IP 联动，让熟悉的角色进入牌桌</h2>
+<p>近年的《Universes Beyond》系列让万智牌和许多热门 IP 产生联动。无论是《指环王》里的中土冒险、《战锤 40,000》的宇宙战争、《辐射》的废土，还是《最终幻想》等作品，都曾以万智牌的规则语言重新呈现。</p>
+<p>联动吸引人的地方不只是“角色上了卡”。设计师会尝试把原作最有辨识度的东西翻译成游戏机制：例如把远征、阵营、装备、同伴或宿命做成可互动的牌桌体验。熟悉原作的人能发现彩蛋；没接触过原作的人，也能借由一张卡进入一个新世界。</p>
+<p>当然，联动产品很容易让人产生“每套都想买”的冲动。把它们当作喜欢的主题或收藏方向会更轻松，不必把跟上所有产品当成入门门槛。</p>
+<h2 id="heading-3">新手先抓住三个概念就够了</h2>
+<p>万智牌的规则很深，但第一局并不需要背完。先理解下面三件事，已经足够开始玩：</p>
+<ol>
+<li><strong>地牌提供法术力。</strong> 大多数牌需要支付对应颜色的法术力才能使用，地牌通常就是资源来源。</li>
+<li><strong>生物会进攻与阻挡。</strong> 生物右下角的数字一般表示力量与防御力；进攻方宣告攻击，防守方选择是否阻挡。</li>
+<li><strong>每回合都在做取舍。</strong> 是先展开生物、留资源应对对手，还是把一张强力法术留到更合适的时机？这种取舍正是游戏的核心乐趣。</li>
+</ol>
+<p>先用现成套牌多打几局，比一开始钻进所有时序细节更有效。遇到规则问题再查，记忆会牢得多。</p>
+<h2 id="-mtga">入门怎么选：线上用 MTGA，线下从成套产品或单卡开始</h2>
+<h3 id="-mtg-arena-">想低成本熟悉规则：从 MTG Arena 开始</h3>
+<p>如果还不确定自己是否喜欢，最推荐先玩 <strong>MTG Arena（MTGA）</strong>。它会自动处理许多规则与结算，教程和对局也能帮助你很快理解回合流程、法术力与战斗。更重要的是，线上试错的成本低：你可以多换几种颜色和策略，不必一开始就为实体卡作大额投入。</p>
+<p><img src="https://windrunner0707.tech/post-images/mtg-arena-gameplay.jpg" alt="MTG Arena 对局界面" /></p>
+<p><em>MTG Arena 对局界面。图片来源：<a href="https://minireview.io/ccg/magic-the-gathering-arena">MiniReview</a>。</em></p>
+<p>刚入门时不必急着组“最强套牌”。先挑一套看起来顺眼、打法直观的预组或新手套牌，连续玩十几局，慢慢体会什么时候该铺场、什么时候该保留手牌。知道自己喜欢快攻、控制、大生物还是组合技之后，再投入资源会更准确。</p>
+<h3 id="heading-4">想和朋友线下休闲：优先买单卡或预组套牌</h3>
+<p>线下的乐趣和线上不同：洗牌的手感、桌面上逐渐铺开的画面、朋友围着一局牌讨论，都是实体卡难以替代的部分。</p>
+<p>如果目标是休闲玩，比较实用的做法有两种：</p>
+<ul>
+<li><strong>买现成预组套牌。</strong> 它能让你开盒就玩，牌之间已有基本配合，特别适合和朋友约一局、或尝试某个主题。多人休闲常见的指挥官预组也是很方便的入口。</li>
+<li><strong>直接买单卡来组牌。</strong> 当你已经知道喜欢的主题或卡表时，买单卡通常比反复开补充包更可控：预算花在真正会用到、也真正喜欢的牌上。</li>
+</ul>
+<p>补充包当然有拆卡的惊喜，也很适合轮抽、现开等玩法；但如果目的只是凑齐一副可玩的实体套牌，它并不是最高效的途径。和固定朋友群一起玩时，还可以先约好预算与强度范围，让每个人的体验更接近。</p>
+<p><img src="https://windrunner0707.tech/post-images/wan-zhi-pai-foundations-tabletop.jpg" alt="Magic Foundations 产品宣传图" /></p>
+<p><em>适合新手认识产品风格的 Foundations 宣传图。图片来源：<a href="https://bardsandcards.com/products/fri-12-6-2024-6-pm-friday-night-magic-foundations-draft">Bards &amp; Cards</a>。</em></p>
+<h2 id="heading-5">从一副喜欢的牌开始</h2>
+<p>万智牌有足够深的规则，让人花很多年研究；也有足够多的美术、世界观和主题，让人只把它当作一项轻松的爱好。无需一开始就记住所有系列、格式和术语。</p>
+<p>选一种让你有感觉的颜色，找一张愿意反复看的插画，或从喜欢的联动 IP 入门都可以。等你第一次发现两张牌恰好能形成漂亮配合，或者看到自己喜欢的角色在牌桌上完成一次戏剧性的逆转，就会明白它为什么能让这么多人一直玩下去。</p>
+]]></description>
+      <category>万智牌</category>
+      <enclosure url="https://windrunner0707.tech/post-images/wan-zhi-pai-foundations-cover.webp" length="0" type="image/webp"></enclosure>
     </item>
     <item>
       <title>Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch</title>
@@ -1721,42 +1919,6 @@ executor.execute(() -&gt; {
       <category>微服务</category>
       <category>架构设计</category>
       <enclosure url="https://windrunner0707.tech/post-images/mian-shi-ba-gu-wen-de-shi-ji-ying-yong-wei-fu-wu-jiao-sha-shi-jie-ou.jpg" length="0" type="image/jpeg"></enclosure>
-    </item>
-    <item>
-      <title>Kubernetes基础组件详解</title>
-      <link>https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/</link>
-      <guid isPermaLink="true">https://windrunner0707.tech/post/kubernetes-ji-chu-zu-jian-xiang-jie/</guid>
-      <pubDate>Tue, 30 Sep 2025 00:00:00 +0800</pubDate>
-      <description><![CDATA[<p><img src="https://windrunner0707.tech/post-images/1759237881724.png" alt="" /></p>
-<h2 id="heading">概述</h2>
-<p>Kubernetes（常简称 K8s）把集群分为控制平面和工作节点。控制平面维护集群的期望状态，工作节点运行 Pod。沿着这条主线理解，各组件的职责就不容易混在一起。</p>
-<h2 id="heading-1">介绍</h2>
-<h3 id="control-plane">控制平面（Control Plane）</h3>
-<p>控制平面接收声明、保存集群状态，并持续推动实际状态接近期望状态，主要包括：</p>
-<h4 id="api-server">API Server</h4>
-<p>API Server 暴露 Kubernetes API。<code>kubectl</code>、控制器和其他集群组件都通过它读取或修改资源；它还负责认证、鉴权、准入控制和请求校验。</p>
-<h4 id="etcd">etcd</h4>
-<p>etcd 是一致性的分布式键值数据库，用于保存 Kubernetes API 对象。它是控制平面的关键数据存储，因此备份、访问控制和磁盘延迟都很重要。</p>
-<h4 id="scheduler">Scheduler</h4>
-<p>Scheduler 负责把新建的 Pod 分配到合适的节点上。它会综合考虑节点的 CPU、内存、亲和性、反亲和性等条件，尽量做到资源合理分配。</p>
-<h4 id="controller-manager">Controller Manager</h4>
-<p>Controller Manager 运行多种控制器，持续比较期望状态与实际状态。例如 Deployment 需要三个副本而当前只有两个时，相关控制器会创建新的 Pod 对象，随后再由调度器和 kubelet 接手。</p>
-<h3 id="worker-node">工作节点（Worker Node）</h3>
-<p>工作节点是真正运行应用的地方，每个节点上都包含以下组件：</p>
-<h4 id="kubelet">kubelet</h4>
-<p>kubelet 监视分配到本节点的 Pod，并通过容器运行时启动容器、执行健康检查和上报状态。副本数量由控制器维护，不是 kubelet 的职责。</p>
-<h4 id="kube-proxy">kube-proxy</h4>
-<p>kube-proxy 在节点上实现 Service 的转发规则，通常使用 iptables 或 IPVS 将虚拟 IP 的流量转到后端 Pod。Pod 网络本身通常由 CNI 插件提供。</p>
-<h4 id="container-runtime">Container Runtime</h4>
-<p>容器运行时负责镜像拉取和容器生命周期管理，并通过 CRI 与 kubelet 交互，常见实现有 containerd 和 CRI-O。Kubernetes 自 1.24 起移除了内置的 dockershim，不能再把 Docker Engine 直接当作 CRI 运行时使用。</p>
-<h4 id="pods">Pods</h4>
-<p>Pod 是 Kubernetes 中最小的调度单元，每个 Pod 包含一个或多个紧密相关的容器。Pod 会共享网络和存储卷，方便容器之间的通信。</p>
-<h2 id="heading-2">把一次部署串起来</h2>
-<p>提交 Deployment 后，API Server 校验并保存对象；控制器创建所需的 Pod；Scheduler 为未调度的 Pod 选择节点；目标节点上的 kubelet 再调用容器运行时启动容器。Service 流量则由 kube-proxy 维护的转发规则送到可用 Pod。沿着这条链路排查问题，通常比孤立地背组件名称更实用。</p>
-<!-- more -->]]></description>
-      <category>Kubernetes</category>
-      <category>云原生</category>
-      <enclosure url="https://windrunner0707.tech/post-images/kubernetes-ji-chu-zu-jian-xiang-jie.webp" length="0" type="image/webp"></enclosure>
     </item>
   </channel>
 </rss>

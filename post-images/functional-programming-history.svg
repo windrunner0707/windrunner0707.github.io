@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
+  <title id="title">函数式编程的思想脉络</title>
+  <desc id="desc">从 Lambda 演算、Lisp 到现代多范式语言的时间线，以及纯函数、不可变数据和函数组合三个核心观念。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#0f2538"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#67e8f9"/>
+      <stop offset="1" stop-color="#fbbf24"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#020617" flood-opacity=".45"/>
+    </filter>
+  </defs>
+  <rect width="1400" height="760" rx="28" fill="url(#bg)"/>
+  <text x="70" y="80" fill="#f8fafc" font-size="34" font-family="system-ui, sans-serif" font-weight="600">函数式编程从哪里来</text>
+  <text x="70" y="120" fill="#94a3b8" font-size="19" font-family="system-ui, sans-serif">数学中的函数抽象逐渐进入编程语言，又回到今天的工程实践</text>
+
+  <line x1="150" y1="270" x2="1250" y2="270" stroke="url(#line)" stroke-width="6" stroke-linecap="round"/>
+  <g font-family="system-ui, sans-serif">
+    <g transform="translate(170 270)">
+      <circle r="19" fill="#67e8f9"/>
+      <rect x="-100" y="-110" width="200" height="78" rx="16" fill="#172337" filter="url(#shadow)"/>
+      <text text-anchor="middle" y="-79" fill="#f8fafc" font-size="22" font-weight="600">1930 年代</text>
+      <text text-anchor="middle" y="-51" fill="#a5f3fc" font-size="19">Lambda 演算</text>
+      <text text-anchor="middle" y="57" fill="#cbd5e1" font-size="17">用函数、参数与应用</text>
+      <text text-anchor="middle" y="82" fill="#cbd5e1" font-size="17">描述计算</text>
+    </g>
+    <g transform="translate(520 270)">
+      <circle r="19" fill="#67e8f9"/>
+      <rect x="-100" y="-110" width="200" height="78" rx="16" fill="#172337" filter="url(#shadow)"/>
+      <text text-anchor="middle" y="-79" fill="#f8fafc" font-size="22" font-weight="600">1958</text>
+      <text text-anchor="middle" y="-51" fill="#a5f3fc" font-size="19">Lisp</text>
+      <text text-anchor="middle" y="57" fill="#cbd5e1" font-size="17">函数成为语言中</text>
+      <text text-anchor="middle" y="82" fill="#cbd5e1" font-size="17">可以传递的值</text>
+    </g>
+    <g transform="translate(880 270)">
+      <circle r="19" fill="#fbbf24"/>
+      <rect x="-112" y="-110" width="224" height="78" rx="16" fill="#172337" filter="url(#shadow)"/>
+      <text text-anchor="middle" y="-79" fill="#f8fafc" font-size="22" font-weight="600">1970s–1990s</text>
+      <text text-anchor="middle" y="-51" fill="#fde68a" font-size="19">ML、Scheme、Haskell</text>
+      <text text-anchor="middle" y="57" fill="#cbd5e1" font-size="17">类型、惰性求值与</text>
+      <text text-anchor="middle" y="82" fill="#cbd5e1" font-size="17">纯函数继续发展</text>
+    </g>
+    <g transform="translate(1220 270)">
+      <circle r="19" fill="#fbbf24"/>
+      <rect x="-115" y="-110" width="230" height="78" rx="16" fill="#172337" filter="url(#shadow)"/>
+      <text text-anchor="middle" y="-79" fill="#f8fafc" font-size="22" font-weight="600">今天</text>
+      <text text-anchor="middle" y="-51" fill="#fde68a" font-size="19">Java、Scala、TS…</text>
+      <text text-anchor="middle" y="57" fill="#cbd5e1" font-size="17">FP 进入多范式语言</text>
+      <text text-anchor="middle" y="82" fill="#cbd5e1" font-size="17">解决真实工程问题</text>
+    </g>
+  </g>
+
+  <g transform="translate(70 465)" font-family="system-ui, sans-serif">
+    <rect width="395" height="210" rx="22" fill="#172337" stroke="#28516c"/>
+    <text x="28" y="48" fill="#67e8f9" font-size="24" font-weight="600">纯函数</text>
+    <text x="28" y="86" fill="#e2e8f0" font-size="18">相同输入 → 相同输出</text>
+    <text x="28" y="117" fill="#94a3b8" font-size="17">依赖写在参数里，结果更容易</text>
+    <text x="28" y="143" fill="#94a3b8" font-size="17">测试、缓存和并行计算。</text>
+    <text x="28" y="181" fill="#f8fafc" font-size="19" font-family="ui-monospace, monospace">f(x) = y</text>
+  </g>
+  <g transform="translate(502 465)" font-family="system-ui, sans-serif">
+    <rect width="395" height="210" rx="22" fill="#172337" stroke="#28516c"/>
+    <text x="28" y="48" fill="#67e8f9" font-size="24" font-weight="600">不可变数据</text>
+    <text x="28" y="86" fill="#e2e8f0" font-size="18">旧值 → 计算 → 新值</text>
+    <text x="28" y="117" fill="#94a3b8" font-size="17">不在原数据上偷偷修改，状态变化</text>
+    <text x="28" y="143" fill="#94a3b8" font-size="17">因而可以追踪。</text>
+    <text x="28" y="181" fill="#f8fafc" font-size="19" font-family="ui-monospace, monospace">user₂ = rename(user₁)</text>
+  </g>
+  <g transform="translate(934 465)" font-family="system-ui, sans-serif">
+    <rect width="395" height="210" rx="22" fill="#172337" stroke="#755b25"/>
+    <text x="28" y="48" fill="#fbbf24" font-size="24" font-weight="600">函数组合</text>
+    <text x="28" y="86" fill="#e2e8f0" font-size="18">小函数 → 组合 → 完整流程</text>
+    <text x="28" y="117" fill="#94a3b8" font-size="17">每一步只做一件事，再像积木一样</text>
+    <text x="28" y="143" fill="#94a3b8" font-size="17">拼成更大的计算。</text>
+    <text x="28" y="181" fill="#f8fafc" font-size="19" font-family="ui-monospace, monospace">h = g ∘ f</text>
+  </g>
+</svg>

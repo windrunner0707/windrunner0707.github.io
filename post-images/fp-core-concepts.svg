@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="t d">
+  <title id="t">函数式编程核心概念图</title>
+  <desc id="d">函数式编程以函数和值为中心，包含一等函数、纯函数、不可变数据、函数组合和副作用边界。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101827"/><stop offset="1" stop-color="#102b35"/></linearGradient>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0L9 3 0 6Z" fill="#64748b"/></marker>
+  </defs>
+  <rect width="1400" height="820" rx="28" fill="url(#bg)"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="70" y="78" fill="#f8fafc" font-size="34" font-weight="600">函数式编程在关心什么</text>
+    <text x="70" y="118" fill="#94a3b8" font-size="19">核心不是某几个 API，而是让计算更容易组合、推理和测试</text>
+
+    <g stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#a)">
+      <path d="M700 405L390 240"/><path d="M700 405L1010 240"/><path d="M700 405L350 610"/><path d="M700 405L1050 610"/>
+    </g>
+    <circle cx="700" cy="405" r="138" fill="#183146" stroke="#67e8f9" stroke-width="3"/>
+    <text x="700" y="392" text-anchor="middle" fill="#67e8f9" font-size="32" font-weight="600">函数与值</text>
+    <text x="700" y="430" text-anchor="middle" fill="#e2e8f0" font-size="19">描述数据怎样变换</text>
+
+    <g transform="translate(115 155)"><rect width="390" height="170" rx="22" fill="#172337" stroke="#2d6077"/><text x="28" y="47" fill="#67e8f9" font-size="24" font-weight="600">一等函数与高阶函数</text><text x="28" y="88" fill="#e2e8f0" font-size="18">函数可以作为参数和返回值</text><text x="28" y="120" fill="#94a3b8" font-size="17">把变化的策略作为值传递</text><text x="28" y="148" fill="#f8fafc" font-size="17" font-family="ui-monospace, monospace">map(fn) · filter(predicate)</text></g>
+    <g transform="translate(895 155)"><rect width="390" height="170" rx="22" fill="#172337" stroke="#2d6077"/><text x="28" y="47" fill="#67e8f9" font-size="24" font-weight="600">纯函数</text><text x="28" y="88" fill="#e2e8f0" font-size="18">相同输入得到相同输出</text><text x="28" y="120" fill="#94a3b8" font-size="17">不暗中读取或修改外部状态</text><text x="28" y="148" fill="#f8fafc" font-size="17" font-family="ui-monospace, monospace">f(x) = y</text></g>
+    <g transform="translate(115 540)"><rect width="390" height="170" rx="22" fill="#172337" stroke="#755b25"/><text x="28" y="47" fill="#fbbf24" font-size="24" font-weight="600">不可变数据</text><text x="28" y="88" fill="#e2e8f0" font-size="18">变化产生新值，旧值保持原样</text><text x="28" y="120" fill="#94a3b8" font-size="17">状态历史更容易追踪</text><text x="28" y="148" fill="#f8fafc" font-size="17" font-family="ui-monospace, monospace">next = update(previous)</text></g>
+    <g transform="translate(895 540)"><rect width="390" height="170" rx="22" fill="#172337" stroke="#755b25"/><text x="28" y="47" fill="#fbbf24" font-size="24" font-weight="600">组合与副作用边界</text><text x="28" y="88" fill="#e2e8f0" font-size="18">小函数拼成完整流程</text><text x="28" y="120" fill="#94a3b8" font-size="17">数据库、网络与时间留在边缘</text><text x="28" y="148" fill="#f8fafc" font-size="17" font-family="ui-monospace, monospace">result = h(g(f(input)))</text></g>
+  </g>
+</svg>

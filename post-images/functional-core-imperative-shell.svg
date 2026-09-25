@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="720" viewBox="0 0 1400 720" role="img" aria-labelledby="t d">
+  <title id="t">纯函数核心与副作用外壳</title>
+  <desc id="d">应用服务读取数据库、时间和网络，把明确数据传给纯函数核心，再把计算结果写回外部系统。</desc>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101827"/><stop offset="1" stop-color="#102b35"/></linearGradient><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0L9 3 0 6Z" fill="#67e8f9"/></marker></defs>
+  <rect width="1400" height="720" rx="28" fill="url(#bg)"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="70" y="78" fill="#f8fafc" font-size="34" font-weight="600">副作用不用消灭，把它留在边界上</text>
+    <text x="70" y="118" fill="#94a3b8" font-size="19">外层负责读取与写入，内层只根据输入计算结果</text>
+    <rect x="70" y="185" width="1260" height="450" rx="30" fill="#172337" stroke="#475569" stroke-width="3"/>
+    <text x="100" y="230" fill="#cbd5e1" font-size="22" font-weight="600">副作用外壳 · 应用服务</text>
+    <g fill="#25364a" stroke="#52677e">
+      <rect x="110" y="290" width="210" height="90" rx="18"/><rect x="110" y="455" width="210" height="90" rx="18"/>
+      <rect x="1080" y="290" width="210" height="90" rx="18"/><rect x="1080" y="455" width="210" height="90" rx="18"/>
+    </g>
+    <g fill="#e2e8f0" font-size="21" text-anchor="middle"><text x="215" y="344">读取数据库</text><text x="215" y="509">取得当前时间</text><text x="1185" y="344">保存订单</text><text x="1185" y="509">发布消息</text></g>
+    <rect x="485" y="270" width="430" height="300" rx="36" fill="#193b3b" stroke="#67e8f9" stroke-width="4"/>
+    <text x="700" y="327" text-anchor="middle" fill="#67e8f9" font-size="27" font-weight="600">纯函数核心 · 领域计算</text>
+    <text x="700" y="382" text-anchor="middle" fill="#f8fafc" font-size="20">订单 + 规则 + 当前时间</text>
+    <text x="700" y="424" text-anchor="middle" fill="#fbbf24" font-size="26">↓ 计算 ↓</text>
+    <text x="700" y="470" text-anchor="middle" fill="#f8fafc" font-size="20">新订单状态 + 领域事件</text>
+    <text x="700" y="520" text-anchor="middle" fill="#94a3b8" font-size="18">容易单元测试 · 结果可预测</text>
+    <g stroke="#67e8f9" stroke-width="4" fill="none" marker-end="url(#a)"><path d="M320 335H465"/><path d="M320 500H465"/><path d="M935 335H1060"/><path d="M935 500H1060"/></g>
+  </g>
+</svg>

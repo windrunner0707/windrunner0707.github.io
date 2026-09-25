@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="880" viewBox="0 0 1400 880" role="img" aria-labelledby="title desc">
+  <title id="title">Monoid 与 Monad 的直观解释</title>
+  <desc id="desc">上半部分展示带单位元且满足结合律的合并操作，下半部分展示在可能失败的上下文中串联计算。</desc>
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101827"/>
+      <stop offset="1" stop-color="#102b35"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#67e8f9"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="880" rx="28" fill="url(#bg2)"/>
+  <text x="70" y="76" fill="#f8fafc" font-size="34" font-family="system-ui, sans-serif" font-weight="600">两个抽象，其实都在谈“怎样组合”</text>
+
+  <g font-family="system-ui, sans-serif">
+    <text x="70" y="148" fill="#67e8f9" font-size="27" font-weight="600">Monoid：可以不断合并的东西</text>
+    <text x="70" y="184" fill="#94a3b8" font-size="18">同一种值 + 合并规则 + 一个不改变结果的空值</text>
+    <rect x="90" y="230" width="170" height="82" rx="18" fill="#183146" stroke="#2d6077"/>
+    <text x="175" y="280" text-anchor="middle" fill="#f8fafc" font-size="24">[订单 A]</text>
+    <text x="300" y="281" fill="#fbbf24" font-size="34">+</text>
+    <rect x="350" y="230" width="170" height="82" rx="18" fill="#183146" stroke="#2d6077"/>
+    <text x="435" y="280" text-anchor="middle" fill="#f8fafc" font-size="24">[订单 B]</text>
+    <path d="M545 271 H650" stroke="#67e8f9" stroke-width="4" marker-end="url(#arrow)"/>
+    <rect x="680" y="220" width="270" height="102" rx="18" fill="#254029" stroke="#4d7c52"/>
+    <text x="815" y="263" text-anchor="middle" fill="#bbf7d0" font-size="23">[订单 A, 订单 B]</text>
+    <text x="815" y="294" text-anchor="middle" fill="#94a3b8" font-size="17">仍然是订单列表</text>
+    <rect x="1030" y="230" width="250" height="82" rx="18" fill="#3b3020" stroke="#816328"/>
+    <text x="1155" y="264" text-anchor="middle" fill="#fde68a" font-size="21">单位元 []</text>
+    <text x="1155" y="290" text-anchor="middle" fill="#cbd5e1" font-size="16">和任何列表合并都不改变它</text>
+    <text x="90" y="360" fill="#cbd5e1" font-size="18">结合律让我们可以先合并左边，也可以先合并右边；结果不变，才便于分批与并行处理。</text>
+
+    <line x1="70" y1="410" x2="1330" y2="410" stroke="#334155"/>
+
+    <text x="70" y="474" fill="#fbbf24" font-size="27" font-weight="600">Monad：让“带上下文的值”继续往下算</text>
+    <text x="70" y="510" fill="#94a3b8" font-size="18">下面用 Result 举例：成功时传递值，失败时保留错误并跳过后续步骤</text>
+
+    <rect x="70" y="570" width="210" height="92" rx="18" fill="#183146" stroke="#2d6077"/>
+    <text x="175" y="607" text-anchor="middle" fill="#a5f3fc" font-size="21">Result&lt;文本&gt;</text>
+    <text x="175" y="638" text-anchor="middle" fill="#f8fafc" font-size="18">"42"</text>
+    <path d="M280 616 H370" stroke="#67e8f9" stroke-width="4" marker-end="url(#arrow)"/>
+    <rect x="395" y="570" width="210" height="92" rx="18" fill="#172337" stroke="#44516a"/>
+    <text x="500" y="606" text-anchor="middle" fill="#f8fafc" font-size="19">parseInt</text>
+    <text x="500" y="635" text-anchor="middle" fill="#94a3b8" font-size="16">可能失败</text>
+    <path d="M605 616 H695" stroke="#67e8f9" stroke-width="4" marker-end="url(#arrow)"/>
+    <rect x="720" y="570" width="210" height="92" rx="18" fill="#183146" stroke="#2d6077"/>
+    <text x="825" y="607" text-anchor="middle" fill="#a5f3fc" font-size="21">Result&lt;整数&gt;</text>
+    <text x="825" y="638" text-anchor="middle" fill="#f8fafc" font-size="18">42</text>
+    <path d="M930 616 H1020" stroke="#67e8f9" stroke-width="4" marker-end="url(#arrow)"/>
+    <rect x="1045" y="570" width="255" height="92" rx="18" fill="#172337" stroke="#44516a"/>
+    <text x="1172" y="606" text-anchor="middle" fill="#f8fafc" font-size="19">loadUser</text>
+    <text x="1172" y="635" text-anchor="middle" fill="#94a3b8" font-size="16">继续返回 Result</text>
+
+    <path d="M500 675 V748 H1170" stroke="#f87171" stroke-width="3" stroke-dasharray="9 8" marker-end="url(#arrow)"/>
+    <rect x="1045" y="713" width="255" height="92" rx="18" fill="#48262c" stroke="#98515c"/>
+    <text x="1172" y="750" text-anchor="middle" fill="#fecaca" font-size="21">Failure(错误)</text>
+    <text x="1172" y="779" text-anchor="middle" fill="#e2e8f0" font-size="16">短路，不再调用 loadUser</text>
+    <text x="70" y="842" fill="#cbd5e1" font-size="18">bind / flatMap 负责拆开上下文、运行下一步，再把结果放回同一种上下文。</text>
+  </g>
+</svg>
