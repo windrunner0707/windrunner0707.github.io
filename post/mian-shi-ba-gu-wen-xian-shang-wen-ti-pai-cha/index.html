@@ -75,7 +75,7 @@
   
 <meta name="description" content="线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例，并补充 Arthas 与可观测性体系的实战用法。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： C&amp;hellip;">
 <link rel="canonical" href="https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-线上问题排查","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/","description":"线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例，并补充 Arthas 与可观测性体系的实战用法。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： C\u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha.webp","datePublished":"2024-10-25T00:00:00+08:00","dateModified":"2026-09-06T00:00:00+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"面试八股文-线上问题排查","url":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/","description":"线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例，并补充 Arthas 与可观测性体系的实战用法。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： C\u0026hellip;","image":"/post-images/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha.webp","datePublished":"2023-10-25T00:00:00+08:00","dateModified":"2026-09-25T22:26:44+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/mian-shi-ba-gu-wen-xian-shang-wen-ti-pai-cha/","name":"面试八股文-线上问题排查","position":2}]}</script>
 <meta property="og:title" content="面试八股文-线上问题排查">
 <meta property="og:description" content="线上排障不能只背工具名。回答时先说明如何确认影响范围和时间点，再用指标、日志和线程或堆转储验证假设，最后才谈修复。下面以 Java 服务的 CPU、内存和死锁问题为例，并补充 Arthas 与可观测性体系的实战用法。 先确认现象和影响 先确认问题从什么时候开始、影响哪些实例和请求，再根据现象判断方向。 在线上系统中，当 CPU 或内存负载过高时，通常会导致以下现象： C&amp;hellip;">
@@ -227,7 +227,7 @@
       
       <span class="article-meta__sep">·</span>
       
-      <span class="article-meta__item">2024-10-25</span>
+      <span class="article-meta__item">2023-10-25</span>
       
       <span class="article-meta__sep">·</span>
       <span class="article-meta__item">9 分钟阅读</span>
@@ -237,6 +237,8 @@
     <div class="article-header__tags">
       
       <a href="/tag/mian-shi-ba-gu-wen/" class="tag-pill tag-pill--sm">面试八股文</a>
+      
+      <a href="/tag/java/" class="tag-pill tag-pill--sm">Java</a>
       
       <a href="/tag/xing-neng-you-hua/" class="tag-pill tag-pill--sm">性能优化</a>
       
@@ -431,15 +433,15 @@ heapdump /tmp/service-heap.hprof
   
   <nav class="post-nav">
     
-    <a href="/post/clean-gitrang-dai-ma-ban-ben-kong-zhi-geng-qing-xi-geng-gao-xiao-de-shi-jian-zhi-nan/" class="post-nav-card post-nav-card--prev">
+    <a href="/post/riichi-mahjong-basics-tile-efficiency/" class="post-nav-card post-nav-card--prev">
       
       <div class="post-nav-card__img">
-        <img src="/post-images/clean-gitrang-dai-ma-ban-ben-kong-zhi-geng-qing-xi-geng-gao-xiao-de-shi-jian-zhi-nan.webp" alt="Clean Git：让代码版本控制更清晰、更高效的实践指南" loading="lazy" />
+        <img src="/post-images/riichi-mahjong-basics-tile-efficiency.webp" alt="日麻入门：从牌型、向听到牌效率" loading="lazy" />
       </div>
       
       <div class="post-nav-card__body">
         <span class="post-nav-card__label meta-text">上一篇</span>
-        <span class="post-nav-card__title">Clean Git：让代码版本控制更清晰、更高效的实践指南</span>
+        <span class="post-nav-card__title">日麻入门：从牌型、向听到牌效率</span>
       </div>
       <span class="post-nav-card__arrow">&larr;</span>
     </a>
