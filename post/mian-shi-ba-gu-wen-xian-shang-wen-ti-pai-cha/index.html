@@ -384,6 +384,8 @@ heapdump /tmp/service-heap.hprof
 <li><strong>止损与修复</strong>：根据证据选择扩容、摘除异常实例、限流/降级、回滚或切流。止损动作之后继续观察同一组 SLI，确认 P99、错误率和饱和度同时恢复；随后修复根因并补回归测试、告警和运行手册。</li>
 </ol>
 <p>这一流程的关键是“假设—证据—结论”：例如“数据库慢”不能只凭接口慢就下结论，至少应有 trace 中的 SQL span、数据库慢查询/锁等待或连接池等待等证据相互印证。</p>
+<p><img src="/post-images/production-troubleshooting-path.svg" alt="线上故障从告警、界定范围到验证恢复的排查路径" /></p>
+<p><em>图：线上排障不是工具命令的堆叠，而是一条从告警到证据、止损和复盘的闭环。</em></p>
 <ol start="4">
 <li>修复与验证</li>
 </ol>

@@ -230,7 +230,7 @@
       <span class="article-meta__item">2024-12-04</span>
       
       <span class="article-meta__sep">·</span>
-      <span class="article-meta__item">11 分钟阅读</span>
+      <span class="article-meta__item">12 分钟阅读</span>
       
     </div>
     
@@ -344,6 +344,8 @@ hotfix/security-patch
 myfix
 temp
 </code></pre>
+<p><img src="/post-images/clean-git-workflow.svg" alt="从工作区、暂存区、原子提交到 Pull Request 和主分支的 Git 工作流" /></p>
+<p><em>图：清晰的 Git 历史来自小而完整的提交、可审查的 Pull Request，以及提交前后的自动验证。</em></p>
 <h3 id="heading-6">合并分支</h3>
 <p>在团队协作中，本地分支需要定期与远程分支同步。<code>git merge</code> 保留分支的汇合关系；<code>git rebase</code> 则把当前分支尚未合入的提交重新应用到新的基点上。两者没有绝对优劣，应按团队约定选择。以下示例假设当前位于 <code>feature</code> 分支，且要同步 <code>origin/main</code>：</p>
 <pre><code>git fetch origin
@@ -510,8 +512,9 @@ exec mvn test
 <li>执行 <code>git push</code>。</li>
 <li>如果测试失败，<code>pre-push</code> Hook 会以非零状态退出并中止推送；测试成功则正常推送。</li>
 </ol>
-<h2 id="heading-12">总结</h2>
-<p>Clean Git 不是追求一条看起来完美的提交曲线，而是让后来的人容易审查、定位和撤销改动。先统一提交粒度、分支命名和合并策略，再按团队痛点引入 <code>rerere</code>、Hooks 或自动检查；规则太多而没有自动化执行，通常只会增加维护负担。</p>
+<h2 id="heading-12">开始时别设太多规则</h2>
+<p>Clean Git 的目标很朴素：后来的人能容易审查、定位和撤销改动。团队可以先统一提交粒度、分支命名和合并策略，碰到重复冲突或漏跑检查时，再引入 <code>rerere</code>、Hooks 或自动化。</p>
+<p>一开始就写下十几条规范，却没有工具帮忙执行，这些规范很快就会变成另一份没人看的文档。</p>
 <!-- more -->
   </div>
 

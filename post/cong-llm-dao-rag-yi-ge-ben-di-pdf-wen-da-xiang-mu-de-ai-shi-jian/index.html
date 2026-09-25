@@ -75,19 +75,19 @@
   
 <meta name="description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
 <link rel="canonical" href="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","url":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","description":"最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。","image":"/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp","datePublished":"2026-07-12T00:00:00+08:00","dateModified":"2026-07-12T13:46:01+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","url":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","description":"最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。","image":"/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian-unsplash.webp","datePublished":"2026-07-12T00:00:00+08:00","dateModified":"2026-07-12T13:46:01+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/","name":"从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践","position":2}]}</script>
 <meta property="og:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践">
 <meta property="og:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
 <meta property="og:url" content="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
-<meta property="og:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp">
+<meta property="og:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian-unsplash.webp">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/cong-llm-dao-rag-yi-ge-ben-di-pdf-wen-da-xiang-mu-de-ai-shi-jian/">
 <meta name="twitter:title" content="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践">
 <meta name="twitter:description" content="最近我做了一个本地 PDF 问答 Demo：上传一本电子书，系统提取内容并建立知识库；在页面中选中这本书后，就可以针对书里的内容提问。模型、数据库和应用都运行在本机，不依赖云端 AI 服务。完整项目代码已经上传到 GitHub：windrunner0707/ai-tooling。 这个项目不大，却把几个常见的 AI 概念放进了一条实际链路：LLM、Prompt、Embedding、向量数据库、LiteLLM 和 RAG。单独记住名词并不难，动手时更需要弄清每个组件负责什么、数据怎样流动，以及怎样减少模型一本正经地“编答案”。 本文不追求搭建一个生产级 AI 平台，而是结合项目中的实际代码，记录我从“调用模型”到“让模型基于本地资料回答”的一次简单实践。">
-<meta name="twitter:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp">
+<meta name="twitter:image" content="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian-unsplash.webp">
 </head>
 <body class="flavor-theme">
 
@@ -230,7 +230,7 @@
       <span class="article-meta__item">2026-07-12</span>
       
       <span class="article-meta__sep">·</span>
-      <span class="article-meta__item">12 分钟阅读</span>
+      <span class="article-meta__item">13 分钟阅读</span>
       
     </div>
     
@@ -248,7 +248,7 @@
 
   
   <div class="article-feature">
-    <img src="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian.webp" alt="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践" decoding="async" fetchpriority="high" />
+    <img src="/post-images/cong-llm-dao-rag-ben-di-pdf-wen-da-ai-shi-jian-unsplash.webp" alt="从 LLM、LiteLLM 到 RAG：一个本地 PDF 问答项目的 AI 实践" decoding="async" fetchpriority="high" />
   </div>
   
 
@@ -302,11 +302,13 @@ CREATE INDEX document_chunks_embedding_hnsw_idx
 </code></pre>
 <p>这样，文档信息、文本、页码等元数据和向量可以放在同一个数据库中。HNSW 索引用更多存储和建索引成本，换取较快的近似最近邻搜索，适合这个小型实践继续向更大数据量扩展。</p>
 <h3 id="5-rag">5. RAG：先检索资料，再让模型回答</h3>
-<p>RAG 是 Retrieval-Augmented Generation，即检索增强生成。它不是一种新模型，而是一套应用流程：先从外部知识库检索与问题相关的内容，再把这些内容和问题一起交给 LLM。</p>
+<p>RAG 是 Retrieval-Augmented Generation，即检索增强生成。它是一套应用流程：先从外部知识库检索与问题相关的内容，再把这些内容和问题一起交给 LLM。这个过程不会改变模型本身。</p>
 <p>可以把它压缩成一句话：</p>
 <pre><code class="language-text">RAG = Retrieval（找资料）+ Augmented Prompt（把资料放进提示词）+ Generation（生成回答）
 </code></pre>
-<p>它的价值不是让模型突然“学会”一本书，而是在每次回答前临时给模型一份开卷资料。知识库内容变化时，不需要重新训练 LLM，只需要更新文档和向量。</p>
+<p>可以把它理解为开卷考试：每次回答前，都临时给模型一份参考资料。知识库内容变化时，更新文档和向量就可以，无需重新训练 LLM。</p>
+<p><img src="/post-images/rag-retrieval-generation-workflow.webp" alt="RAG 从检索、提示词增强到生成回答的完整流程" /></p>
+<p><em>图：RAG 的检索、增强与生成链路。来源：<a href="https://aws.amazon.com/blogs/machine-learning/from-rag-to-fabric-lessons-learned-from-building-real-world-rags-at-genaiic-part-1/">AWS Generative AI Innovation Center</a></em></p>
 <h3 id="6-litellm">6. LiteLLM：统一不同模型的调用入口</h3>
 <p>LiteLLM 不是 LLM，也不负责从文档中检索内容。它更像模型网关：在应用和具体模型服务之间提供统一的 OpenAI 兼容 API，并把应用使用的模型名称映射到真实后端。</p>
 <p>项目中的配置很短：</p>
@@ -351,7 +353,7 @@ response = await self.client.chat.completions.create(
 <p>项目还实现了流式输出。模型每生成一小段内容，后端就通过 SSE 发送一个 <code>delta</code> 事件，前端不必等完整答案生成后再显示。这不会让模型真正计算得更快，却能明显改善长回答的等待体验。</p>
 <p><code>temperature</code> 可以粗略理解为输出随机性的控制参数。翻译、抽取和 RAG 问答通常更需要稳定，适合较低值；创意写作可以适当提高。但它不是“正确率旋钮”，降低 temperature 也不能阻止模型基于错误上下文生成错误答案。</p>
 <h2 id="-pdf-">四、第二步实践：把 PDF 建成可检索的知识库</h2>
-<p>PDF 入库不是简单地把整个文件塞给模型，而是经过提取、切分、向量化和存储。</p>
+<p>PDF 入库要经过提取、切分、向量化和存储。整个文件直接塞给模型，既难控制上下文长度，也不利于定位引用。</p>
 <h3 id="1--ocr">1. 提取文字，必要时使用 OCR</h3>
 <p>普通 PDF 先由 <code>pypdf</code> 读取文字层。如果所有页面都没有提取到文本，系统会用 Poppler 的 <code>pdftoppm</code> 把页面渲染成图片，再用 Tesseract 做 <code>chi_sim+eng</code> OCR。</p>
 <pre><code class="language-text">PDF
@@ -372,6 +374,8 @@ start = max(end - overlap, start + 1)
 <h3 id="3--chunk--embedding">3. 为每个 chunk 生成 embedding</h3>
 <p>每个文本块都会调用 <code>bge-m3</code> 生成向量，并和原文、文件名、页码、字符范围一起写入数据库。保留原文是因为向量只适合计算相似度，真正交给 LLM 阅读的仍然是文本内容；保留 metadata 则是为了显示引用和定位来源。</p>
 <p>当前实现逐个 chunk 等待 embedding 后再写入数据库，逻辑清楚，但大 PDF 会比较慢。后续可以在模型接口支持的前提下批量生成 embedding，或者引入后台任务和进度反馈。</p>
+<p><img src="/post-images/rag-document-ingestion-workflow.webp" alt="文档切分、生成向量并写入向量数据库的流程" /></p>
+<p><em>图：文档被切分为 chunk，经 Embedding 模型向量化后与原文一起写入向量库。来源：<a href="https://aws.amazon.com/blogs/machine-learning/from-rag-to-fabric-lessons-learned-from-building-real-world-rags-at-genaiic-part-1/">AWS Generative AI Innovation Center</a></em></p>
 <h2 id="heading-1">五、第三步实践：从相似检索到带来源回答</h2>
 <p>用户在前端选择一本书并提问时，页面会同时提交 <code>question</code> 和 <code>document_id</code>：</p>
 <pre><code class="language-json">{
@@ -436,9 +440,9 @@ npm run dev
 ./scripts/start_litellm.sh
 </code></pre>
 <p>最后访问 <code>http://127.0.0.1:5173</code>，上传 PDF，等待提取和 embedding 完成，选择电子书后即可提问。扫描版 PDF 还需要本机安装 Poppler、Tesseract 和中文语言包。</p>
-<h2 id="heading-4">结语</h2>
-<p>完成这个 Demo 后，我对这些概念的关系有了更具体的认识：LLM 负责理解和生成语言，Prompt 描述任务，Embedding 把语义变成可检索的向量，pgvector 保存并搜索向量，RAG 把找到的资料交给 LLM，LiteLLM 则为不同模型提供相对统一的调用入口。</p>
-<p>真正值得练习的不是记住这些缩写，而是画出一次请求经过了哪些组件，知道每一层能解决什么、不能保证什么。先跑通一个本地、可观察的小闭环，再逐步加入评估、监控和安全控制，比一开始堆叠大量 AI 框架更容易建立可靠的工程判断。</p>
+<h2 id="-demo-">做完 Demo 以后</h2>
+<p>这个 Demo 做完后，这些缩写终于连到了一起。LLM 负责理解和生成语言，Prompt 描述任务，Embedding 把语义变成可检索的向量，pgvector 保存并搜索向量，LiteLLM 提供统一的模型入口。一次 RAG 问答会经过文档提取、切分、向量检索、Prompt 组装和模型生成，每层都会影响最后的回答。</p>
+<p>我会先保留这个本地、可观察的小闭环，再逐步加入评估、监控和安全控制。一开始就堆上大量 AI 框架，反而容易看不清答案究竟是在哪一层变坏的。</p>
 
   </div>
 
@@ -448,7 +452,7 @@ npm run dev
     <a href="/post/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-chan-pin-jia-gou-she-ji-yu-nan-dian/" class="post-nav-card post-nav-card--prev">
       
       <div class="post-nav-card__img">
-        <img src="/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou.webp" alt="元数据驱动的多租户 ERP：SaaS 产品架构设计与难点" loading="lazy" />
+        <img src="/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou-unsplash.webp" alt="元数据驱动的多租户 ERP：SaaS 产品架构设计与难点" loading="lazy" />
       </div>
       
       <div class="post-nav-card__body">

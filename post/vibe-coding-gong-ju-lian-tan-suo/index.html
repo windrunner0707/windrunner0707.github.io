@@ -73,12 +73,12 @@
   <meta name="generator" content="Gridea Pro 1.2.2">
   <title>Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch | 0707&#39;s Blog</title>
   
-<meta name="description" content="最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。">
+<meta name="description" content="最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 我现在所说的 Vibe Coding，主要是把时间从逐行输入代码，挪到问题拆解、上下文准备和结果验收上。用了一段时间后，我遇到的头一个烦恼却不是代码，而是配置。模型、账号、API Key 和中转站越积越多；今天用 Claude Code，明天试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。每次都手动改环境变量，很快就乱了。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。">
 <link rel="canonical" href="https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch","url":"https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/","description":"最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。","image":"/post-images/vibe-coding-gong-ju-lian-tan-suo.jpg","datePublished":"2026-08-02T00:00:00+08:00","dateModified":"2026-09-06T10:38:49+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch","url":"https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/","description":"最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 我现在所说的 Vibe Coding，主要是把时间从逐行输入代码，挪到问题拆解、上下文准备和结果验收上。用了一段时间后，我遇到的头一个烦恼却不是代码，而是配置。模型、账号、API Key 和中转站越积越多；今天用 Claude Code，明天试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。每次都手动改环境变量，很快就乱了。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。","image":"/post-images/vibe-coding-gong-ju-lian-tan-suo.jpg","datePublished":"2026-08-02T00:00:00+08:00","dateModified":"2026-09-06T10:38:49+08:00","author":{"@type":"Person","name":"0707's Blog"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"0707's Blog"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://windrunner0707.tech","name":"0707's Blog","position":1},{"@type":"ListItem","item":"https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/","name":"Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch","position":2}]}</script>
 <meta property="og:title" content="Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch">
-<meta property="og:description" content="最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。">
+<meta property="og:description" content="最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 我现在所说的 Vibe Coding，主要是把时间从逐行输入代码，挪到问题拆解、上下文准备和结果验收上。用了一段时间后，我遇到的头一个烦恼却不是代码，而是配置。模型、账号、API Key 和中转站越积越多；今天用 Claude Code，明天试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。每次都手动改环境变量，很快就乱了。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。">
 <meta property="og:url" content="https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="0707's Blog">
@@ -86,7 +86,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://windrunner0707.tech/post/vibe-coding-gong-ju-lian-tan-suo/">
 <meta name="twitter:title" content="Vibe Coding 工具链实践：OpenCode、Codex、Claude Code 与 CC Switch">
-<meta name="twitter:description" content="最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。">
+<meta name="twitter:description" content="最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。 我现在所说的 Vibe Coding，主要是把时间从逐行输入代码，挪到问题拆解、上下文准备和结果验收上。用了一段时间后，我遇到的头一个烦恼却不是代码，而是配置。模型、账号、API Key 和中转站越积越多；今天用 Claude Code，明天试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。每次都手动改环境变量，很快就乱了。 这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。 本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。">
 <meta name="twitter:image" content="/post-images/vibe-coding-gong-ju-lian-tan-suo.jpg">
 </head>
 <body class="flavor-theme">
@@ -261,7 +261,7 @@
 
   <div class="article-content">
     <p>最近一段时间，我把写代码的方式改了一点。以前是打开 IDE，查文档，写函数，再跑测试；现在更多时候是先把目标、约束和验收标准说清楚，让 coding agent 先把项目跑起来，我再检查它的方案、代码和边界条件。</p>
-<p>这就是我理解的 Vibe Coding。它不是“完全不写代码”，而是把注意力从逐行输入，挪到问题拆解、上下文准备和结果验收上。真正用起来以后，工具选择很快就变成一个现实问题：模型有很多，账号有很多，API Key 和中转站也有很多。今天用 Claude Code，明天想试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。如果每次都手动改环境变量，Vibe 很快就变成了配置地狱。</p>
+<p>我现在所说的 Vibe Coding，主要是把时间从逐行输入代码，挪到问题拆解、上下文准备和结果验收上。用了一段时间后，我遇到的头一个烦恼却不是代码，而是配置。模型、账号、API Key 和中转站越积越多；今天用 Claude Code，明天试 Codex，晚上又想拿便宜的 DeepSeek 跑一轮重构。每次都手动改环境变量，很快就乱了。</p>
 <p>这篇文章记录我目前在用的一套组合：用 OpenCode 接入不同供应商，再加上 Oh My OpenCode 做多代理编排；用 Codex 体验 GPT-5.6，再加上 Oh My Codex 固化工作流；用 Claude Code 处理长任务，最后用 CC Switch 管理供应商和 Skill。</p>
 <blockquote>
 <p>本文价格、模型名称和支付路径按 2026 年 8 月 2 日公开页面整理。涉及产品能力和支付方式的事实均尽量链接到官方页面；“适合什么任务”属于我的使用定位，不等同于统一基准测试。模型服务改价很快，实际扣费前应以供应商控制台显示为准。文中提到的中转站只讨论合规的工程配置，不用于绕过账户、地区或服务计划限制。</p>
@@ -291,7 +291,7 @@
 </code></pre>
 <p>OpenCode 也支持通过 GitHub OAuth 使用 Copilot 账号，官方文档中的方式是先执行 <code>opencode auth github</code>。这和直接购买某家模型 API 不一样：你买到的是 GitHub Copilot 计划里的模型访问和额度，具体可用模型、倍率和剩余额度要看 Copilot 当前计划。</p>
 <h3 id="heading">几个供应商怎么选：先看计费模型，再谈效果</h3>
-<p>我不建议简单地说“哪个模型最强”。API 单价、订阅费和 Copilot Credits 不是同一单位；真正需要比较的是，完成一次验收任务一共花了多少钱、花了多久、你还要修多少代码。</p>
+<p>“哪个模型最强”对我没有多少操作价值。API 单价、订阅费和 Copilot Credits 也不在同一个计量体系里。我更关心一次验收任务总共花了多少钱、多长时间，以及我最后还要修多少代码。</p>
 <table>
 <thead>
 <tr>
@@ -403,7 +403,7 @@ bunx oh-my-opencode install
 <li>把一个已经想清楚的功能做完整，包括配置、代码、测试和文档；</li>
 <li>对 OpenCode 或 Claude Code 的结果做一次独立审查，尤其关注权限、异常路径和回滚。</li>
 </ol>
-<p>这里的关键不是让它一次生成完美代码，而是给它一个可以验证的闭环：先告诉它允许修改哪些目录，再要求它运行现有检查，最后把失败输出带回任务中。没有测试和边界条件的 Vibe Coding，很容易只是“看起来完成了”。</p>
+<p>我不期待它一次生成完美代码。任务里会先写清允许修改的目录和需要运行的检查，失败输出再带回下一轮。没有测试和边界条件时，Vibe Coding 特别容易停在“看起来完成了”。</p>
 <h3 id="oh-my-codex-codex-">Oh My Codex：把 Codex 变成一套可重复的工作流</h3>
 <p>Oh My Codex，项目缩写是 OMX，和 Oh My OpenCode 的思路相似，但它服务的对象不同。OMX 是 Codex CLI 的工作流层，Codex 仍然负责实际的 Agent 执行；OMX 主要增加提示词、Skill、hooks、Agent team、HUD，以及计划和运行状态管理。它会在项目里使用 <code>.omx/</code> 保存计划、日志、记忆和运行状态。</p>
 <p>我会先确认当前使用的是 Codex CLI，而不是把 Codex App 和 CLI 的体验混在一起。项目 README 明确建议优先在 macOS 或 Linux 的 Codex CLI 上使用，原生 Windows 和 Codex App 目前不是默认支持路径。安装和初始化可以这样做：</p>
@@ -416,7 +416,7 @@ omx setup
 codex login status
 omx exec --skip-git-repo-check -C . &quot;Reply with exactly OMX-EXEC-OK&quot;
 </code></pre>
-<p><code>omx doctor</code> 只能检查安装形态和依赖，真正的 <code>omx exec</code> 才能验证当前 Shell 里的登录状态、模型调用和配置是否可用。确认没问题后，再用推荐模式启动：</p>
+<p><code>omx doctor</code> 检查安装形态和依赖，<code>omx exec</code> 则跑一次完整调用，可以顺便验证当前 Shell 里的登录状态、模型和配置。确认没问题后，再用推荐模式启动：</p>
 <pre><code class="language-bash">omx --madmax --high
 </code></pre>
 <p>我更常用的是把几个关键词当作工作流入口，而不是记一串 CLI 参数：</p>
@@ -460,9 +460,9 @@ $ultragoal        把批准后的计划推进到完成
 </ul>
 <p>还有一个容易忽略的坑：中转站经常只兼容聊天接口，不一定完整兼容 Claude Code 所需的工具调用、长上下文、缓存和错误码。如果只是能收到一段文本，不代表 coding agent 真的可用。我的做法是先拿一个没有业务数据的小仓库跑完整流程，再决定是否长期使用。</p>
 <h2 id="cc-switch-skill-">四、CC Switch：把供应商切换和 Skill 管理放到同一个地方</h2>
-<p>当 OpenCode、Codex 和 Claude Code 同时存在时，最烦的事情不是安装它们，而是记住每个工具的配置位置。CC Switch 的思路就是把这些配置收进一个桌面应用里，统一管理供应商、切换配置，并提供 MCP 和 Skill 管理。</p>
+<p>同时用 OpenCode、Codex 和 Claude Code 后，我很快记不住每个工具的配置位置。CC Switch 把这些配置收进一个桌面应用，统一管理供应商、配置、MCP 和 Skill。</p>
 <p>它目前支持 Claude Code、Codex、Gemini CLI、OpenCode 等工具。Skill 也可以从 GitHub 仓库或压缩包安装，再分发到对应目录，例如 Claude Code 使用 <code>~/.claude/skills/</code>，Codex 使用 <code>~/.codex/skills/</code>，OpenCode 使用 <code>~/.opencode/skills/</code>。这对于需要在多个 agent 之间复用“代码审查”“文档生成”“发布检查”工作流的人很方便。</p>
-<p>我理解它最有用的地方不是“帮我点一下切换”，而是让配置变得可恢复：</p>
+<p>对我来说，一键切换只是顺手。配置出问题后能恢复，才是留下它的原因：</p>
 <pre><code class="language-text">供应商配置
    -&gt; 选择目标工具
    -&gt; 切换当前模型和端点
@@ -486,6 +486,8 @@ Codex + GPT-5.6
 CC Switch
     管理供应商、Skill、MCP 和备份
 </code></pre>
+<p><img src="/post-images/vibe-coding-toolchain.svg" alt="Vibe Coding 中不同模型与 Agent 的分工流程" /></p>
+<p><em>图：便宜模型负责探索，强模型负责跨文件收口，最终仍要回到测试、代码审查和 Git 差异验证。</em></p>
 <p>这样做的代价是工具变多了，配置和账号也更复杂。对刚开始的人，我反而建议只保留一个 Agent 和一个供应商，连续做完三到五个小任务后，再决定是否需要多模型、Oh My 插件或 CC Switch。</p>
 <p>Vibe Coding 说到底还是工程工作。模型可以替我写很多代码，但不能替我决定哪些数据能发给第三方，不能替我确认一次支付是否真的完成，也不能替我承担上线后的事故。把模型、账号、端点和 Skill 管理好，可能没有“让 AI 一句话写出完整应用”那么吸引人，却更接近我愿意长期使用的工作方式。</p>
 
@@ -515,7 +517,7 @@ CC Switch
       </div>
       
       <div class="post-nav-card__img">
-        <img src="/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou.webp" alt="元数据驱动的多租户 ERP：SaaS 产品架构设计与难点" loading="lazy" />
+        <img src="/post-images/yuan-shu-ju-qu-dong-de-duo-zu-hu-erp-saas-jia-gou-unsplash.webp" alt="元数据驱动的多租户 ERP：SaaS 产品架构设计与难点" loading="lazy" />
       </div>
       
       <span class="post-nav-card__arrow">&rarr;</span>

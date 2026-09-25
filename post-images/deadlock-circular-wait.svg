@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#071426"/><stop offset="1" stop-color="#172554"/></linearGradient><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#60a5fa"/></marker></defs>
+  <rect width="1200" height="630" rx="32" fill="url(#bg)"/><text x="70" y="92" fill="#f8fafc" font-size="42" font-weight="700" font-family="sans-serif">死锁：资源占有形成环形等待</text>
+  <g font-family="sans-serif" text-anchor="middle" font-size="28" font-weight="600"><rect x="130" y="220" width="220" height="110" rx="24" fill="#1e40af"/><text x="240" y="285" fill="white">线程 A</text><rect x="850" y="220" width="220" height="110" rx="24" fill="#1e40af"/><text x="960" y="285" fill="white">线程 B</text><rect x="480" y="120" width="240" height="100" rx="22" fill="#0f766e"/><text x="600" y="182" fill="white">资源 1</text><rect x="480" y="410" width="240" height="100" rx="22" fill="#0f766e"/><text x="600" y="472" fill="white">资源 2</text></g>
+  <g stroke="#60a5fa" stroke-width="8" fill="none" marker-end="url(#a)"><path d="M350 250 C420 210 430 180 480 175"/><path d="M720 175 C790 180 820 215 850 250"/><path d="M850 305 C790 350 780 430 720 450"/><path d="M480 450 C410 430 390 340 350 305"/></g>
+  <g fill="#bfdbfe" font-size="22" font-family="sans-serif"><text x="382" y="195">持有</text><text x="770" y="195">等待</text><text x="775" y="405">持有</text><text x="382" y="405">等待</text></g>
+</svg>
